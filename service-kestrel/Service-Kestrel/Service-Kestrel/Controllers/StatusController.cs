@@ -11,10 +11,17 @@ namespace Service_Kestrel.Controllers
     [ApiController]
     public class StatusController : ControllerBase
 	{
-		[HttpGet("/status")]
-		public async Task<StatusDto> Status()
+		[HttpGet("/status-async")]
+		public async Task<StatusDto> StatusAsync()
 		{
 			return await Task.FromResult(new StatusDto { Text = "ok" });
 		}
+
+		[HttpGet("/status")]
+		public IActionResult Status()
+		{
+			return Ok(new StatusDto { Text = "ok" });
+		}
+
 	}
 }
