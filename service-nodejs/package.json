@@ -1,0 +1,9 @@
+{
+    "license": "",
+    "scripts": {
+        "start": "node ./src/index.js"
+    },
+    "dependencies": {
+        "winston": "^3.2.1"
+    }
+}

@@ -1,0 +1,38 @@
+version: '3'
+services:
+  mmq-db:
+    image: mongo:4.2.1-bionic
+    ports:
+    - "27017:27017"
+    volumes:
+    - mongodata:/data/db
+  mmq-service:
+    build: ./service
+    links:
+    - "mmq-db:database"
+    ports:
+    - "3000:3000"
+    environment:
+    - ASPNETCORE_ENVIRONMENT=Docker
+    - ASPNETCORE_URLS=http://0.0.0.0:3000
+    # shm_size: "2gb"
+  mmq-service-express:
+    build: ./service-express
+    links:
+    - "mmq-db:database"
+    ports:
+    - "4000:4000"
+  mmq-service-nodejs:
+    build: ./service-nodejs
+    links:
+    - "mmq-db:database"
+    ports:
+    - "8000:8000"
+  mmq-load-tests:
+    build: ./load-tests
+    links:
+    - "mmq-service"
+    - "mmq-service-nodejs"
+    - "mmq-service-express"
+volumes:
+  mongodata: {}

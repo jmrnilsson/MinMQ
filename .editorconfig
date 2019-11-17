@@ -1,0 +1,63 @@
+# https://editorconfig.org/
+# https://docs.microsoft.com/en-us/visualstudio/ide/create-portable-custom-editor-options?view=vs-2017
+# https://www.hanselman.com/blog/TabsVsSpacesAPeacefulResolutionWithEditorConfigInVisualStudioPlusNETExtensions.aspx
+
+# Supported things in vs pro 2017
+# - indent_style
+# - indent_size
+# - tab_width
+# - end_of_line
+# - charset
+# - trim_trailing_whitespace
+# - insert_final_newline
+# - root
+
+[*]
+max_line_length = 120
+
+[Dockerfile]
+end_of_line = lf
+indent_style = space
+indent_size = 4
+trim_trailing_whitespace = true
+
+[*.cs]
+end_of_line = crlf
+indent_style = tab
+indent_size = 4
+insert_final_newline = true
+trim_trailing_whitespace = true
+charset = utf-8-bom
+
+[*.ts]
+end_of_line = lf
+indent_style = space
+indent_size = 2
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.json]
+end_of_line = crlf
+indent_style = space
+indent_size = 4
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.{yaml,yml}]
+end_of_line = lf
+indent_style = space
+indent_size = 2
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.config]
+end_of_line = crlf
+indent_style = tab
+indent_size = 4
+insert_final_newline = true
+
+[*.bash, *.sh]
+end_of_line = lf
+indent_style = space
+insert_final_newline = true
+trim_trailing_whitespace = true
