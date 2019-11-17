@@ -22,8 +22,8 @@ It's not designed for
 ## Usage
 With Docker-compose
 
-    docker-compose build; \
-    docker-compose down; \
+    docker-compose build
+    docker-compose down
     docker-compose run mmq-load-tests -- status.sh
 
 Enter load-tests container
@@ -33,3 +33,7 @@ Enter load-tests container
 Checkout out the nodejs expression server
 
     curl -X GET http://localhost:4000/status
+
+## TL;DR
+
+- https://docs.microsoft.com/en-us/aspnet/core/fundamentals/servers/kestrel?view=aspnetcore-3.0

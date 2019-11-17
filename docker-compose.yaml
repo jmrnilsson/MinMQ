@@ -6,15 +6,15 @@ services:
     - "27017:27017"
     volumes:
     - mongodata:/data/db
-  mmq-service-kestrel:
-    build: ./service-kestrel
+  mmq-service:
+    build: ./service
     links:
     - "mmq-db:database"
     ports:
-    - "9000:9000"
+    - "3000:3000"
     environment:
-    - ASPNETCORE_ENVIRONMENT=Development
-    - ASPNETCORE_URLS=http://0.0.0.0:9000
+    - ASPNETCORE_ENVIRONMENT=Docker
+    - ASPNETCORE_URLS=http://0.0.0.0:3000
     # shm_size: "2gb"
   mmq-service-express:
     build: ./service-express
@@ -31,7 +31,7 @@ services:
   mmq-load-tests:
     build: ./load-tests
     links:
-    - "mmq-service-kestrel"
+    - "mmq-service"
     - "mmq-service-nodejs"
     - "mmq-service-express"
 volumes:
