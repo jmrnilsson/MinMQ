@@ -33,3 +33,7 @@ Enter load-tests container
 Checkout out the nodejs expression server
 
     curl -X GET http://localhost:4000/status
+
+## TL;DR
+
+- https://docs.microsoft.com/en-us/aspnet/core/fundamentals/servers/kestrel?view=aspnetcore-3.0
