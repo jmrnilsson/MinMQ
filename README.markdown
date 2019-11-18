@@ -67,7 +67,7 @@ Transfer/sec:      2.77MB
 PS M:\devwork\MinMQ>
 ``` 
 
-### Kestrel HTTP POST
+### Kestrel HTTP POST - In-memory EFCore database
 #### A test message
 
     Running 10s test @ http://mmq-service-kestrel:9000/message-text
