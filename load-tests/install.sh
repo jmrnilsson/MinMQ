@@ -42,6 +42,7 @@ echo ''
 ./http-ready.sh
 echo ''; ./wrk -t12 -c400 -d10s -s ./post.lua http://mmq-service-kestrel:9000/message-text
 echo ''; ./wrk -t12 -c400 -d10s -s ./post-large.lua http://mmq-service-kestrel:9000/message-text
+echo ''; ./wrk -t12 -c400 -d10s -s ./post-large.lua http://mmq-service-kestrel:9000/message-text-sync
 echo ''; ./wrk -t12 -c400 -d10s -s ./post-json.lua http://mmq-service-kestrel:9000/message
 # echo ''; ./wrk -t12 -c400 -d10s -s ./post-large.lua http://mmq-service-kestrel:9000/message-sync
 echo ''; ./wrk -t12 -c400 -d10s http://mmq-service-nodejs:8000/status

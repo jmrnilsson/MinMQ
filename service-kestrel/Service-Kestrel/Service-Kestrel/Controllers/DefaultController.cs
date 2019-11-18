@@ -48,10 +48,10 @@ namespace Service_Kestrel.Controllers
 		}
 
 
-		[HttpPost("/message-sync")]
-		public IActionResult Post(MessageDto message)
+		[HttpPost("/message-text-sync")]
+		public IActionResult Post(string message)
 		{
-			messagesContext.Messages.Add(new Message { Content = message.Content });
+			messagesContext.Messages.Add(new Message { Content = message });
 			messagesContext.SaveChanges();
 			return Ok();
 		}
