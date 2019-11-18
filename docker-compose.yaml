@@ -8,14 +8,14 @@ services:
     - mongodata:/data/db
   mmq-service-kestrel:
     build: ./service-kestrel
-    links:
-    - "mmq-db:database"
+    # links:
+    # - "mmq-db:database"
     ports:
     - "9000:9000"
     environment:
     - ASPNETCORE_ENVIRONMENT=Development
     - ASPNETCORE_URLS=http://0.0.0.0:9000
-    # shm_size: "2gb"
+    shm_size: "2gb"
   mmq-service-express:
     build: ./service-express
     links:

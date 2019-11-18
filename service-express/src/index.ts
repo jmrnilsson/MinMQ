@@ -34,9 +34,12 @@ const server = app.listen(config.port, config.host, async (e) => {
 // https://stackoverflow.com/questions/18771707/how-to-flush-winston-logs
 // https://github.com/winstonjs/winston/issues/228
 // https://medium.com/@becintec/building-graceful-node-applications-in-docker-4d2cd4d5d392
+// --> https://github.com/winstonjs/winston/issues/1250
 function shutdown(reason: string) {
   return () => {
+    logger.on('finish', () => { process.exit(3); });
     logger.info('Process exiting. Reason=%s', reason);
+    logger.end();
     setTimeout(() => process.exit(2), 2000);
   };
 }
@@ -44,4 +47,4 @@ function shutdown(reason: string) {
 process.on('SIGHUP', shutdown('SIGHUP'));
 process.on('SIGINT', shutdown('SIGINT'));
 process.on('SIGTERM', shutdown('SIGTERM'));
-process.on('uncaughtException', e => shutdown(`${e}`));
+process.on('uncaughtException', e => shutdown(String(e)));

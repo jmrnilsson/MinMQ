@@ -6,10 +6,12 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Service_Kestrel.Models;
 
 namespace Service_Kestrel
 {
@@ -26,12 +28,19 @@ namespace Service_Kestrel
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+			services.AddDbContext<MessagesContext>(options => options.UseInMemoryDatabase(databaseName: "Messages"));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (env.IsDevelopment())
+			new ConfigurationBuilder()
+				.AddJsonFile("appsettings.json")
+				.AddJsonFile($"appsettings.{env.EnvironmentName}.json")
+				.AddEnvironmentVariables()
+				.Build();
+
+			if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }

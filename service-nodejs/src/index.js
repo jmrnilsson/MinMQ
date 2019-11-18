@@ -5,7 +5,7 @@ const port = 8000
 const requestHandler = (req, res) => {
   const url = req.url || "";
   if (url.match(/^\/status\/?$/)) {
-    logger.info('Url=%s', req.url);
+    // logger.info('Url=%s', req.url);
     res.writeHead(200);
     return res.end('{text: "ok"}');
   }

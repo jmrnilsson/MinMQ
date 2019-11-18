@@ -33,3 +33,7 @@ Enter load-tests container
 Checkout out the nodejs expression server
 
     curl -X GET http://localhost:4000/status
+
+Log onto load tester
+
+    docker-compose run mmq-load-tests --

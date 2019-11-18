@@ -40,10 +40,15 @@ echo ''
 echo '- Make sure to check CPU and RAM saturation.'
 echo ''
 ./http-ready.sh
-echo ''; ./wrk -t12 -c400 -d30s http://mmq-service-nodejs:8000/status
-echo ''; ./wrk -t12 -c400 -d30s http://mmq-service-express:4000/status
-echo ''; ./wrk -t12 -c400 -d30s http://mmq-service-kestrel:9000/status
-echo ''; ./wrk -t12 -c400 -d30s http://mmq-service-kestrel:9000/status-async
+echo ''; ./wrk -t12 -c400 -d10s -s ./post.lua http://mmq-service-kestrel:9000/message-text
+echo ''; ./wrk -t12 -c400 -d10s -s ./post-large.lua http://mmq-service-kestrel:9000/message-text
+echo ''; ./wrk -t12 -c400 -d10s -s ./post-json.lua http://mmq-service-kestrel:9000/message
+# echo ''; ./wrk -t12 -c400 -d10s -s ./post-large.lua http://mmq-service-kestrel:9000/message-sync
+echo ''; ./wrk -t12 -c400 -d10s http://mmq-service-nodejs:8000/status
+echo ''; ./wrk -t12 -c400 -d10s http://mmq-service-express:4000/status
+echo ''; ./wrk -t12 -c400 -d10s http://mmq-service-kestrel:9000/status
+# echo ''; ./wrk -t12 -c400 -d10s -s ./post.lua http://mmq-service-kestrel:9000/message
+# echo ''; ./wrk -t12 -c400 -d10s -s ./post.lua http://mmq-service-kestrel:9000/message-sync
 EOF
 
 chmod +x /app/wrk/status.sh
