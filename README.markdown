@@ -7,10 +7,10 @@ low ceremony, high throughput, medium latency, HTTP-transport for transmission o
 - C# 8
 - Dotnet core 3
 - IAsyncEnumerable
-- Rx (maybe)
-- RedHat Linux Socket Transport
-- Load tested
-- In-order processing
+- Rx (maybe). :skull: Hike!
+- RedHat Linux Socket Transport. :skull: Dotnet core 3.0 unsupported.
+- Load tested :heavy_check_mark:
+- In-order processing :heavy_check_mark:
 - Error queue-capable
 - Named queues for concurrency control
 - Limited to small messages (<256kB).
