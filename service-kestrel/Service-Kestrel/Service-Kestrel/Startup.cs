@@ -5,11 +5,15 @@ using System.Threading;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Service_Kestrel.Exceptions;
+using Service_Kestrel.Filters;
 using Service_Kestrel.Models;
+using Service_Kestrel.RequestHandlers;
 
 namespace Service_Kestrel
 {
@@ -17,9 +21,6 @@ namespace Service_Kestrel
 	
 	public class Startup
 	{
-		private static SemaphoreSlim handleFasterRunSemaphore { get; set; } = new SemaphoreSlim(8, 8);
-		//private static BlockingCollectionQueue blockingCollectionQueue { get; set; } = new BlockingCollectionQueue();
-
 		public Startup(IConfiguration configuration)
 		{
 			Configuration = configuration;
@@ -50,53 +51,13 @@ namespace Service_Kestrel
 			o.FasterDevice = Configuration[nameof(o.FasterDevice)];
 		}
 
-		//private static async Task HandleFaster(HttpContext context)
-		//{
-		//	//app.Run(async context =>
-		//	//{
-		//	using (StreamReader reader = new StreamReader(context.Request.Body))
-		//	{
-		//		// var bytes = context.Request.Body.ReadAsByteArrayAsync();
-		//		var body = await reader.ReadToEndAsync();
-		//		var bytes = Encoding.ASCII.GetBytes(body);
-		//		CancellationTokenSource cts = new CancellationTokenSource();
-		//		long address = await FasterContext.Instance.Value.Logger.EnqueueAndWaitForCommitAsync(bytes, cts.Token);
-		//		//long address = await FasterContext.Instance.Value.Logger.EnqueueAsync(bytes, cts.Token);
-		//		//await FasterContext.Instance.Value.Logger.WaitForCommitAsync(address, cts.Token);
-		//	}
-		//	await context.Response.WriteAsync("{\"ok\": true}");
-		//	//});
-		//}
-
 		// public static void HandleFasterRun(IApplicationBuilder app)
-		public static void HandleFasterRun(IApplicationBuilder app)
-		{
-			
-			app.Run(async context =>
-			{
-				await handleFasterRunSemaphore.WaitAsync();
 
-				using (StreamReader reader = new StreamReader(context.Request.Body))
-				{
-					var body = await reader.ReadToEndAsync();
-					var bytes = Encoding.ASCII.GetBytes(body);
-					CancellationTokenSource cts = new CancellationTokenSource();
-					long address = await FasterWriter.Instance.Value.EnqueueAsync(bytes, cts.Token);
-					await FasterWriter.Instance.Value.CommitAsync(cts.Token);
-					await FasterWriter.Instance.Value.WaitForCommitAsync(address, cts.Token);
-					context.Response.StatusCode = 201;
-					await context.Response.WriteAsync("Created");
-				}
-
-				handleFasterRunSemaphore.Release();
-			});
-
-		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
 		public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
 		{
-			app.Map("/faster", HandleFasterRun);
+			app.Map("/faster", a => a.Run(FasterHttpHandler.HandleRequest));
 
 			new ConfigurationBuilder()
 				.AddJsonFile("appsettings.json")
@@ -113,27 +74,12 @@ namespace Service_Kestrel
 
 			//app.UseAuthorization();
 
-			// RequestDelegate fasterDelegate = new RequestDelegate(HandleFaster);
-
 			app.UseEndpoints(endpoints =>
 			{
 				endpoints.MapControllers();
-				//endpoints.MapGet("/secret", context =>
-				//{
-				//	// logger.LogInformation("entry");
-				//	context.Response.StatusCode = 200;
-				//	// context.Response.WriteAsync("secret");
-				//	return Task.CompletedTask;
-				//});
-				// endpoints.MapGet("/get", HandleFaster);
-				//endpoints.MapPost("/faster", HandleFaster);
+				endpoints.MapGet("/faster-get", FasterHttpHandler.HandleRequest);
 				endpoints.MapHealthChecks("/healthcheck");
 			});
 		}
-	}
-
-	public class ServiceKestrelOptions
-	{
-		public string FasterDevice { get; set; }
 	}
 }

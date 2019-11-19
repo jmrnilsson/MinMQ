@@ -234,4 +234,39 @@ Running 7s test @ http://mmq-service-kestrel:9000/faster
   144830 requests in 7.08s, 16.99MB read
 Requests/sec:  20441.80
 Transfer/sec:      2.40MB
-PS M:\devwork\MinMQ>
+
+# Run 6
+
+Running 5s test @ http://mmq-service-kestrel:9000/efcore-in-mem-text
+  1 threads and 5 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency   295.74us  442.69us  10.03ms   98.11%
+    Req/Sec    18.43k     2.63k   21.84k    86.27%
+  93459 requests in 5.10s, 8.82MB read
+  Non-2xx or 3xx responses: 93459
+Requests/sec:  18325.97
+Transfer/sec:      1.73MB
+Running 7s test @ http://mmq-service-kestrel:9000/faster
+  1 threads and 5 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency   479.06us    1.21ms  29.98ms   98.81%
+    Req/Sec    13.02k     1.92k   15.10k    81.43%
+  90734 requests in 7.00s, 10.64MB read
+Requests/sec:  12958.56
+Transfer/sec:      1.52MB
+Running 7s test @ http://mmq-service-kestrel:9000/faster
+  2 threads and 15 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency     1.05ms    1.29ms  19.99ms   93.75%
+    Req/Sec     8.40k     1.22k   10.95k    72.86%
+  117051 requests in 7.00s, 13.73MB read
+Requests/sec:  16718.16
+Transfer/sec:      1.96MB
+Running 7s test @ http://mmq-service-kestrel:9000/faster
+  12 threads and 400 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency    20.15ms   10.53ms 230.57ms   86.33%
+    Req/Sec     1.66k   408.57     3.31k    80.40%
+  131969 requests in 7.05s, 15.48MB read
+Requests/sec:  18711.49
+Transfer/sec:      2.19MB

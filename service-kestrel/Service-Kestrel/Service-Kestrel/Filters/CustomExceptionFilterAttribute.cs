@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Logging;
+using Service_Kestrel.Exceptions;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
-namespace Service_Kestrel
+namespace Service_Kestrel.Filters
 {
 	public class CustomExceptionFilterAttribute : ExceptionFilterAttribute
 	{
@@ -18,7 +18,7 @@ namespace Service_Kestrel
 
 		public override void OnException(ExceptionContext context)
 		{
-			handler.ReportError(context.Exception);
+			handler.Mend(context.Exception);
 		}
 
 		public async override Task OnExceptionAsync(ExceptionContext context)
@@ -37,8 +37,12 @@ namespace Service_Kestrel
 			this.logger = logger;
 		}
 
-		public void ReportError(Exception exception)
+		public void Mend(Exception exception)
 		{
+			if (exception is BadHttpRequestException)
+			{
+				logger.LogInformation("A suspected thread starvation exceptions occured.");
+			}
 			logger.LogError("Unhandled error={0}", exception);
 		}
 	}

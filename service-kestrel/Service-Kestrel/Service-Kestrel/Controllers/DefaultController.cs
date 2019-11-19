@@ -36,7 +36,7 @@ namespace Service_Kestrel.Controllers
 			return Ok(new StatusDto { Text = "ok" });
 		}
 
-		[HttpPost("/message")]
+		[HttpPost("/efcore-in-mem-dto")]
 		public async Task PostAsync(MessageDto message)
 		{
 			logger.LogInformation("Running Post-message");
@@ -44,7 +44,7 @@ namespace Service_Kestrel.Controllers
 			await messagesContext.SaveChangesAsync();
 		}
 
-		[HttpPost("/message-text")]
+		[HttpPost("/efcore-in-mem-text")]
 		public async Task PostAsync(string message)
 		{
 			await messagesContext.Messages.AddAsync(new Message { Content = message });
