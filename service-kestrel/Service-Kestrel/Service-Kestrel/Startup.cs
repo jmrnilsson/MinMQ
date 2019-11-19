@@ -56,45 +56,47 @@ namespace Service_Kestrel
 			o.FasterDevice = Configuration[nameof(o.FasterDevice)];
 		}
 
-		private static async Task HandleFaster(HttpContext context)
-		{
-			//app.Run(async context =>
-			//{
-			using (StreamReader reader = new StreamReader(context.Request.Body))
-			{
-				// var bytes = context.Request.Body.ReadAsByteArrayAsync();
-				var body = await reader.ReadToEndAsync();
-				var bytes = Encoding.ASCII.GetBytes(body);
-				CancellationTokenSource cts = new CancellationTokenSource();
-				long address = await FasterContext.Instance.Value.Logger.EnqueueAndWaitForCommitAsync(bytes, cts.Token);
-				//long address = await FasterContext.Instance.Value.Logger.EnqueueAsync(bytes, cts.Token);
-				//await FasterContext.Instance.Value.Logger.WaitForCommitAsync(address, cts.Token);
-			}
-			await context.Response.WriteAsync("{\"ok\": true}");
-			//});
-		}
+		//private static async Task HandleFaster(HttpContext context)
+		//{
+		//	//app.Run(async context =>
+		//	//{
+		//	using (StreamReader reader = new StreamReader(context.Request.Body))
+		//	{
+		//		// var bytes = context.Request.Body.ReadAsByteArrayAsync();
+		//		var body = await reader.ReadToEndAsync();
+		//		var bytes = Encoding.ASCII.GetBytes(body);
+		//		CancellationTokenSource cts = new CancellationTokenSource();
+		//		long address = await FasterContext.Instance.Value.Logger.EnqueueAndWaitForCommitAsync(bytes, cts.Token);
+		//		//long address = await FasterContext.Instance.Value.Logger.EnqueueAsync(bytes, cts.Token);
+		//		//await FasterContext.Instance.Value.Logger.WaitForCommitAsync(address, cts.Token);
+		//	}
+		//	await context.Response.WriteAsync("{\"ok\": true}");
+		//	//});
+		//}
 
 		private static void HandleFasterRun(IApplicationBuilder app)
 		{
 			app.Run(async context =>
 			{
+				var logger = new LoggerFactory().CreateLogger<FasterContext>();
+				logger.LogInformation("Running HandleFasterRun");
+
 				using (StreamReader reader = new StreamReader(context.Request.Body))
 				{
 					// var bytes = context.Request.Body.ReadAsByteArrayAsync();
 					var body = await reader.ReadToEndAsync();
 					var bytes = Encoding.ASCII.GetBytes(body);
 					CancellationTokenSource cts = new CancellationTokenSource();
-					long address = await FasterContext.Instance.Value.Logger.EnqueueAsync(bytes, cts.Token);
-					await FasterContext.Instance.Value.Logger.WaitForCommitAsync(address, cts.Token);
+					long address = await FasterContext.Instance.Value.Logger.EnqueueAndWaitForCommitAsync(bytes, cts.Token);
 				}
-				await context.Response.WriteAsync("{\"ok\": true, \"posted\", \"yes\"");
+				await context.Response.WriteAsync("{\"ok\": true, \"posted\", \"yes\"}");
 			});
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
 		public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
 		{
-			app.Map("/faster", HandleFasterRun);
+			// app.Map("/faster", HandleFasterRun);
 
 			new ConfigurationBuilder()
 				.AddJsonFile("appsettings.json")
@@ -111,7 +113,7 @@ namespace Service_Kestrel
 
 			//app.UseAuthorization();
 
-			RequestDelegate fasterDelegate = new RequestDelegate(HandleFaster);
+			// RequestDelegate fasterDelegate = new RequestDelegate(HandleFaster);
 
 			app.UseEndpoints(endpoints =>
 			{

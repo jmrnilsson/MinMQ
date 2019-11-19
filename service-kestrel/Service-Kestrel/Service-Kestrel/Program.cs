@@ -15,8 +15,9 @@ namespace Service_Kestrel
 	{
 		public static async Task Main(string[] args)
 		{
+			// ApplicationLogging.LoggerFactory = new LoggerFactory();
 			var host = CreateHostBuilder(args).Build();
-			
+			// var logger = ApplicationLogging.LoggerFactory.CreateLogger<Program>();
 
 			using (var scope = host.Services.CreateScope())
 			{
@@ -31,8 +32,8 @@ namespace Service_Kestrel
 					Console.WriteLine("Could not start logger. Error=" + error);
 				}
 
-				// var services = scope.ServiceProvider;
-				// DataGenerator.Initialize(services);
+				//var services = scope.ServiceProvider;
+				//DataGenerator.Initialize(services);
 				var urls = Environment.GetEnvironmentVariable("ASPNETCORE_URLS");
 				var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 				logger.LogInformation("Hosted with env '{1}' will listen on '{0}'", urls, env);
@@ -58,6 +59,7 @@ namespace Service_Kestrel
 					//		 return false;
 					//	 });
 					// });
+					webBuilder.UseLibuv(opt => opt.ThreadCount = 1);
 					webBuilder.UseStartup<Startup>();
 				});
 	}
