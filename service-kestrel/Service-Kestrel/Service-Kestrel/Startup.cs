@@ -15,6 +15,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Service_Kestrel.Controllers;
 using Service_Kestrel.Handlers;
 using Service_Kestrel.Models;
 
@@ -74,29 +75,47 @@ namespace Service_Kestrel
 		//	//});
 		//}
 
-		private static void HandleFasterRun(IApplicationBuilder app)
+		public static void HandleFasterRun(IApplicationBuilder app)
 		{
 			app.Run(async context =>
 			{
-				var logger = new LoggerFactory().CreateLogger<FasterContext>();
-				logger.LogInformation("Running HandleFasterRun");
-
 				using (StreamReader reader = new StreamReader(context.Request.Body))
 				{
+
+					// logger.LogInformation("Running PostFasterAsync - Reading body");
 					// var bytes = context.Request.Body.ReadAsByteArrayAsync();
 					var body = await reader.ReadToEndAsync();
 					var bytes = Encoding.ASCII.GetBytes(body);
 					CancellationTokenSource cts = new CancellationTokenSource();
-					long address = await FasterContext.Instance.Value.Logger.EnqueueAndWaitForCommitAsync(bytes, cts.Token);
+					// logger.LogInformation("Running PostFasterAsync - Enqueue");
+					long address = await FasterContext.Instance.Value.Logger.EnqueueAsync(bytes, cts.Token);
+					// logger.LogInformation("Running PostFasterAsync - CommitAsync");
+					await FasterContext.Instance.Value.Logger.CommitAsync(cts.Token);
+					// logger.LogInformation("Running PostFasterAsync - WaitForCommitAsync");
+					await FasterContext.Instance.Value.Logger.WaitForCommitAsync(address, cts.Token);
+					// long address = await FasterContext.Instance.Value.Logger.EnqueueAndWaitForCommitAsync(bytes, cts.Token);
+					// logger.LogInformation("Running PostFasterAsync - Commited");
+					//var response = new HttpResponseMessage()
+					//{
+					//	StatusCode = HttpStatusCode.Created,
+					//	Content = new StringContent("ok value!")
+					//	//RequestMessage = "ok!"
+					// };
+
+					// Response.StatusCode = HttpStatusCode.Created;
+					// return await Task.FromResult(response);
+					context.Response.StatusCode = 201;
+					await context.Response.WriteAsync("Maybe good!?");
+
 				}
-				await context.Response.WriteAsync("{\"ok\": true, \"posted\", \"yes\"}");
+				// await Response.WriteAsync("{\"ok\": true, \"handler\", \"yes\"}");
 			});
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
 		public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
 		{
-			// app.Map("/faster", HandleFasterRun);
+			app.Map("/faster", HandleFasterRun);
 
 			new ConfigurationBuilder()
 				.AddJsonFile("appsettings.json")

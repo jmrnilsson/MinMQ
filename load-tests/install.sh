@@ -62,9 +62,9 @@ echo ''
 echo '- Make sure to check CPU and RAM saturation.'
 echo ''
 ./http-ready.sh
-./wrk -t12 -c400 -d10s -s ./post.lua http://mmq-service-kestrel:9000/message
-./wrk -t12 -c400 -d10s -s ./post.lua http://mmq-service-kestrel:9000/faster-text
-./wrk -t12 -c400 -d10s -s ./post.lua http://mmq-service-kestrel:9000/faster
+./wrk -t1 -c8 -d5s -s ./post.lua http://mmq-service-kestrel:9000/message-text
+# ./wrk -t1 -c8 -d5s -s ./post.lua http://mmq-service-kestrel:9000/faster-text
+./wrk -t1 -c8 -d5s -s ./post.lua http://mmq-service-kestrel:9000/faster
 EOF
 
 chmod +x /app/wrk/post_message.sh
