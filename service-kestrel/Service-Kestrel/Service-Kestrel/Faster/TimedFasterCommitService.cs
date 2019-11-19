@@ -1,16 +1,16 @@
-﻿using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Service_Kestrel.Handlers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace Service_Kestrel.Faster
 {
+	delegate ValueTask CommitAsyncDelegate(CancellationToken token = default);
+
 	public class FasterCommitHostedService : IHostedService, IDisposable
 	{
+		private const int periodMs = 5;
 		private readonly ILogger<FasterCommitHostedService> logger;
 		private Timer timer;
 
@@ -23,32 +23,63 @@ namespace Service_Kestrel.Faster
 		{
 			logger.LogInformation("Commit Hosted Service running.");
 
-			var state = new FasterCommitState(FasterContext.Instance.Value.Logger, logger);
-			var loop = new FasterCommitCallback();
-			// var stateTimer = new Timer(loop.Execute, state, 0, 10);
-			timer = new Timer(loop.ExecuteAsync, state, TimeSpan.Zero, TimeSpan.FromMilliseconds(5));
+			var state = new FasterCommitState(FasterWriter.Instance.Value.CommitAsync, logger, GetLoggingInterval());
+			timer = new Timer(ExecuteAsync, state, TimeSpan.Zero, TimeSpan.FromMilliseconds(periodMs));
 
 			return Task.CompletedTask;
 		}
-
-		//private void DoWork(object state)
-		//{
-		//	executionCount++;
-
-		//	logger.LogInformation("Timed Hosted Service is working. Count: {Count}", executionCount);
-		//}
 
 		public Task StopAsync(CancellationToken stoppingToken)
 		{
 			logger.LogInformation("Timed Hosted' Service is stopping.");
 			timer?.Change(Timeout.Infinite, 0);
-			// cancellationTokenSourceFactory().Cancel();
 			return Task.CompletedTask;
 		}
 
 		public void Dispose()
 		{
 			timer?.Dispose();
+		}
+
+		private int GetLoggingInterval()
+		{
+			int interval = 2000 / periodMs;
+			interval = Math.Max(1, interval);
+			return Math.Min(2000, interval);
+		}
+
+		private static async void ExecuteAsync(object stateInfo)
+		{
+			FasterCommitState state = stateInfo as FasterCommitState;
+
+			await state.CommitAsync();
+
+			if (state.InvokationCount > 0 && state.InvokationCount % state.LoggingInterval == 0)
+			{
+				state.InvokationCount = 0;
+				state.Logger.LogInformation("Polling commits. state.InvokationCount % {0} == 0", state.LoggingInterval);
+			}
+			else
+			{
+				state.InvokationCount++;
+			}
+		}
+
+		class FasterCommitState
+		{
+			public FasterCommitState(CommitAsyncDelegate commitAsync, ILogger logger, int loggingInterval)
+			{
+				CommitAsync = commitAsync;
+				Logger = logger;
+				LoggingInterval = loggingInterval;
+				InvokationCount = 0;
+
+			}
+
+			public CommitAsyncDelegate CommitAsync { get; }
+			public ILogger Logger { get; }
+			public int LoggingInterval { get; }
+			public int InvokationCount { get; set; }
 		}
 	}
 }

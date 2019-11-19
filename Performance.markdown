@@ -199,3 +199,39 @@ Same as above (see run 2)
   Requests/sec:  18957.32
   Transfer/sec:      2.31MB
 ```
+
+# Run 5
+
+Running 5s test @ http://mmq-service-kestrel:9000/message-text
+  1 threads and 5 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency    13.53ms   52.21ms 377.62ms   94.74%
+    Req/Sec     6.53k     1.85k    8.51k    74.47%
+  30570 requests in 5.00s, 2.68MB read
+Requests/sec:   6113.29
+Transfer/sec:    549.24KB
+Running 7s test @ http://mmq-service-kestrel:9000/faster
+  1 threads and 5 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency   468.50us    1.00ms  28.30ms   98.83%
+    Req/Sec    12.52k     2.21k   14.96k    77.14%
+  87122 requests in 7.00s, 10.22MB read
+Requests/sec:  12445.50
+Transfer/sec:      1.46MB
+Running 7s test @ http://mmq-service-kestrel:9000/faster
+  2 threads and 15 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency     0.97ms    1.09ms  19.24ms   93.91%
+    Req/Sec     8.66k     1.47k   13.78k    72.34%
+  121423 requests in 7.10s, 14.24MB read
+Requests/sec:  17101.68
+Transfer/sec:      2.01MB
+Running 7s test @ http://mmq-service-kestrel:9000/faster
+  12 threads and 400 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency    19.10ms    7.08ms 115.85ms   85.94%
+    Req/Sec     1.73k   344.00     3.64k    79.88%
+  144830 requests in 7.08s, 16.99MB read
+Requests/sec:  20441.80
+Transfer/sec:      2.40MB
+PS M:\devwork\MinMQ>

@@ -1,23 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Service_Kestrel.Controllers;
-using Service_Kestrel.Faster;
-using Service_Kestrel.Handlers;
 using Service_Kestrel.Models;
 
 namespace Service_Kestrel
@@ -90,11 +81,11 @@ namespace Service_Kestrel
 					var body = await reader.ReadToEndAsync();
 					var bytes = Encoding.ASCII.GetBytes(body);
 					CancellationTokenSource cts = new CancellationTokenSource();
-					long address = await FasterContext.Instance.Value.Logger.EnqueueAsync(bytes, cts.Token);
-					await FasterContext.Instance.Value.Logger.CommitAsync(cts.Token);
-					await FasterContext.Instance.Value.Logger.WaitForCommitAsync(address, cts.Token);
+					long address = await FasterWriter.Instance.Value.EnqueueAsync(bytes, cts.Token);
+					await FasterWriter.Instance.Value.CommitAsync(cts.Token);
+					await FasterWriter.Instance.Value.WaitForCommitAsync(address, cts.Token);
 					context.Response.StatusCode = 201;
-					await context.Response.WriteAsync("Maybe good!?");
+					await context.Response.WriteAsync("Created");
 				}
 
 				handleFasterRunSemaphore.Release();
