@@ -40,19 +40,34 @@ echo ''
 echo '- Make sure to check CPU and RAM saturation.'
 echo ''
 ./http-ready.sh
-echo ''; ./wrk -t12 -c400 -d10s -s ./post.lua http://mmq-service-kestrel:9000/message-text
-echo ''; ./wrk -t12 -c400 -d10s -s ./post-large.lua http://mmq-service-kestrel:9000/message-text
-echo ''; ./wrk -t12 -c400 -d10s -s ./post-large.lua http://mmq-service-kestrel:9000/message-text-sync
-echo ''; ./wrk -t12 -c400 -d10s -s ./post-json.lua http://mmq-service-kestrel:9000/message
-# echo ''; ./wrk -t12 -c400 -d10s -s ./post-large.lua http://mmq-service-kestrel:9000/message-sync
-echo ''; ./wrk -t12 -c400 -d10s http://mmq-service-nodejs:8000/status
-echo ''; ./wrk -t12 -c400 -d10s http://mmq-service-express:4000/status
-echo ''; ./wrk -t12 -c400 -d10s http://mmq-service-kestrel:9000/status
-# echo ''; ./wrk -t12 -c400 -d10s -s ./post.lua http://mmq-service-kestrel:9000/message
-# echo ''; ./wrk -t12 -c400 -d10s -s ./post.lua http://mmq-service-kestrel:9000/message-sync
+# ./wrk -t12 -c400 -d10s -s ./post.lua http://mmq-service-kestrel:9000/message-text
+# ./wrk -t12 -c400 -d10s -s ./post-large.lua http://mmq-service-kestrel:9000/message-text
+# ./wrk -t12 -c400 -d10s -s ./post-json.lua http://mmq-service-kestrel:9000/message
+# ./wrk -t12 -c400 -d10s -s ./post-large.lua http://mmq-service-kestrel:9000/message-sync
+# ./wrk -t12 -c400 -d10s http://mmq-service-nodejs:8000/status
+# ./wrk -t12 -c400 -d10s http://mmq-service-express:4000/status
+# ./wrk -t12 -c400 -d10s http://mmq-service-kestrel:9000/status
+# ./wrk -t12 -c400 -d10s -s ./post.lua http://mmq-service-kestrel:9000/message-sync
+./wrk -t12 -c400 -d10s -s ./post.lua http://mmq-service-kestrel:9000/message
+./wrk -t12 -c400 -d10s -s ./post.lua http://mmq-service-kestrel:9000/faster
 EOF
 
 chmod +x /app/wrk/status.sh
+
+
+echo 'Creating post_message.sh'
+cat >> /app/wrk/post_message.sh << EOF
+#!/bin/bash
+echo ''
+echo '- Make sure to check CPU and RAM saturation.'
+echo ''
+./http-ready.sh
+./wrk -t12 -c400 -d10s -s ./post.lua http://mmq-service-kestrel:9000/message
+./wrk -t12 -c400 -d10s -s ./post.lua http://mmq-service-kestrel:9000/faster
+EOF
+
+chmod +x /app/wrk/post_message.sh
+
 
 touch /opt/install_done
 echo 'Done!'

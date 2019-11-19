@@ -16,18 +16,26 @@ namespace Service_Kestrel
 		public static async Task Main(string[] args)
 		{
 			var host = CreateHostBuilder(args).Build();
+			
 
 			using (var scope = host.Services.CreateScope())
 			{
-				var services = scope.ServiceProvider;
-				var context = services.GetRequiredService<MessagesContext>();
-				DataGenerator.Initialize(services);
+				ILogger<Program> logger = null;
 
-				var logger = host.Services.GetRequiredService<ILogger<Program>>();
-				var options = host.Services.GetRequiredService<ILogger<Program>>();
+				try
+				{
+					logger = host.Services.GetRequiredService<ILogger<Program>>();
+				}
+				catch (Exception error)
+				{
+					Console.WriteLine("Could not start logger. Error=" + error);
+				}
+
+				// var services = scope.ServiceProvider;
+				// DataGenerator.Initialize(services);
 				var urls = Environment.GetEnvironmentVariable("ASPNETCORE_URLS");
 				var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
-				logger.LogInformation("Hosting '{1}' is listening on '{0}'", urls, env);
+				logger.LogInformation("Hosted with env '{1}' will listen on '{0}'", urls, env);
 			}
 
 			await host.RunAsync();

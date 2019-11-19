@@ -22,9 +22,8 @@ It's not designed for
 ## Usage
 With Docker-compose
 
-    docker-compose build; \
-    docker-compose down; \
-    docker-compose run mmq-load-tests -- status.sh
+    docker-compose build; docker-compose down; docker-compose run mmq-load-tests -- status.sh
+    docker-compose build; docker-compose down; docker-compose run mmq-load-tests -- post_message.sh
 
 Enter load-tests container
 
@@ -34,7 +33,6 @@ Checkout out the nodejs expression server
 
     curl -X GET http://localhost:4000/status
 
-    
 ## Some preliminary benchmarks
 ### HTTP GET Compared
 ```

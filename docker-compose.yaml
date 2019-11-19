@@ -13,8 +13,10 @@ services:
     ports:
     - "9000:9000"
     environment:
-    - ASPNETCORE_ENVIRONMENT=Development
+    - ASPNETCORE_ENVIRONMENT=Docker
     - ASPNETCORE_URLS=http://0.0.0.0:9000
+    volumes:
+    - fasterdata:/opt/faster
     shm_size: "2gb"
   mmq-service-express:
     build: ./service-express
@@ -36,3 +38,10 @@ services:
     - "mmq-service-express"
 volumes:
   mongodata: {}
+  fasterdata:
+    # driver: local
+    # driver_opts:
+      # type: 
+      # o: size=1200m
+      # device: K://docker-faster-hlog
+    external: true
