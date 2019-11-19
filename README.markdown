@@ -33,7 +33,37 @@ Checkout out the nodejs expression server
 
     curl -X GET http://localhost:4000/status
 
+Curl faster
+
+    curl -H "Accept: application/json" -H "Content-type: application/json" -X POST -d '{"id":100}' http://localhost:9000/faster --trace-ascii /dev/stdout
+
+
 ## Some preliminary benchmarks
+### EFCore In-Memory Database
+
+Warning: The file name argument '-I' looks like a flag.
+Warning: The file name argument '-I' looks like a flag.
+Warning: The file name argument '-I' looks like a flag.
+Running 5s test @ http://mmq-service-kestrel:9000/message-text
+  2 threads and 3 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency     9.01ms   44.44ms 369.75ms   95.97%
+    Req/Sec     2.79k   758.75     3.78k    86.46%
+  26670 requests in 5.10s, 2.34MB read
+Requests/sec:   5229.63
+Transfer/sec:    469.85KB
+
+### Faster
+
+Running 5s test @ http://mmq-service-kestrel:9000/faster
+  2 threads and 13 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency     1.12ms    2.69ms  45.34ms   97.36%
+    Req/Sec     6.87k     2.12k    9.85k    75.00%
+  32854 requests in 5.01s, 4.01MB read
+Requests/sec:   6561.83
+Transfer/sec:    820.23KB
+
 ### HTTP GET Compared
 ```
 Running 10s test @ http://mmq-service-nodejs:8000/status

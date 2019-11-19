@@ -25,3 +25,16 @@ server.listen(port, (err) => {
   logger.info('Listening. Port=%s', port);
 });
 
+function shutdown(reason) {
+  return () => {
+    logger.on('finish', () => { process.exit(3); });
+    logger.info('Process exiting. Reason=%s', reason);
+    logger.end();
+    setTimeout(() => process.exit(2), 2000);
+  };
+}
+
+process.on('SIGHUP', shutdown('SIGHUP'));
+process.on('SIGINT', shutdown('SIGINT'));
+process.on('SIGTERM', shutdown('SIGTERM'));
+process.on('uncaughtException', e => shutdown(String(e)));

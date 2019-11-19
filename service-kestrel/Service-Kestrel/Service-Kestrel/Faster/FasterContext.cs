@@ -46,9 +46,10 @@ namespace Service_Kestrel
 
 		public static void StartCommitInterval(CancellationToken token, FasterLog log)
 		{
-			var state = new FasterCommitState(log, token);
-			var loop = new FasterCommitCallback();
-			var stateTimer = new Timer(loop.Execute, state, 0, 30);
+			throw new NotImplementedException("Does not execute in Docker");
+			//var state = new FasterCommitState(log);
+			//var loop = new FasterCommitCallback();
+			//var stateTimer = new Timer(loop.Execute, state, 0, 30);
 		}
 	}
 }

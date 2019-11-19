@@ -27,7 +27,6 @@ namespace Service_Kestrel.Controllers
 		{
 			this.messagesContext = messagesContext;
 			this.logger = logger;
-			logger.LogInformation("default controller some info");
 		}
 
 		[HttpGet("/status")]
@@ -51,39 +50,5 @@ namespace Service_Kestrel.Controllers
 			await messagesContext.Messages.AddAsync(new Message { Content = message });
 			await messagesContext.SaveChangesAsync();
 		}
-
-		[HttpPost("/faster-text")]
-		public async Task<HttpResponseMessage> PostFasterAsync(string message)
-		{
-			// logger.LogInformation("Running PostFasterAsync");
-
-			using (StreamReader reader = new StreamReader(Request.Body))
-			{
-
-				// logger.LogInformation("Running PostFasterAsync - Reading body");
-				// var bytes = context.Request.Body.ReadAsByteArrayAsync();
-				var body = await reader.ReadToEndAsync();
-				var bytes = Encoding.ASCII.GetBytes(body);
-				CancellationTokenSource cts = new CancellationTokenSource();
-				// logger.LogInformation("Running PostFasterAsync - Enqueue");
-				long address = await FasterContext.Instance.Value.Logger.EnqueueAsync(bytes, cts.Token);
-				// logger.LogInformation("Running PostFasterAsync - CommitAsync");
-				await FasterContext.Instance.Value.Logger.CommitAsync(cts.Token);
-				// logger.LogInformation("Running PostFasterAsync - WaitForCommitAsync");
-				await FasterContext.Instance.Value.Logger.WaitForCommitAsync(address, cts.Token);
-				// long address = await FasterContext.Instance.Value.Logger.EnqueueAndWaitForCommitAsync(bytes, cts.Token);
-				// logger.LogInformation("Running PostFasterAsync - Commited");
-				var response = new HttpResponseMessage()
-				{
-					StatusCode = HttpStatusCode.Created,
-					Content = new StringContent("ok value!")
-					//RequestMessage = "ok!"
-				};
-				return await Task.FromResult(response);
-			}
-			// await Response.WriteAsync("{\"ok\": true, \"handler\", \"yes\"}");
-		}
-
-
 	}
 }
