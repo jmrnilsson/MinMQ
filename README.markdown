@@ -14,6 +14,9 @@ low ceremony, high throughput, medium latency, HTTP-transport for transmission o
 - Error queue-capable
 - Named queues for concurrency control
 - Limited to small messages (<256kB).
+- Test with [FASTER Log](https://github.com/microsoft/FASTER/blob/master/docs/cs/FasterLog.md)
+- !? First segment for access to contex. https://docs.microsoft.com/en-us/aspnet/core/fundamentals/middleware/?view=aspnetcore-3.0
+
 
 ## Caveats
 It's not designed for
