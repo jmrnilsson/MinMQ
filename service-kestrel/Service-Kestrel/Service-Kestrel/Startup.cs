@@ -26,8 +26,8 @@ namespace Service_Kestrel
 	
 	public class Startup
 	{
-		private static SemaphoreSlim handleFasterRunSemaphore { get; set; } = new SemaphoreSlim(25, 25);
-		private static BlockingCollectionQueue blockingCollectionQueue { get; set; } = new BlockingCollectionQueue();
+		private static SemaphoreSlim handleFasterRunSemaphore { get; set; } = new SemaphoreSlim(8, 8);
+		//private static BlockingCollectionQueue blockingCollectionQueue { get; set; } = new BlockingCollectionQueue();
 
 		public Startup(IConfiguration configuration)
 		{
@@ -83,7 +83,7 @@ namespace Service_Kestrel
 			
 			app.Run(async context =>
 			{
-				// await handleFasterRunSemaphore.WaitAsync();
+				await handleFasterRunSemaphore.WaitAsync();
 
 				using (StreamReader reader = new StreamReader(context.Request.Body))
 				{
@@ -91,13 +91,13 @@ namespace Service_Kestrel
 					var bytes = Encoding.ASCII.GetBytes(body);
 					CancellationTokenSource cts = new CancellationTokenSource();
 					long address = await FasterContext.Instance.Value.Logger.EnqueueAsync(bytes, cts.Token);
-					// await FasterContext.Instance.Value.Logger.CommitAsync(cts.Token);
+					await FasterContext.Instance.Value.Logger.CommitAsync(cts.Token);
 					await FasterContext.Instance.Value.Logger.WaitForCommitAsync(address, cts.Token);
 					context.Response.StatusCode = 201;
 					await context.Response.WriteAsync("Maybe good!?");
 				}
 
-				// handleFasterRunSemaphore.Release();
+				handleFasterRunSemaphore.Release();
 			});
 
 		}

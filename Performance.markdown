@@ -25,3 +25,81 @@ Running 12s test @ http://mmq-service-kestrel:9000/faster
 Requests/sec:  13812.66
 Transfer/sec:      1.69MB
 PS M:\devwork\MinMQ>
+
+# Run 1
+1 single wrk thread 5 connections
+semaphore 12
+CommitAsync inlined and scheduled 5 in hosted service
+
+Running 5s test @ http://mmq-service-kestrel:9000/message-text
+  1 threads and 5 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency    14.18ms   54.69ms 384.68ms   94.52%
+    Req/Sec     6.24k     1.79k    7.99k    80.85%
+  29224 requests in 5.00s, 2.56MB read
+Requests/sec:   5844.06
+Transfer/sec:    525.05KB
+Running 7s test @ http://mmq-service-kestrel:9000/faster
+  1 threads and 5 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency   603.35us    2.03ms  44.94ms   98.25%
+    Req/Sec    12.60k     1.92k   15.40k    72.86%
+  87728 requests in 7.00s, 10.71MB read
+Requests/sec:  12529.97
+Transfer/sec:      1.53MB
+Running 7s test @ http://mmq-service-kestrel:9000/faster
+  2 threads and 15 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency   730.05us  405.16us  19.18ms   91.86%
+    Req/Sec     8.62k     2.31k   10.73k    85.71%
+  12010 requests in 7.01s, 1.47MB read
+  Socket errors: connect 0, read 14, write 5728, timeout 0
+  Non-2xx or 3xx responses: 1
+Requests/sec:   1713.00
+Transfer/sec:    214.12KB
+./wrk: invalid option -- '1'
+
+
+# Run 2 
+same as above except semaphore 8
+
+  Running 5s test @ http://mmq-service-kestrel:9000/message-text
+    1 threads and 5 connections
+    Thread Stats   Avg      Stdev     Max   +/- Stdev
+      Latency    13.87ms   55.17ms 397.95ms   94.66%
+      Req/Sec     6.21k     1.86k    8.49k    65.96%
+    29041 requests in 5.00s, 2.55MB read
+  Requests/sec:   5807.17
+  Transfer/sec:    521.74KB
+  Running 7s test @ http://mmq-service-kestrel:9000/faster
+    1 threads and 5 connections
+    Thread Stats   Avg      Stdev     Max   +/- Stdev
+      Latency   435.85us    0.91ms  25.67ms   98.68%
+      Req/Sec    13.43k     1.55k   15.29k    83.10%
+    94885 requests in 7.10s, 11.58MB read
+  Requests/sec:  13364.14
+  Transfer/sec:      1.63MB
+  Running 7s test @ http://mmq-service-kestrel:9000/faster
+    2 threads and 15 connections
+    Thread Stats   Avg      Stdev     Max   +/- Stdev
+      Latency     0.95ms    1.14ms  19.11ms   94.96%
+      Req/Sec     8.91k     1.22k   11.60k    72.14%
+    124084 requests in 7.00s, 15.15MB read
+  Requests/sec:  17723.17
+  Transfer/sec:      2.16MB
+  ./wrk: invalid option -- '1'
+
+## Error count 1. See below:
+mmq-service-kestrel_1  | fail: Microsoft.AspNetCore.Server.Kestrel[13]
+mmq-service-kestrel_1  |       Connection id "0HLRCRPGBP8G2", Request id "0HLRCRPGBP8G2:000021DD": An unhandled exception was thrown by the application.
+mmq-service-kestrel_1  | Microsoft.AspNetCore.Server.Kestrel.Core.BadHttpRequestException: Unexpected end of request content.
+mmq-service-kestrel_1  |    at Microsoft.AspNetCore.Server.Kestrel.Core.BadHttpRequestException.Throw(RequestRejectionReason reason)
+mmq-service-kestrel_1  |    at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http.Http1ContentLengthMessageBody.ReadAsyncInternal(CancellationToken cancellationToken)
+mmq-service-kestrel_1  |    at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http.HttpRequestStream.ReadAsyncInternal(Memory`1 buffer, CancellationToken cancellationToken)
+mmq-service-kestrel_1  |    at System.IO.StreamReader.ReadBufferAsync()
+mmq-service-kestrel_1  |    at System.IO.StreamReader.ReadToEndAsyncInternal()
+mmq-service-kestrel_1  |    at Service_Kestrel.Startup.<>c.<<HandleFasterRun>b__11_0>d.MoveNext() in /src/Startup.cs:line 101
+mmq-service-kestrel_1  | --- End of stack trace from previous location where exception was thrown ---
+mmq-service-kestrel_1  |    at Microsoft.AspNetCore.Builder.Extensions.MapMiddleware.Invoke(HttpContext context)
+mmq-service-kestrel_1  |    at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http.HttpProtocol.ProcessRequests[TContext](IHttpApplication`1 application)
+mmq-service-kestrel_1  | info: Service_Kestrel.Faster.FasterCommitHostedService[0]
