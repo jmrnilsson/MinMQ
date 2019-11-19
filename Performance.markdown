@@ -1,8 +1,8 @@
 # Run 0
-5 ms flush as ihosted service
-1 single wrk thread 5 connections
+- 5 ms commit flush in aspnet hosted service
+- 1 single wrk thread 5 connections
 
-Starting minmq_mmq-db_1              ... done                                                                                              Starting minmq_mmq-service-kestrel_1 ... done                                                                                              Starting minmq_mmq-service-express_1 ... done                                                                                              Starting minmq_mmq-service-nodejs_1  ... done                                                                                              
+```
 - Make sure to check CPU and RAM saturation.
 
 Warning: The file name argument '-I' looks like a flag.
@@ -24,13 +24,14 @@ Running 12s test @ http://mmq-service-kestrel:9000/faster
   167135 requests in 12.10s, 20.40MB read
 Requests/sec:  13812.66
 Transfer/sec:      1.69MB
-PS M:\devwork\MinMQ>
+```
 
 # Run 1
 1 single wrk thread 5 connections
 semaphore 12
 CommitAsync inlined and scheduled 5 in hosted service
 
+```
 Running 5s test @ http://mmq-service-kestrel:9000/message-text
   1 threads and 5 connections
   Thread Stats   Avg      Stdev     Max   +/- Stdev
@@ -58,11 +59,13 @@ Running 7s test @ http://mmq-service-kestrel:9000/faster
 Requests/sec:   1713.00
 Transfer/sec:    214.12KB
 ./wrk: invalid option -- '1'
+```
 
 
 # Run 2 
-same as above except semaphore 8
+Same as above except semaphore 8
 
+```
   Running 5s test @ http://mmq-service-kestrel:9000/message-text
     1 threads and 5 connections
     Thread Stats   Avg      Stdev     Max   +/- Stdev
@@ -88,8 +91,11 @@ same as above except semaphore 8
   Requests/sec:  17723.17
   Transfer/sec:      2.16MB
   ./wrk: invalid option -- '1'
+```
 
 ## Error count 1. See below:
+
+```
 mmq-service-kestrel_1  | fail: Microsoft.AspNetCore.Server.Kestrel[13]
 mmq-service-kestrel_1  |       Connection id "0HLRCRPGBP8G2", Request id "0HLRCRPGBP8G2:000021DD": An unhandled exception was thrown by the application.
 mmq-service-kestrel_1  | Microsoft.AspNetCore.Server.Kestrel.Core.BadHttpRequestException: Unexpected end of request content.
@@ -103,3 +109,93 @@ mmq-service-kestrel_1  | --- End of stack trace from previous location where exc
 mmq-service-kestrel_1  |    at Microsoft.AspNetCore.Builder.Extensions.MapMiddleware.Invoke(HttpContext context)
 mmq-service-kestrel_1  |    at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http.HttpProtocol.ProcessRequests[TContext](IHttpApplication`1 application)
 mmq-service-kestrel_1  | info: Service_Kestrel.Faster.FasterCommitHostedService[0]
+```
+
+# Run 3
+Same as above (see run 2)
+
+```
+- Make sure to check CPU and RAM saturation.
+
+Warning: The file name argument '-I' looks like a flag.
+Warning: The file name argument '-I' looks like a flag.
+Warning: The file name argument '-I' looks like a flag.
+Running 5s test @ http://mmq-service-kestrel:9000/message-text
+  1 threads and 5 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency    14.03ms   54.66ms 395.86ms   94.74%
+    Req/Sec     6.17k     1.78k    8.38k    68.09%
+  28896 requests in 5.00s, 2.54MB read
+Requests/sec:   5777.66
+Transfer/sec:    519.09KB
+Running 7s test @ http://mmq-service-kestrel:9000/faster
+  1 threads and 5 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency   459.33us    0.93ms  29.67ms   98.74%
+    Req/Sec    12.69k     1.87k   14.91k    82.86%
+  88370 requests in 7.00s, 10.79MB read
+Requests/sec:  12623.80
+Transfer/sec:      1.54MB
+Running 7s test @ http://mmq-service-kestrel:9000/faster
+  2 threads and 15 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency     1.07ms    1.36ms  20.20ms   94.01%
+    Req/Sec     8.27k     1.32k   13.68k    72.34%
+  116066 requests in 7.10s, 14.17MB read
+Requests/sec:  16347.69
+Transfer/sec:      2.00MB
+Running 7s test @ http://mmq-service-kestrel:9000/faster
+  12 threads and 400 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency    21.62ms    8.38ms 141.03ms   87.89%
+    Req/Sec     1.52k   346.36     2.30k    73.81%
+  127299 requests in 7.07s, 15.54MB read
+Requests/sec:  18012.16
+Transfer/sec:      2.20MB
+PS M:\devwork\MinMQ>
+```
+
+# Run 4
+Same as above (see run 2)
+
+```
+  > docker-compose run mmq-load-tests -- post_message.sh
+                                                    
+  - Make sure to check CPU and RAM saturation.
+
+  Warning: The file name argument '-I' looks like a flag.
+  Warning: The file name argument '-I' looks like a flag.
+  Warning: The file name argument '-I' looks like a flag.
+  Running 5s test @ http://mmq-service-kestrel:9000/message-text
+    1 threads and 5 connections
+    Thread Stats   Avg      Stdev     Max   +/- Stdev
+      Latency    13.86ms   53.68ms 394.64ms   94.47%
+      Req/Sec     6.08k     1.66k    8.43k    65.96%
+    28456 requests in 5.00s, 2.50MB read
+  Requests/sec:   5690.37
+  Transfer/sec:    511.24KB
+  Running 7s test @ http://mmq-service-kestrel:9000/faster
+    1 threads and 5 connections
+    Thread Stats   Avg      Stdev     Max   +/- Stdev
+      Latency   786.12us    4.41ms  81.17ms   98.93%
+      Req/Sec    12.75k     2.02k   15.04k    81.43%
+    88752 requests in 7.00s, 10.83MB read
+  Requests/sec:  12676.25
+  Transfer/sec:      1.55MB
+  Running 7s test @ http://mmq-service-kestrel:9000/faster
+    2 threads and 15 connections
+    Thread Stats   Avg      Stdev     Max   +/- Stdev
+      Latency     0.93ms    0.96ms  11.94ms   93.96%
+      Req/Sec     8.70k     1.20k   14.85k    69.50%
+    121995 requests in 7.10s, 14.89MB read
+  Requests/sec:  17183.07
+  Transfer/sec:      2.10MB
+  Running 7s test @ http://mmq-service-kestrel:9000/faster
+    12 threads and 400 connections
+    Thread Stats   Avg      Stdev     Max   +/- Stdev
+      Latency    20.31ms    7.36ms  73.75ms   83.62%
+      Req/Sec     1.62k   351.02     3.70k    80.72%
+    134040 requests in 7.07s, 16.36MB read
+  Requests/sec:  18957.32
+  Transfer/sec:      2.31MB
+```
