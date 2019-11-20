@@ -5,7 +5,7 @@ managed or defined API for sending or retrieving messages._
 
 MinMQ is a minimal message queue for private networks, on-premise, or atleast non-public networks. It targets virtual
 machines, Docker and physical hosts. It's designed for low ceremony, high throughput, medium-to-low latency, and a 
-HTTP-transport for the transmission of small messages.
+HTTP-transport for comfortable transmission of small messages.
 
 This effort focuses on having:
 - Below 50 ms latency
