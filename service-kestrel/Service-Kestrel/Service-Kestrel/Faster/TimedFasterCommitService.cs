@@ -10,6 +10,12 @@ namespace Service_Kestrel.Faster
 {
 	delegate ValueTask CommitAsyncDelegate(CancellationToken token = default);
 
+	/// <summary>
+	/// A hosted service that runs in the background. It's responsible for flushing commits every 5ms. It's required
+	/// in high-contention scenarios because the eventloop gets completely bogged down with requests. In such scenarios
+	/// all threads get stuck at some other step than FasterLog.CommitAsync(). However, this service's Timer is always
+	/// granted some CPU-time.
+	/// </summary>
 	public class FasterCommitHostedService : IHostedService, IDisposable
 	{
 		private const int periodMs = 5;
