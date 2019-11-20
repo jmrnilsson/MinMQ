@@ -44,7 +44,6 @@ namespace Service_Kestrel
 		private static void SetOptions(ServiceKestrelConfiguration o)
 		{
 			o.FasterDevice = Configuration[nameof(o.FasterDevice)];
-			o.LogCommitPollingEverySeconds = int.Parse(Configuration[nameof(o.LogCommitPollingEverySeconds)]);
 		}
 
 		// public static void HandleFasterRun(IApplicationBuilder app)

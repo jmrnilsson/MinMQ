@@ -14,11 +14,6 @@ namespace Service_Kestrel.RequestHandlers
 	{
 		private static SemaphoreSlim requestThrottling { get; set; } = new SemaphoreSlim(8, 8);
 
-		public static void HandleFasterRun(IApplicationBuilder app)
-		{
-			app.Run(HandleRequest);
-		}
-
 		public static async Task HandleRequest(HttpContext context)
 		{
 			await requestThrottling.WaitAsync();
