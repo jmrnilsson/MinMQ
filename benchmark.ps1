@@ -1,6 +1,7 @@
 #!/usr/bin/env pwsh
 
 docker-compose build;
-docker-compose up;
 docker-compose down;
-docker-compose run mmq-load-tests -- status.sh
+docker-compose up -d;
+docker-compose run mmq-benchmark -- status.sh
+docker-compose run mmq-benchmark -- post_message.sh

@@ -1,15 +1,13 @@
 version: '3'
 services:
-  mmq-db:
-    image: mongo:4.2.1-bionic
-    ports:
-    - "27017:27017"
-    volumes:
-    - mongodata:/data/db
+  # mmq-db:
+  #   image: mongo:4.2.1-bionic
+  #   ports:
+  #   - "27017:27017"
+  #   volumes:
+  #   - mongodata:/data/db
   mmq-service-kestrel:
     build: ./service-kestrel
-    # links:
-    # - "mmq-db:database"
     ports:
     - "9000:9000"
     environment:
@@ -19,19 +17,17 @@ services:
     - fasterdata:/opt/faster
     shm_size: "2gb"
   mmq-service-express:
-    build: ./service-express
-    links:
-    - "mmq-db:database"
+    build: ./benchmark/service-express
     ports:
     - "4000:4000"
   mmq-service-nodejs:
-    build: ./service-nodejs
-    links:
-    - "mmq-db:database"
+    build: ./benchmark/service-nodejs
+    # links:
+    # - "mmq-db:database"
     ports:
     - "8000:8000"
-  mmq-load-tests:
-    build: ./load-tests
+  mmq-benchmarks:
+    build: ./benchmark
     links:
     - "mmq-service-kestrel"
     - "mmq-service-nodejs"
@@ -39,6 +35,7 @@ services:
 volumes:
   mongodata: {}
   fasterdata:
+    # DOESN'T WORK FROM INSIDE DOCKER-COMPOSE TO ALLOCATE BIG VOLUME
     # driver: local
     # driver_opts:
       # type: 

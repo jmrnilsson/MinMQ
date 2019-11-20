@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Service_Kestrel.Dto
+namespace Service_Kestrel.Controllers.Dto
 {
     public class StatusDto
     {

@@ -3,6 +3,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Service_Kestrel.Configuration;
 
 namespace Service_Kestrel.Faster
 {
@@ -11,11 +13,13 @@ namespace Service_Kestrel.Faster
 	public class FasterCommitHostedService : IHostedService, IDisposable
 	{
 		private const int periodMs = 5;
+		private readonly IOptions<ServiceKestrelConfiguration> config;
 		private readonly ILogger<FasterCommitHostedService> logger;
 		private Timer timer;
 
-		public FasterCommitHostedService(ILogger<FasterCommitHostedService> logger)
+		public FasterCommitHostedService(IOptions<ServiceKestrelConfiguration> config, ILogger<FasterCommitHostedService> logger)
 		{
+			this.config = config;
 			this.logger = logger;
 		}
 
@@ -43,7 +47,7 @@ namespace Service_Kestrel.Faster
 
 		private int GetLoggingInterval()
 		{
-			int interval = 2000 / periodMs;
+			int interval = config.Value.LogCommitPollingEverySeconds / periodMs;
 			interval = Math.Max(1, interval);
 			return Math.Min(2000, interval);
 		}
@@ -73,7 +77,6 @@ namespace Service_Kestrel.Faster
 				Logger = logger;
 				LoggingInterval = loggingInterval;
 				InvokationCount = 0;
-
 			}
 
 			public CommitAsyncDelegate CommitAsync { get; }

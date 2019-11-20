@@ -28,12 +28,9 @@ RUN apt-get install -y --no-install-recommends \
     ca-certificates \
     curl
 
-# COPY --from=build /app/wrk/ /app/wrk/
 COPY --from=build /app/wrk/wrk-master/ /app/wrk/
 COPY install.sh /opt/install.sh
-COPY post.lua /app/wrk/post.lua
-COPY post-json.lua /app/wrk/post-json.lua
-COPY post-large.lua /app/wrk/post-large.lua
+COPY *.lua /app/wrk/scripts/
 RUN chmod +x /opt/install.sh
 
 WORKDIR /app/wrk
