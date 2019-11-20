@@ -20,7 +20,7 @@ RUN wget https://github.com/wg/wrk/archive/master.zip
 RUN unzip master.zip
 RUN (cd wrk-master; make)
 
-FROM ubuntu:eoan-20191017 AS mmq-load-tests
+FROM ubuntu:eoan-20191017 AS mmq-benchmark
 
 RUN apt-get update
 
