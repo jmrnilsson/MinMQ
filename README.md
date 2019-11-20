@@ -1,6 +1,6 @@
 # MinMQ
 
-*Note:* _This is a work-in-progress. So far only prototype API is in place for write queries. Nothing exists in terms a
+**Note:** _This is a work-in-progress. So far only prototype API is in place for write queries. Nothing exists in terms a
 managed or defined API for sending or retrieving messages._ 
 
 MinMQ is a minimal message queue for private networks, on-premise, or atleast non-public networks. It targets virtual
