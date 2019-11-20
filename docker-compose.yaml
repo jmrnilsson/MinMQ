@@ -26,7 +26,7 @@ services:
     # - "mmq-db:database"
     ports:
     - "8000:8000"
-  mmq-load-tests:
+  mmq-benchmarks:
     build: ./benchmark
     links:
     - "mmq-service-kestrel"

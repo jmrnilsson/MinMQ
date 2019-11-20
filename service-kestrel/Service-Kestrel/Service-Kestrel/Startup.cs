@@ -1,16 +1,12 @@
 ﻿using System;
-using System.IO;
-using System.Text;
 using System.Threading;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Service_Kestrel.Exceptions;
+using Service_Kestrel.Configuration;
 using Service_Kestrel.Filters;
 using Service_Kestrel.Models;
 using Service_Kestrel.RequestHandlers;

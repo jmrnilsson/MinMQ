@@ -1,4 +1,4 @@
-﻿namespace Service_Kestrel
+﻿namespace Service_Kestrel.Configuration
 {
 	public class ServiceKestrelOptions
 	{
