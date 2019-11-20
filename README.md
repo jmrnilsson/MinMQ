@@ -36,6 +36,17 @@ Future aspirations may include:
 - Possibly a client, or and example implementation of set of atomic yet composite messages.
 - Materialized views, cached responses or read models. 
 
+## Setup
+FASTER allocates disk preemptively. Around 1.1 GB is used per default. Consequently a large docker volume, or path on
+disk that comfortably can allocate more than 1.1GB have to be assigned, preferably an SSD.
+
+**For docker users:**
+Inspect the `setup.ps1` and change path so corresponds some disk space. For comfort i may be simpler change it to
+shell-script instead.
+
+**For all others**
+If you plan to run the service without a container service the path set as FasterDevice in [appsettings.Development.json](./service-kestrel/Service-Kestrel/Service-Kestrel/appsettings.Development.json) must be assigned.
+
 ## Usage
 With Docker-compose
 
