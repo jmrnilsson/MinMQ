@@ -18,7 +18,8 @@ The implementation merely combines the efforts of [microsoft.FASTER](https://git
 [AspNet Core 3.0](https://docs.microsoft.com/en-us/aspnet/core/?view=aspnetcore-3.0); A HTTP-transports on top of a very
 fast file handler. FASTER provides "group commits" with [Concurrent Prefix Recovery](https://www.microsoft.com/en-us/research/uploads/prod/2019/01/cpr-sigmod19.pdf) (CDR) over a [Work Ahead Log](https://wiki.postgresql.org/wiki/Improve_the_performance_of_ALTER_TABLE_SET_LOGGED_UNLOGGED_statement)
 (WAL). This approach to transactions is reminiscent to that of [Microsoft Message Queue](https://support.microsoft.com/ms-my/help/256096/how-to-install-msmq-2-0-to-enable-queued-components) (MSMQ) for messages transacted in bulk when using the Microsoft
-Distributed Transaction Coordinator (MSDTC). But it's quite diffent from ["two-phase" commits](https://en.wikipedia.org/wiki/Two-phase_commit_protocol) in-memory database to durable disk propagation that is commonplace today. 
+Distributed Transaction Coordinator (MSDTC). But it's quite diffent from "unlogged" tables or in-memory database 
+flushing to a durable disk later on. 
 
 Further more, this version reverts back from Managed sockets to the
 Libuv-transport previously was used in AspNetCore 1.0 and [restored](https://github.com/aspnet/KestrelHttpServer/issues/2104) in AspNet 2.*. Similar to [this article](https://github.com/aspnet/KestrelHttpServer/issues/2104) it's found that performance drops
@@ -26,9 +27,10 @@ significantly in high-contention scenarios.
 
 Future aspirations may include:
 - A formal API (perhaps somthing reminiscent to MSMQ or IronMQ)
-  - Send (or Post)
-  - Peek (or Reserve)
-  - Delete (or Recieve or Get)
+  - `Send` (or Post)
+  - Explicit two-phase commits for retrieving messages:
+    - `Peek` (or Reserve)
+    - `Delete` (or Recieve or Get)  
 - Swagger/Swashbuckle
 - More [advanced benchmarks suites](https://github.com/aspnet/Benchmarks).
 - A Docker image and/or [Helm charts](https://helm.sh/).
@@ -36,7 +38,8 @@ Future aspirations may include:
 - Named queues for concurrency control.
 - Limitation to small messages (<256kB).
 - Possibly a client, or and example implementation of set of atomic yet composite messages.
-- Materialized views, cached responses or read models. 
+- Materialized views, cached responses or read models.
+
 
 ## Setup
 FASTER allocates disk preemptively. Around 1.1 GB is used per default. Consequently a large docker volume, or path on
