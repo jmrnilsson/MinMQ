@@ -30,7 +30,7 @@ RUN apt-get install -y --no-install-recommends \
 
 COPY --from=build /app/wrk/wrk-master/ /app/wrk/
 COPY install.sh /opt/install.sh
-COPY *.lua /app/wrk/Scripts/
+COPY *.lua /app/wrk/scripts/
 RUN chmod +x /opt/install.sh
 
 WORKDIR /app/wrk

@@ -17,7 +17,7 @@ namespace Service_Kestrel.Filters
 
 		public override void OnException(ExceptionContext context)
 		{
-			handler.Mend(context.Exception);
+			handler.ActOn(context.Exception);
 		}
 
 		public async override Task OnExceptionAsync(ExceptionContext context)
@@ -36,11 +36,12 @@ namespace Service_Kestrel.Filters
 			this.logger = logger;
 		}
 
-		public void Mend(Exception exception)
+		public void ActOn(Exception exception)
 		{
 			if (exception is BadHttpRequestException)
 			{
 				logger.LogInformation("A suspected thread starvation exceptions occured.");
+				return;
 			}
 			logger.LogError("Unhandled error={0}", exception);
 		}

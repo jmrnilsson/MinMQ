@@ -1,7 +1,8 @@
 ﻿namespace Service_Kestrel.Configuration
 {
-	public class ServiceKestrelOptions
-	{
-		public string FasterDevice { get; set; }
-	}
+	public class ServiceKestrelConfiguration
+    {
+        public string FasterDevice { get; set; }
+        public int LogCommitPollingEverySeconds { get; set; }
+    }
 }

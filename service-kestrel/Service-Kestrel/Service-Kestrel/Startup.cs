@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -37,14 +36,15 @@ namespace Service_Kestrel
 			});
 			services.AddTransient<CustomExceptionHandler>();
 			services.AddDbContext<MessagesContext>(options => options.UseInMemoryDatabase(databaseName: "Messages"));
-			services.AddOptions<ServiceKestrelOptions>().Configure(SetOptions).ValidateDataAnnotations();
+			services.AddOptions<ServiceKestrelConfiguration>().Configure(SetOptions).ValidateDataAnnotations();
 			services.AddHealthChecks();
 			services.AddScoped<CancellationTokenSourceFactory>(_ => () => new CancellationTokenSource());
 		}
 
-		private static void SetOptions(ServiceKestrelOptions o)
+		private static void SetOptions(ServiceKestrelConfiguration o)
 		{
 			o.FasterDevice = Configuration[nameof(o.FasterDevice)];
+			o.LogCommitPollingEverySeconds = int.Parse(Configuration[nameof(o.LogCommitPollingEverySeconds)]);
 		}
 
 		// public static void HandleFasterRun(IApplicationBuilder app)
@@ -73,7 +73,7 @@ namespace Service_Kestrel
 			app.UseEndpoints(endpoints =>
 			{
 				endpoints.MapControllers();
-				endpoints.MapGet("/faster-get", FasterHttpHandler.HandleRequest);
+				endpoints.MapPost("/faster-get", FasterHttpHandler.HandleRequest);
 				endpoints.MapHealthChecks("/healthcheck");
 			});
 		}

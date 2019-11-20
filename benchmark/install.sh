@@ -40,16 +40,16 @@ echo ''
 echo '- Make sure to check CPU and RAM saturation.'
 echo ''
 ./http-ready.sh
-# ./wrk -t12 -c400 -d10s -s ./mmq-post.lua http://mmq-service-kestrel:9000/efcore-in-mem-text
-# ./wrk -t12 -c400 -d10s -s ./mmq-post-large.lua http://mmq-service-kestrel:9000/efcore-in-mem-text
-# ./wrk -t12 -c400 -d10s -s ./mmq-post-json.lua http://mmq-service-kestrel:9000/efcore-in-mem-dto
-# ./wrk -t12 -c400 -d10s -s ./mmq-post-large.lua http://mmq-service-kestrel:9000/message-sync
+# ./wrk -t12 -c400 -d10s -s ./scripts/mmq-post.lua http://mmq-service-kestrel:9000/efcore-in-mem-text
+# ./wrk -t12 -c400 -d10s -s ./scripts/mmq-post-large.lua http://mmq-service-kestrel:9000/efcore-in-mem-text
+# ./wrk -t12 -c400 -d10s -s ./scripts/mmq-post-json.lua http://mmq-service-kestrel:9000/efcore-in-mem-dto
+# ./wrk -t12 -c400 -d10s -s ./scripts/mmq-post-large.lua http://mmq-service-kestrel:9000/message-sync
 ./wrk -t12 -c400 -d10s http://mmq-service-nodejs:8000/status
 ./wrk -t12 -c400 -d10s http://mmq-service-express:4000/status
 ./wrk -t12 -c400 -d10s http://mmq-service-kestrel:9000/status
 ./wrk -t12 -c400 -d10s http://mmq-service-kestrel:9000/healthcheck
-./wrk -t12 -c400 -d10s -s ./mmq-post.lua http://mmq-service-kestrel:9000/efcore-in-mem-dto
-./wrk -t12 -c400 -d10s -s ./mmq-post.lua http://mmq-service-kestrel:9000/faster
+./wrk -t12 -c400 -d10s -s ./scripts/mmq-post.lua http://mmq-service-kestrel:9000/efcore-in-mem-dto
+./wrk -t12 -c400 -d10s -s ./scripts/mmq-post.lua http://mmq-service-kestrel:9000/faster
 EOF
 
 chmod +x /app/wrk/status.sh
@@ -62,11 +62,11 @@ echo ''
 echo '- Make sure to check CPU and RAM saturation.'
 echo ''
 ./http-ready.sh
-./wrk -t1 -c5 -d5s -s ./mmq-post.lua http://mmq-service-kestrel:9000/efcore-in-mem-text
-./wrk -t12 -c400 -d3s -s ./mmq-post.lua http://mmq-service-kestrel:9000/faster-get
-./wrk -t1 -c5 -d7s -s ./mmq-post.lua http://mmq-service-kestrel:9000/faster
-./wrk -t2 -c15 -d7s -s ./mmq-post.lua http://mmq-service-kestrel:9000/faster
-./wrk -t12 -c400 -d7s -s ./mmq-post.lua http://mmq-service-kestrel:9000/faster
+./wrk -t1 -c5 -d5s -s ./scripts/mmq-post.lua http://mmq-service-kestrel:9000/efcore-in-mem-text
+./wrk -t12 -c400 -d3s -s ./scripts/mmq-post.lua http://mmq-service-kestrel:9000/faster-get
+./wrk -t1 -c5 -d7s -s ./scripts/mmq-post.lua http://mmq-service-kestrel:9000/faster
+./wrk -t2 -c15 -d7s -s ./scripts/mmq-post.lua http://mmq-service-kestrel:9000/faster
+./wrk -t12 -c400 -d7s -s ./scripts/mmq-post.lua http://mmq-service-kestrel:9000/faster
 EOF
 
 chmod +x /app/wrk/post_message.sh

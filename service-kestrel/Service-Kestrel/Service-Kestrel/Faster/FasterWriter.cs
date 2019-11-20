@@ -15,7 +15,7 @@ namespace Service_Kestrel
 
 		private FasterWriter()
 		{
-			string devicePath = Startup.Configuration[nameof(ServiceKestrelOptions.FasterDevice)];
+			string devicePath = Startup.Configuration[nameof(ServiceKestrelConfiguration.FasterDevice)];
 			device = Devices.CreateLogDevice(devicePath);
 			logger = new FasterLog(new FasterLogSettings { LogDevice = device });
 		}
