@@ -20,7 +20,8 @@ fast file handler. FASTER provides "group commits" with [Concurrent Prefix Recov
 (WAL). This approach to transactions is reminiscent to that of [Microsoft Message Queue](https://support.microsoft.com/ms-my/help/256096/how-to-install-msmq-2-0-to-enable-queued-components) (MSMQ) for messages transacted in bulk when using the Microsoft
 Distributed Transaction Coordinator (MSDTC). But it's quite diffent from "two-staged" commits (in-memory database to 
 durable disk propagation that is commonplace today. 
-    Further more, this version reverts back from Managed sockets to the
+
+Further more, this version reverts back from Managed sockets to the
 Libuv-transport previously was used in AspNetCore 1.0 and [restored](https://github.com/aspnet/KestrelHttpServer/issues/2104) in AspNet 2.*. Similar to [this article](https://github.com/aspnet/KestrelHttpServer/issues/2104) it's found that performance drops
 significantly in high-contention scenarios.
 
