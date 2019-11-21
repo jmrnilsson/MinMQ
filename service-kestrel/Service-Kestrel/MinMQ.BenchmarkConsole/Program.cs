@@ -12,8 +12,8 @@ namespace MinMQ.BenchmarkConsole
     class Program
     {
 		private static string[] words = GetWords().ToArray();
-		private const int showProgressEvery = 500;
-		private const int len = 7_500;
+		private const int showProgressEvery = 30;
+		private const int len = 300;
 		private static int wordIndex = 0;
 
 		static void Main(string[] args)
@@ -99,74 +99,68 @@ namespace MinMQ.BenchmarkConsole
 
 
 		/// <summary>
-		/// Poorly designed JSON generator. Depth is usually zero. Though lenght is variable.
+		/// Poorly designed JSON generator.
 		/// </summary>
 		/// <param name="seed"></param>
 		/// <returns></returns>
 		private static string GenerateJson(Random seed)
 		{
-			int propCount = seed.Next(10, 20);
+			int propCount = seed.Next(10, 100);
 
-			JObject doc = new JObject();
-			var child = new JProperty(Pick(words, seed), new JValue(Pick(words, seed)));  // Bottom child
-			// var topMost = child;
+			JObject child = new JObject(new JProperty(Pick(words, seed), new JValue(Pick(words, seed))));  // Bottom child
 			int i = 0;
 			while(i < propCount)
 			{
-				if (i < 1 || seed.Next(0, 2) < 1)
+				if (i < 1 || seed.Next(0, 5) < 1)
 				{
 					string prop_ = Pick(words, seed);
-					child = new JProperty(prop_, new JObject(child));
+					child = new JObject(new JProperty(prop_, child));
 				}
 				else 
 				{
 					string prop = Pick(words, seed);
-					string value = Pick(words, seed);
+					JToken value = null;
 
-					foreach(JToken c in child)
+					var chance = seed.Next(0, 5);
+					if (chance < 1)
 					{
-						// c.
-						//c
-						//c.AddAfterSelf(new JProperty(prop, new JValue(value)));
-						child.AddAfterSelf(c, new JProperty(prop, new JValue(value)));
-						c.AddAfterSelf(new JProperty(prop));
+						var values = Enumerable.Range(0, seed.Next(10)).Select(_ => new JValue(seed.Next(0, 999)));
+						value = new JArray(values);
+					}
+					else if (chance < 2)
+					{
+						value = new JValue(DateTime.Now);
+					}
+					else if (chance < 3)
+					{
+						value = new JValue(seed.Next(0, 10_000));
+					}
+					else if (chance < 4)
+					{
+						value = new JValue(seed.NextDouble());
+					}
+					else if (chance < 5)
+					{
+						new JValue(Pick(words, seed));
+					}
+
+					foreach ((string c, JToken a) in child)
+					{
+						try
+						{
+							child.Property(c).AddAfterSelf(new JProperty(prop, value));
+						}
+						catch (ArgumentException)
+						{
+							child.Property(c).AddAfterSelf(new JProperty(Guid.NewGuid().ToString(), value));
+						}
 						break;
 					}
-					//var token = child.Children()[0] as JObject;
-					//token.AddAfterSelf(new JProperty(prop, new JValue(value)));
 				}
 				i++;
-				// ((JObject)()).AddAfterSelf();
-				// child.AddAfterSelf(new JProperty(Pick(words, seed), new JValue(Pick(words, seed))));
-				// child = new JProperty(Pick(words, seed), child, new JProperty(Pick(words, seed), new JValue(Pick(words, seed))));
 			}
 
-			//int i = 0;
-			//int depth = 0;
-			//HashSet<string> used = new HashSet<string>();
-
-			//while (i < propCount)
-			//{
-			//	depth++;
-			//	string nextProp = Pick(words, seed);
-
-			//	if (used.Contains(nextProp))
-			//	{
-			//		nextProp = Guid.NewGuid().ToString();
-			//	}
-			//	else
-			//	{
-			//		used.Add(nextProp);
-			//	}
-
-			//	var child = new JProperty(nextProp, new JValue(Pick(words, seed)));
-			//	doc.Add(child);
-			//	i++;
-			//}
-
-			doc.Add(child);
-
-			return doc.ToString();
+			return child.ToString();
 		}
 
 		private static IEnumerable<string> GetWords()
