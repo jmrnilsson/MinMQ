@@ -58,12 +58,15 @@ chmod +x /app/wrk/status.sh
 echo 'Creating post_message.sh'
 cat >> /app/wrk/post_message.sh << EOF
 #!/bin/bash
+set -v
 echo ''
 echo '- Make sure to check CPU and RAM saturation.'
 echo ''
 ./http-ready.sh
 ./wrk -t1 -c5 -d5s -s ./scripts/mmq-post.lua http://mmq-service-kestrel:9000/efcore-in-mem-text
 ./wrk -t12 -c400 -d3s -s ./scripts/mmq-post.lua http://mmq-service-kestrel:9000/faster-get
+./wrk -t1 -c5 -d7s -s ./scripts/mmq-post-json-2.lua http://mmq-service-kestrel:9000/faster
+./wrk -t2 -c15 -d7s -s ./scripts/mmq-post-xml.lua http://mmq-service-kestrel:9000/faster
 ./wrk -t1 -c5 -d7s -s ./scripts/mmq-post.lua http://mmq-service-kestrel:9000/faster
 ./wrk -t2 -c15 -d7s -s ./scripts/mmq-post.lua http://mmq-service-kestrel:9000/faster
 ./wrk -t12 -c400 -d7s -s ./scripts/mmq-post.lua http://mmq-service-kestrel:9000/faster

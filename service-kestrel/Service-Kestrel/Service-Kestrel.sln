@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29324.140
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Service-Kestrel", "Service-Kestrel\Service-Kestrel.csproj", "{0806F4F4-011D-4841-A2EA-E784C0224EB5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Service-Kestrel", "Service-Kestrel\Service-Kestrel.csproj", "{0806F4F4-011D-4841-A2EA-E784C0224EB5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MinMQ.BenchmarkConsole", "MinMQ.BenchmarkConsole\MinMQ.BenchmarkConsole.csproj", "{BAEBB1F1-F13A-456D-8F7E-48A8BB72D098}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{0806F4F4-011D-4841-A2EA-E784C0224EB5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0806F4F4-011D-4841-A2EA-E784C0224EB5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0806F4F4-011D-4841-A2EA-E784C0224EB5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BAEBB1F1-F13A-456D-8F7E-48A8BB72D098}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BAEBB1F1-F13A-456D-8F7E-48A8BB72D098}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BAEBB1F1-F13A-456D-8F7E-48A8BB72D098}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BAEBB1F1-F13A-456D-8F7E-48A8BB72D098}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
