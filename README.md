@@ -42,6 +42,8 @@ Future aspirations may include:
 
 
 ## Setup
+**NOTE:** Linux/OSX may have to add sudo some of the Docker commands.
+
 FASTER allocates disk preemptively. Around 1.1 GB is used per default. Consequently a large docker volume, or path on
 disk that comfortably can allocate more than 1.1GB have to be assigned, preferably an SSD.
 
