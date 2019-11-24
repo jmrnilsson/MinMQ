@@ -12,7 +12,7 @@ namespace Service_Kestrel.RequestHandlers
 {
 	public static class FasterHttpHandler
 	{
-		private static SemaphoreSlim requestThrottling { get; set; } = new SemaphoreSlim(8, 8);
+		private static SemaphoreSlim requestThrottling { get; set; } = new SemaphoreSlim(4, 4);
 
 		public static async Task HandleRequest(HttpContext context)
 		{

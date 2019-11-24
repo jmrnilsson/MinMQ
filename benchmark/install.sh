@@ -74,6 +74,19 @@ EOF
 
 chmod +x /app/wrk/post_message.sh
 
+echo 'Creating arm.sh'
+cat >> /app/wrk/arm.sh << EOF
+#!/bin/bash
+set -v
+echo ''
+echo '- Make sure to check CPU and RAM saturation.'
+echo ''
+./http-ready.sh
+./wrk -t1 -c5 -d7s -s ./scripts/mmq-post.lua http://mmq-service-kestrel:9000/faster
+EOF
+
+chmod +x /app/wrk/arm.sh
+
 
 touch /opt/install_done
 echo 'Done!'
