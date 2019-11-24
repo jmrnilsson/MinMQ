@@ -21,9 +21,8 @@ namespace MinMQ.BenchmarkConsole
 		{
 			var jsons = new List<string>();
 			var xmls = new List<string>();
-			var seed = new Random();
-			var jsonGenerator = new JsonGenerator(500);
-			var xmlGenerator = new XmlGenerator(1000);
+			var jsonGenerator = new JsonGenerator(100);
+			var xmlGenerator = new XmlGenerator(200);
 
 			Console.WriteLine("Preparing payload");
 
@@ -38,13 +37,13 @@ namespace MinMQ.BenchmarkConsole
 				xmls.Add(xmlGenerator.Generate());
 			}
 
-			Console.WriteLine("-----------------XML-----------------");
-			Console.WriteLine();
-			Console.WriteLine(xmls[0]);
-			Console.WriteLine();
 			Console.WriteLine("-----------------JSON----------------");
 			Console.WriteLine();
 			Console.WriteLine(jsons[0]);
+			Console.WriteLine();
+			Console.WriteLine("-----------------XML-----------------");
+			Console.WriteLine();
+			Console.WriteLine(xmls[0]);
 			Console.WriteLine();
 		}
 

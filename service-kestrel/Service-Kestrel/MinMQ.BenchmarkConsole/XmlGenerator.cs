@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Xml;
 
 namespace MinMQ.BenchmarkConsole
 {
+
 	public class XmlGenerator : IDocumentGenerator<XmlElement>
 	{
 		private static Random seed = new Random();
@@ -35,6 +35,7 @@ namespace MinMQ.BenchmarkConsole
 			int depth = 0;
 			while (i < propCount)
 			{
+				// Every prop-count, 
 				depth++;
 				var child = doc.CreateElement(wordFactory());
 				root.InsertAfter(child, root.FirstChild);
@@ -42,26 +43,31 @@ namespace MinMQ.BenchmarkConsole
 
 				while (depth < 20)
 				{
-					var appendChild = seed.Next(0, 3);
-					var orMakeAttribute = seed.Next(0, 2);
+					// Per prop-count and 20 times
+					// - Append another child or set attr
+					if (seed.OneIn(5)) break;
 
-					if (appendChild < 1)
-					{
-						break;
-					}
+					bool orSetAttr = seed.OneIn(2);
 
-					depth++;
-					i++;
+					//if (@break)
+					//{
+					//	// depth++;
+					//	break;
+					//	// continue;
+					//}
 
-					if (orMakeAttribute < 1)
+
+					if (orSetAttr)
 					{
 						child.SetAttribute(wordFactory(), wordFactory());
 						continue;
 					}
+
 					var nextChild = doc.CreateElement(wordFactory());
 					child.AppendChild(nextChild);
 					child = nextChild;
 				}
+				i++;
 
 				child.InnerText = $"{wordFactory()} {wordFactory()} {wordFactory()} {wordFactory()}";
 				depth = 0;
