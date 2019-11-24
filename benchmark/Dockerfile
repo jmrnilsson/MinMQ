@@ -16,7 +16,8 @@ RUN apt-get install -y --no-install-recommends \
 # RUN make
 
 WORKDIR /app/wrk
-RUN wget https://github.com/wg/wrk/archive/master.zip
+# RUN wget https://github.com/wg/wrk/archive/master.zip
+RUN wget https://github.com/jmrnilsson/wrk/archive/master.zip > /dev/null 2>&1
 RUN unzip master.zip
 RUN (cd wrk-master; make)
 
