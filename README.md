@@ -9,7 +9,7 @@ HTTP-transport for comfortable transmission of small messages.
 
 This effort focuses on having:
 - Below 50 ms latency
-- Throughput of at least 10 000 messages per second
+- High throughput (dependant on storage)
 - Transactional commits that are durable
 - Continuous benchmarks mend discoverability  of performance hits
 - In-order processing
@@ -42,6 +42,8 @@ Future aspirations may include:
 
 
 ## Setup
+**NOTE:** Linux/OSX may have to add sudo some of the Docker commands.
+
 FASTER allocates disk preemptively. Around 1.1 GB is used per default. Consequently a large docker volume, or path on
 disk that comfortably can allocate more than 1.1GB have to be assigned, preferably an SSD.
 
@@ -79,3 +81,7 @@ Some ad-hoc performance comparisons have been made [comparing both different web
 (./web-performance.md); Mostly those kinds that rely on Libuv. Moreover, benchmarks are mainly focused towards
 seeing commit-over-commit performance hits. Metrics in focus are really just _throughput_ and _latency_. Some
 unstructured logs of benchmarks runs can be found in [performance.md](./performance.md).
+
+## Links 
+- https://docs.microsoft.com/en-us/aspnet/core/fundamentals/middleware/write?view=aspnetcore-3.0#per-request-middleware-dependencies
+- https://docs.microsoft.com/en-us/aspnet/core/fundamentals/dependency-injection?view=aspnetcore-3.0

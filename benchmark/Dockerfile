@@ -11,14 +11,13 @@ RUN apt-get install -y --no-install-recommends \
     wget \
     unzip
 
+WORKDIR /source
 # RUN git clone https://github.com/wg/wrk.git app/wrk
-# WORKDIR /app/wrk
-# RUN make
-
-WORKDIR /app/wrk
 RUN wget https://github.com/wg/wrk/archive/master.zip
+# RUN wget https://github.com/jmrnilsson/wrk/archive/master.zip
 RUN unzip master.zip
-RUN (cd wrk-master; make)
+COPY ARM64v8-atomic-op-fix.diff /source/wrk-master/
+RUN (cd wrk-master; patch -p1 < ./ARM64v8-atomic-op-fix.diff; make)
 
 FROM ubuntu:eoan-20191017 AS mmq-benchmark
 
@@ -28,7 +27,7 @@ RUN apt-get install -y --no-install-recommends \
     ca-certificates \
     curl
 
-COPY --from=build /app/wrk/wrk-master/ /app/wrk/
+COPY --from=build /source/wrk-master/ /app/wrk/
 COPY install.sh /opt/install.sh
 COPY *.lua /app/wrk/scripts/
 RUN chmod +x /opt/install.sh

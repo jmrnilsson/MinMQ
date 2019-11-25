@@ -1,10 +1,10 @@
-FROM mcr.microsoft.com/dotnet/core/sdk:3.0.100-buster AS build
+FROM mcr.microsoft.com/dotnet/core/sdk AS build
 WORKDIR /src
 COPY ./Service-Kestrel/Service-Kestrel .
 RUN dotnet build "Service-Kestrel.csproj"
 RUN dotnet publish "Service-Kestrel.csproj" -c Release -o /app
 
-FROM mcr.microsoft.com/dotnet/core/aspnet:3.0.0-buster-slim AS mmq
+FROM mcr.microsoft.com/dotnet/core/aspnet AS mmq
 # ENV ASPNETCORE_ENVIRONMENT Docker
 # ENV ASPNETCORE_URLS "http://0.0.0.0:9000"
 ENV ASPNETCORE_ENVIRONMENT "Docker"
