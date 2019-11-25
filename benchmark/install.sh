@@ -55,8 +55,8 @@ EOF
 chmod +x /app/wrk/status.sh
 
 
-echo 'Creating post_message.sh'
-cat >> /app/wrk/post_message.sh << EOF
+echo 'Creating misc.sh'
+cat >> /app/wrk/misc.sh << EOF
 #!/bin/bash
 set -e
 echo ''
@@ -78,6 +78,27 @@ echo '** LARGE JSON 15C **'
 echo ''
 echo '** JSON 400C **'
 ./wrk -t12 -c400 -d7s -s ./scripts/mmq-post.lua http://mmq-service:9000/faster
+EOF
+
+chmod +x /app/wrk/misc.sh
+
+echo 'Creating post_message.sh'
+cat >> /app/wrk/post_message.sh << EOF
+#!/bin/bash
+set -e
+echo ''
+echo '- Make sure to check CPU and RAM saturation.'
+echo ''
+./http-ready.sh
+echo ''
+echo '** EF CORE IN-MEMORY DB **'
+./wrk -t1 -c5 -d5s -s ./scripts/mmq-post.lua http://mmq-service:9000/efcore-in-mem-text
+echo ''
+echo '** JSON 400C **'
+./wrk -t12 -c400 -d12s -s ./scripts/mmq-post.lua http://mmq-service:9000/faster
+echo ''
+echo '** HTTP-GET HANDLE 400c **'
+./wrk -t12 -c400 -d12s -s ./scripts/mmq-post.lua http://mmq-service:9000/faster-get
 EOF
 
 chmod +x /app/wrk/post_message.sh
