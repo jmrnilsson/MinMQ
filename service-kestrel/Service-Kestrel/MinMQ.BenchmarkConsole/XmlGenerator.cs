@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Xml;
@@ -6,71 +7,27 @@ using System.Xml;
 namespace MinMQ.BenchmarkConsole
 {
 
-	public class XmlGenerator : IDocumentGenerator<XmlElement>
+	public class XmlGenerator : GeneratorBase<XmlElement>
 	{
-		private static Random seed = new Random();
-		private readonly int maxNumberOfProps;
-		private const int minNoOfProps = 10;
-
-		public XmlGenerator(int maxNumberOfProps)
-		{
-			this.maxNumberOfProps = Math.Max(minNoOfProps + 1, maxNumberOfProps);
-		}
+		XmlDocument doc;
+		public XmlGenerator(int n) : base(n) { }
 
 		/// <summary>
 		/// XML-generator. Combines variable depth with attributes and sets a text value at the lowest child.
 		/// </summary>
-		/// <param name="seed"></param>
 		/// <returns></returns>
-		public string Generate()
+		public override string GenerateObject()
 		{
-			Func<string> wordFactory = Words.Pick;
-			int propCount = seed.Next(minNoOfProps, maxNumberOfProps);
-
-			XmlDocument doc = new XmlDocument();
-			doc.AppendChild(doc.CreateElement(wordFactory()));
+			doc = new XmlDocument();
+			doc.AppendChild(doc.CreateElement(Words.Pick()));
 			var root = doc.DocumentElement;
 
-			int i = 0;
 			int depth = 0;
-			while (i < propCount)
+			var children = GenerateChildren(++depth);
+
+			foreach(XmlElement child in children)
 			{
-				// Every prop-count, 
-				depth++;
-				var child = doc.CreateElement(wordFactory());
-				root.InsertAfter(child, root.FirstChild);
-				i++;
-
-				while (depth < 20)
-				{
-					// Per prop-count and 20 times
-					// - Append another child or set attr
-					if (seed.OneIn(5)) break;
-
-					bool orSetAttr = seed.OneIn(2);
-
-					//if (@break)
-					//{
-					//	// depth++;
-					//	break;
-					//	// continue;
-					//}
-
-
-					if (orSetAttr)
-					{
-						child.SetAttribute(wordFactory(), wordFactory());
-						continue;
-					}
-
-					var nextChild = doc.CreateElement(wordFactory());
-					child.AppendChild(nextChild);
-					child = nextChild;
-				}
-				i++;
-
-				child.InnerText = $"{wordFactory()} {wordFactory()} {wordFactory()} {wordFactory()}";
-				depth = 0;
+				root.AppendChild(child);
 			}
 
 			return PrintXml(doc.InnerXml);
@@ -104,9 +61,29 @@ namespace MinMQ.BenchmarkConsole
 			return formattedXml;
 		}
 
-		public XmlElement GenerateObject(XmlElement child, bool allowCollisions)
+		protected override XmlElement GenerateChild(IEnumerable<XmlElement> innerChildren)
 		{
-			throw new NotImplementedException();
+			Func<string> wordFactory = Words.Pick;
+			int numberOfProps = NumberOfProperties();
+			var child = doc.CreateElement(wordFactory());
+
+			for(int i = 0; i < numberOfProps; i++)
+			{
+				child.SetAttribute(wordFactory(), wordFactory());
+			}
+
+			foreach(XmlElement innerChild in innerChildren)
+			{
+				child.AppendChild(innerChild);
+			}
+
+			if (child.ChildNodes.Count < 1)
+			{
+				child.InnerText = $"{wordFactory()} {wordFactory()} {wordFactory()} {wordFactory()}";
+			}
+
+			return child;
+
 		}
 	}
 }

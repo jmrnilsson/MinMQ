@@ -7,22 +7,18 @@ using System.Xml;
 
 namespace MinMQ.BenchmarkConsole
 {
-	public interface IDocumentGenerator<T> where T : class
-	{
-		T GenerateObject(T child, bool allowCollisions);
-	}
-
 	class Program
 	{
 		private const int showProgressEvery = 30;
 		private const int len = 1000;
+		private const int ntree = 5;  // n = 2 == binary tree
 
 		static void Main(string[] args)
 		{
 			var jsons = new List<string>();
 			var xmls = new List<string>();
-			var jsonGenerator = new JsonGenerator(100);
-			var xmlGenerator = new XmlGenerator(200);
+			var jsonGenerator = new JsonGenerator(ntree);
+			var xmlGenerator = new XmlGenerator(ntree);
 
 			Console.WriteLine("Preparing payload");
 
@@ -33,8 +29,8 @@ namespace MinMQ.BenchmarkConsole
 					Console.WriteLine($"{Math.Floor((decimal)i * 100 / len)}%");
 				}
 
-				jsons.Add(jsonGenerator.Generate());
-				xmls.Add(xmlGenerator.Generate());
+				jsons.Add(jsonGenerator.GenerateObject());
+				xmls.Add(xmlGenerator.GenerateObject());
 			}
 
 			Console.WriteLine("-----------------JSON----------------");

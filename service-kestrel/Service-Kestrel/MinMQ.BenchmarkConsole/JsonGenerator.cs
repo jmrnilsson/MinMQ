@@ -1,56 +1,24 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace MinMQ.BenchmarkConsole
 {
-	public class JsonGenerator // : IDocumentGenerator<JToken>
+	public class JsonGenerator : GeneratorBase<JObject>
 	{
-		private static Random seed = new Random();
-		private readonly int maxNoOfProps;
-		private const int minNoOfProps = 10;
-		public JsonGenerator(int maxNoOfProps)
-		{
-			this.maxNoOfProps = Math.Max(minNoOfProps + 1, maxNoOfProps);
-		}
+		public JsonGenerator(int n) : base(n) { }
 
 		/// <summary>
 		/// Poorly designed JSON generator.
 		/// </summary>
 		/// <returns></returns>
-		public string Generate()
+		public override string GenerateObject()
 		{
-			Func<string> wordFactory = Words.Pick;
-			int propCount = seed.Next(minNoOfProps, maxNoOfProps);
-
-			JObject child = new JObject(new JProperty(wordFactory(), new JValue(wordFactory())));  // Bottom child
-			int i = 0;
-			while (i < propCount)
-			{
-				if (i < 1 || seed.Next(0, 2) < 1)
-				{
-					// Set parent and assign child to a property
-					child = new JObject(GenerateObject(true, child));
-				}
-				else
-				{
-					foreach ((string c, JToken a) in child)
-					{
-						try
-						{
-							// Attach sibling
-							child.Property(c).AddAfterSelf(GenerateObject(true));
-						}
-						catch (ArgumentException)
-						{
-							// Retry with GUID as property name since property may already be in use.
-							child.Property(c).AddAfterSelf(GenerateObject(false));
-						}
-						break;
-					}
-				}
-				i++;
-			}
+			JObject child = new JObject(new JProperty(Words.Pick(), new JValue(Words.Pick())));
+			int depth = 0;
+			IEnumerable<JObject> children = GenerateChildren(++depth);
+			AddChildren(children, child);
 
 			return child.ToString();
 		}
@@ -70,16 +38,30 @@ namespace MinMQ.BenchmarkConsole
 			}
 		}
 
-		public JToken GenerateObject(bool allowCollisions, JToken child = null)
+		protected override JObject GenerateChild(IEnumerable<JObject> innerChildren)
 		{
 			JToken value = GenerateJValue(seed);
+			JProperty prop = new JProperty(Words.Pick(), value);
+			JObject child = new JObject(prop);
 
-			if (allowCollisions)
+			AddChildren(innerChildren, child);
+
+			return child;
+		}
+
+		private static void AddChildren(IEnumerable<JObject> innerChildren, JObject child)
+		{
+			foreach (JObject innerChild in innerChildren)
 			{
-				return new JProperty(Words.Pick(), child ?? value);
+				try
+				{
+					child.Add(Words.Pick(), innerChild);
+				}
+				catch (ArgumentException)
+				{
+					child.Add(Guid.NewGuid().ToString(), innerChild);
+				}
 			}
-
-			return new JProperty(Guid.NewGuid().ToString(), child ?? value);
 		}
 	}
 }
