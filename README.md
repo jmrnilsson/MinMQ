@@ -9,7 +9,7 @@ HTTP-transport for comfortable transmission of small messages.
 
 This effort focuses on having:
 - Below 50 ms latency
-- Throughput of at least 10 000 messages per second
+- High throughput (dependant on storage)
 - Transactional commits that are durable
 - Continuous benchmarks mend discoverability  of performance hits
 - In-order processing
