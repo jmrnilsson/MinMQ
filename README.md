@@ -61,7 +61,7 @@ With Docker-compose
     docker-compose run mmq-benchmark -- status.sh
   
 Or, 
-    docker-compose run mmq-benchmark -- post_message.sh
+    docker-compose run mmq-benchmarks -- post_message.sh
 
 Or just enter benchmark container,
 
