@@ -55,13 +55,13 @@ shell-script instead.
 If you plan to run the service without a container service the path set as FasterDevice in [appsettings.Development.json](./service-kestrel/Service-Kestrel/Service-Kestrel/appsettings.Development.json) must be assigned.
 
 ## Usage
-With Docker-compose
+With Docker-compose. `Sudo` is system dependant doesn't have to apply.
 
     docker-compose build; docker-compose up;
-    docker-compose run mmq-benchmark -- status.sh
+    sudo docker-compose run mmq-benchmarks -- status.sh
   
 Or, 
-    docker-compose run mmq-benchmarks -- post_message.sh
+    sudo docker-compose run mmq-benchmarks -- post_message.sh
 
 Or just enter benchmark container,
 
