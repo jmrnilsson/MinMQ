@@ -48,7 +48,7 @@ echo ''
 ./wrk -t12 -c400 -d10s http://mmq-service-express:4000/status
 ./wrk -t12 -c400 -d10s http://mmq-service-kestrel:9000/status
 ./wrk -t12 -c400 -d10s http://mmq-service-kestrel:9000/healthcheck
-./wrk -t12 -c400 -d10s -s ./scripts/mmq-post.lua http://mmq-service-kestrel:9000/efcore-in-mem-dto
+./wrk -t12 -c400 -d10s -s ./scripts/mmq-post.lua http://mmq-service-kestrel:9000/efcore-in-mem-text
 ./wrk -t12 -c400 -d10s -s ./scripts/mmq-post.lua http://mmq-service-kestrel:9000/faster
 EOF
 
