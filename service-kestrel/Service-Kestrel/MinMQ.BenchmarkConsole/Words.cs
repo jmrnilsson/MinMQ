@@ -9,11 +9,11 @@ namespace MinMQ.BenchmarkConsole
 	{
 		private static int wordIndex = 0;
 
-		public static Lazy<string[]> Instance = new Lazy<string[]>(WordFactory);
+		public static Lazy<string[]> Instance { get; set; } = new Lazy<string[]>(WordFactory);
 
 		public static string[] WordFactory()
 		{
-			IEnumerable<string> GetWords()
+			static IEnumerable<string> GetWords()
 			{
 				var phrase = @"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris eleifend leo ut velit pellentesque
 				dictum. In venenatis ipsum non lacinia luctus. Aliquam pretium mauris nec quam imperdiet, in euismod ligula
@@ -67,7 +67,5 @@ namespace MinMQ.BenchmarkConsole
 
 			return Instance.Value[wordIndex];
 		}
-
 	}
-
 }

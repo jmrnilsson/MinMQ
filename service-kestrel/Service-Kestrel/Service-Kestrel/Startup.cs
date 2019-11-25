@@ -5,12 +5,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Service_Kestrel.Configuration;
-using Service_Kestrel.Filters;
-using Service_Kestrel.Models;
-using Service_Kestrel.RequestHandlers;
+using MinMQ.Service.Configuration;
+using MinMq.Service.Filters;
+using MinMq.Service.Models;
+using MinMq.Service.RequestHandlers;
 
-namespace Service_Kestrel
+namespace MinMq.Service
 {
 	public delegate CancellationTokenSource CancellationTokenSourceFactory();
 	
@@ -32,12 +32,12 @@ namespace Service_Kestrel
 			});
 			services.AddTransient<CustomExceptionHandler>();
 			services.AddDbContext<MessagesContext>(options => options.UseInMemoryDatabase(databaseName: "Messages"));
-			services.AddOptions<ServiceKestrelConfiguration>().Configure(SetOptions).ValidateDataAnnotations();
+			services.AddOptions<MinMQConfiguration>().Configure(SetOptions).ValidateDataAnnotations();
 			services.AddHealthChecks();
 			services.AddScoped<CancellationTokenSourceFactory>(_ => () => new CancellationTokenSource());
 		}
 
-		private static void SetOptions(ServiceKestrelConfiguration o)
+		private static void SetOptions(MinMQConfiguration o)
 		{
 			o.FasterDevice = Configuration[nameof(o.FasterDevice)];
 		}

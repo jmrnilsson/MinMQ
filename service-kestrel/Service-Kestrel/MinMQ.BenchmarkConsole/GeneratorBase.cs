@@ -6,13 +6,13 @@ namespace MinMQ.BenchmarkConsole
 {
 	public abstract class GeneratorBase<T>
 	{
-		protected Random seed = new Random();
 		private readonly int n;
 
 		public GeneratorBase(int n)
 		{
 			this.n = n;
 		}
+		protected Random Seed { get; set; } = new Random();
 
 		protected abstract T GenerateChild(IEnumerable<T> innerChildren);
 		public abstract string GenerateObject();
@@ -21,7 +21,7 @@ namespace MinMQ.BenchmarkConsole
 		{
 			if (depth < 10)
 			{
-				var count = seed.Next(0, n);
+				var count = Seed.Next(0, n);
 				for (int i = 0; i < count; i++)
 				{
 					yield return GenerateChild(GenerateChildren(++depth));
@@ -31,7 +31,7 @@ namespace MinMQ.BenchmarkConsole
 
 		protected int NumberOfProperties()
 		{
-			return seed.Next(0, 6);
+			return Seed.Next(0, 6);
 		}
 	}
 }

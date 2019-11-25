@@ -4,9 +4,9 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Service_Kestrel.Faster;
+using MinMq.Service.Faster;
 
-namespace Service_Kestrel
+namespace MinMq.Service
 {
 	delegate void LogOrPrint(string message, params object[] args);
 
@@ -19,6 +19,7 @@ namespace Service_Kestrel
 			using (var scope = host.Services.CreateScope())
 			{
 				LogOrPrint logOrPrint;
+
 				try
 				{
 					logOrPrint = new LogOrPrint(host.Services.GetRequiredService<ILogger<Program>>().LogInformation);

@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
 
-namespace Service_Kestrel.Filters
+namespace MinMq.Service.Filters
 {
 	public class CustomExceptionFilterAttribute : ExceptionFilterAttribute
 	{

@@ -6,7 +6,7 @@ services:
   #   - "27017:27017"
   #   volumes:
   #   - mongodata:/data/db
-  mmq-service-kestrel:
+  mmq-service:
     build: ./service-kestrel
     ports:
     - "9000:9000"
@@ -29,7 +29,7 @@ services:
   mmq-benchmarks:
     build: ./benchmark
     links:
-    - "mmq-service-kestrel"
+    - "mmq-service"
     - "mmq-service-nodejs"
     - "mmq-service-express"
 volumes:

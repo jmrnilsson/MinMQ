@@ -1,9 +1,9 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Service_Kestrel.Controllers.Dto;
-using Service_Kestrel.Models;
+using MinMq.Service.Controllers.Dto;
+using MinMq.Service.Models;
 
-namespace Service_Kestrel.Controllers
+namespace MinMq.Service.Controllers
 {
 	[Route("api")]
 	[ApiController]

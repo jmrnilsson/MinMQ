@@ -1,18 +1,21 @@
-﻿using Newtonsoft.Json.Linq;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json.Linq;
 
 namespace MinMQ.BenchmarkConsole
 {
 	public class JsonGenerator : GeneratorBase<JObject>
 	{
-		public JsonGenerator(int n) : base(n) { }
+		public JsonGenerator(int n)
+            : base(n)
+        {
+        }
 
 		/// <summary>
-		/// Poorly designed JSON generator.
+		/// A JSON generator.
 		/// </summary>
-		/// <returns></returns>
+		/// <returns>JSON with random objects and values</returns>
 		public override string GenerateObject()
 		{
 			JObject child = new JObject(new JProperty(Words.Pick(), new JValue(Words.Pick())));
@@ -40,7 +43,7 @@ namespace MinMQ.BenchmarkConsole
 
 		protected override JObject GenerateChild(IEnumerable<JObject> innerChildren)
 		{
-			JToken value = GenerateJValue(seed);
+			JToken value = GenerateJValue(Seed);
 			JProperty prop = new JProperty(Words.Pick(), value);
 			JObject child = new JObject(prop);
 

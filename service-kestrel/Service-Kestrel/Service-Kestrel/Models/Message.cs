@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Service_Kestrel.Models
+namespace MinMq.Service.Models
 {
 	public sealed class Message
 	{

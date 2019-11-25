@@ -6,16 +6,18 @@ using System.Xml;
 
 namespace MinMQ.BenchmarkConsole
 {
-
 	public class XmlGenerator : GeneratorBase<XmlElement>
 	{
-		XmlDocument doc;
-		public XmlGenerator(int n) : base(n) { }
+		private XmlDocument doc;
+		public XmlGenerator(int n)
+            : base(n)
+        {
+        }
 
 		/// <summary>
 		/// XML-generator. Combines variable depth with attributes and sets a text value at the lowest child.
 		/// </summary>
-		/// <returns></returns>
+		/// <returns>XML with random attributes and elements</returns>
 		public override string GenerateObject()
 		{
 			doc = new XmlDocument();
@@ -25,40 +27,12 @@ namespace MinMQ.BenchmarkConsole
 			int depth = 0;
 			var children = GenerateChildren(++depth);
 
-			foreach(XmlElement child in children)
+			foreach (XmlElement child in children)
 			{
 				root.AppendChild(child);
 			}
 
 			return PrintXml(doc.InnerXml);
-		}
-
-		public static string PrintXml(string xml)
-		{
-			string formattedXml = "";
-
-			MemoryStream memoryStream = new MemoryStream();
-			XmlTextWriter writer = new XmlTextWriter(memoryStream, Encoding.Unicode);
-			XmlDocument document = new XmlDocument();
-
-			try
-			{
-				document.LoadXml(xml);
-				writer.Formatting = Formatting.Indented;
-				document.WriteContentTo(writer);
-				writer.Flush();
-				memoryStream.Flush();
-				memoryStream.Position = 0;
-				StreamReader sReader = new StreamReader(memoryStream);
-				formattedXml = sReader.ReadToEnd();
-			}
-			finally
-			{
-				memoryStream.Close();
-				writer.Close();
-			}
-
-			return formattedXml;
 		}
 
 		protected override XmlElement GenerateChild(IEnumerable<XmlElement> innerChildren)
@@ -67,12 +41,12 @@ namespace MinMQ.BenchmarkConsole
 			int numberOfProps = NumberOfProperties();
 			var child = doc.CreateElement(wordFactory());
 
-			for(int i = 0; i < numberOfProps; i++)
+			for (int i = 0; i < numberOfProps; i++)
 			{
 				child.SetAttribute(wordFactory(), wordFactory());
 			}
 
-			foreach(XmlElement innerChild in innerChildren)
+			foreach (XmlElement innerChild in innerChildren)
 			{
 				child.AppendChild(innerChild);
 			}
@@ -83,7 +57,35 @@ namespace MinMQ.BenchmarkConsole
 			}
 
 			return child;
+		}
 
+		public static string PrintXml(string xml)
+		{
+			string formattedXml = "";
+
+			MemoryStream memoryStream = new MemoryStream();
+			XmlTextWriter writer = new XmlTextWriter(memoryStream, Encoding.Unicode);
+			XmlDocument document = new XmlDocument();
+			StreamReader reader = new StreamReader(memoryStream);
+
+			try
+			{
+				document.LoadXml(xml);
+				writer.Formatting = Formatting.Indented;
+				document.WriteContentTo(writer);
+				writer.Flush();
+				memoryStream.Flush();
+				memoryStream.Position = 0;
+				formattedXml = reader.ReadToEnd();
+			}
+			finally
+			{
+				reader.Close();
+				memoryStream.Close();
+				writer.Close();
+			}
+
+			return formattedXml;
 		}
 	}
 }

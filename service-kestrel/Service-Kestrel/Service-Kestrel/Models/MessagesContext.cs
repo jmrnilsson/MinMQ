@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Service_Kestrel.Models
+namespace MinMq.Service.Models
 {
 	public class MessagesContext : DbContext
 	{

@@ -6,11 +6,12 @@ namespace MinMQ.BenchmarkConsole
 	public static class RandomExtensions
 	{
 		/// <summary>
-		/// Python-inspired random choice
+		/// Python inspired random choice
 		/// </summary>
-		/// <param name="randon"></param>
-		/// <param name="options"></param>
-		/// <returns></returns>
+		/// <typeparam name="T">Object or value</typeparam>
+		/// <param name="random">Random</param>
+		/// <param name="options">Options</param>
+		/// <returns>Returns a random choice out of several options</returns>
 		public static T Choice<T>(this Random random, params T[] options)
 		{
 			var choice = random.Next(1, options.Length) - 1;
@@ -18,12 +19,13 @@ namespace MinMQ.BenchmarkConsole
 		}
 
 		/// <summary>
-		/// Python-inspired random choice for enums
+		/// Python inspired random choice for enums
 		/// </summary>
-		/// <param name="randon"></param>
-		/// <param name="options"></param>
-		/// <returns></returns>
-		public static T Choice<T>(this Random random) where T : struct, IConvertible
+		/// <typeparam name="T">enum</typeparam>
+		/// <param name="random">Random</param>
+		/// <returns>Returns one enum</returns>
+		public static T Choice<T>(this Random random)
+		    where T : struct, IConvertible
 		{
 			if (!typeof(T).IsEnum) throw new ArgumentException("Type must be an enumerated type");
 

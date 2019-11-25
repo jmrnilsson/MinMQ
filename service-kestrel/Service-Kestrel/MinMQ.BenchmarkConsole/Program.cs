@@ -7,26 +7,26 @@ using System.Xml;
 
 namespace MinMQ.BenchmarkConsole
 {
-	class Program
+	public class Program
 	{
-		private const int showProgressEvery = 30;
-		private const int len = 1000;
-		private const int ntree = 5;  // n = 2 == binary tree
+		private const int ShowProgressEvery = 30;
+		private const int TotalNumberOfObject = 1000;
+		private const int NTree = 5;  // NTree = 2 == binary tree
 
-		static void Main(string[] args)
+		public static void Main(string[] args)
 		{
 			var jsons = new List<string>();
 			var xmls = new List<string>();
-			var jsonGenerator = new JsonGenerator(ntree);
-			var xmlGenerator = new XmlGenerator(ntree);
+			var jsonGenerator = new JsonGenerator(NTree);
+			var xmlGenerator = new XmlGenerator(NTree);
 
 			Console.WriteLine("Preparing payload");
 
-			for (int i = 0; i < len; i++)
+			for (int i = 0; i < TotalNumberOfObject; i++)
 			{
-				if (i > 0 && i % showProgressEvery == 0)
+				if (i > 0 && i % ShowProgressEvery == 0)
 				{
-					Console.WriteLine($"{Math.Floor((decimal)i * 100 / len)}%");
+					Console.WriteLine($"{Math.Floor((decimal)i * 100 / TotalNumberOfObject)}%");
 				}
 
 				jsons.Add(jsonGenerator.GenerateObject());
@@ -42,8 +42,5 @@ namespace MinMQ.BenchmarkConsole
 			Console.WriteLine(xmls[0]);
 			Console.WriteLine();
 		}
-
-
 	}
-
 }

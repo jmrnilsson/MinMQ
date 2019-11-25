@@ -1,10 +1,10 @@
 ﻿using FASTER.core;
-using Service_Kestrel.Configuration;
+using MinMQ.Service.Configuration;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Service_Kestrel
+namespace MinMq.Service
 {
 	public sealed class FasterWriter : IFasterWriter
 	{
@@ -15,7 +15,7 @@ namespace Service_Kestrel
 
 		private FasterWriter()
 		{
-			string devicePath = Startup.Configuration[nameof(ServiceKestrelConfiguration.FasterDevice)];
+			string devicePath = Startup.Configuration[nameof(MinMQConfiguration.FasterDevice)];
 			device = Devices.CreateLogDevice(devicePath);
 			logger = new FasterLog(new FasterLogSettings { LogDevice = device });
 		}

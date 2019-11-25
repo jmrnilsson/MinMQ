@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Service_Kestrel.Controllers.Dto
+namespace MinMq.Service.Controllers.Dto
 {
     public class StatusDto
     {

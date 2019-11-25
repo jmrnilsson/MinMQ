@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace Service_Kestrel.Faster
+namespace MinMq.Service.Faster
 {
 	delegate ValueTask CommitAsyncDelegate(CancellationToken token = default);
 
