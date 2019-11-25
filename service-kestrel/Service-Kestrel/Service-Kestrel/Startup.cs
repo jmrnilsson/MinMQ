@@ -6,14 +6,14 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using MinMQ.Service.Configuration;
-using MinMq.Service.Filters;
-using MinMq.Service.Models;
-using MinMq.Service.RequestHandlers;
+using MinMQ.Service.Filters;
+using MinMQ.Service.Models;
+using MinMQ.Service.RequestHandlers;
 
-namespace MinMq.Service
+namespace MinMQ.Service
 {
 	public delegate CancellationTokenSource CancellationTokenSourceFactory();
-	
+
 	public class Startup
 	{
 		public Startup(IConfiguration configuration)
@@ -59,7 +59,7 @@ namespace MinMq.Service
 
 			app.UseRouting();
 
-			//app.UseAuthorization();
+			// app.UseAuthorization();
 
 			app.UseEndpoints(endpoints =>
 			{

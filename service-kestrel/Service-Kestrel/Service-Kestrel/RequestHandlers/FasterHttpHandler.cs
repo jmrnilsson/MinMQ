@@ -1,10 +1,10 @@
-﻿using Microsoft.AspNetCore.Http;
-using System.IO;
+﻿using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 
-namespace MinMq.Service.RequestHandlers
+namespace MinMQ.Service.RequestHandlers
 {
 	public static class FasterHttpHandler
 	{

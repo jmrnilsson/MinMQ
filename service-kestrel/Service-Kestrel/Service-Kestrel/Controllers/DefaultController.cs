@@ -1,9 +1,9 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using MinMq.Service.Controllers.Dto;
-using MinMq.Service.Models;
+using MinMQ.Service.Controllers.Dto;
+using MinMQ.Service.Models;
 
-namespace MinMq.Service.Controllers
+namespace MinMQ.Service.Controllers
 {
 	[Route("api")]
 	[ApiController]

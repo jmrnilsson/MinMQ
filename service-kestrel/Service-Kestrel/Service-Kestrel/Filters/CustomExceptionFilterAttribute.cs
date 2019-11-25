@@ -1,10 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc.Filters;
+﻿using System;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Threading.Tasks;
 
-namespace MinMq.Service.Filters
+namespace MinMQ.Service.Filters
 {
 	public class CustomExceptionFilterAttribute : ExceptionFilterAttribute
 	{

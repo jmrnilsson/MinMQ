@@ -1,17 +1,15 @@
-﻿using FASTER.core;
-using MinMQ.Service.Configuration;
-using System;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using FASTER.core;
+using MinMQ.Service.Configuration;
 
-namespace MinMq.Service
+namespace MinMQ.Service
 {
 	public sealed class FasterWriter : IFasterWriter
 	{
-		private IDevice device;
-		private FasterLog logger;
-
-		public static Lazy<FasterWriter> Instance = new Lazy<FasterWriter>(() => new FasterWriter());
+		private readonly IDevice device;
+		private readonly FasterLog logger;
 
 		private FasterWriter()
 		{
@@ -19,6 +17,8 @@ namespace MinMq.Service
 			device = Devices.CreateLogDevice(devicePath);
 			logger = new FasterLog(new FasterLogSettings { LogDevice = device });
 		}
+
+		public static Lazy<FasterWriter> Instance { get; set; } = new Lazy<FasterWriter>(() => new FasterWriter());
 
 		public async ValueTask CommitAsync(CancellationToken token = default)
 		{

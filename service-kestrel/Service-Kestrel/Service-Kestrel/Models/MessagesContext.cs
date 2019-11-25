@@ -1,10 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace MinMq.Service.Models
+namespace MinMQ.Service.Models
 {
 	public class MessagesContext : DbContext
 	{
@@ -15,5 +11,4 @@ namespace MinMq.Service.Models
 
 		public DbSet<Message> Messages { get; set; }
 	}
-
 }

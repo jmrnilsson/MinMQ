@@ -1,11 +1,8 @@
-﻿using NodaTime;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Threading.Tasks;
+using NodaTime;
 
-namespace MinMq.Service.Models
+namespace MinMQ.Service.Models
 {
 	public sealed class Message
 	{

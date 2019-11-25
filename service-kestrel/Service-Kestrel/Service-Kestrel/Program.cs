@@ -4,18 +4,18 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using MinMq.Service.Faster;
+using MinMQ.Service.Faster;
 
-namespace MinMq.Service
+namespace MinMQ.Service
 {
-	delegate void LogOrPrint(string message, params object[] args);
+	internal delegate void LogOrPrint(string message, params object[] args);
 
 	public class Program
 	{
 		public static async Task Main(string[] args)
 		{
 			var host = CreateHostBuilder(args).Build();
-	
+
 			using (var scope = host.Services.CreateScope())
 			{
 				LogOrPrint logOrPrint;
@@ -43,7 +43,7 @@ namespace MinMq.Service
 				{
 					// Filter functions could be useful in future:
 					// - https://docs.microsoft.com/en-us/aspnet/core/fundamentals/logging/?view=aspnetcore-3.0#filter-functions
-					// - https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/hosted-services?view=aspnetcore-3.0&tabs=visual-studio 
+					// - https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/hosted-services?view=aspnetcore-3.0&tabs=visual-studio
 					webBuilder.UseLibuv();
 					webBuilder.UseStartup<Startup>();
 				}).ConfigureServices(services =>

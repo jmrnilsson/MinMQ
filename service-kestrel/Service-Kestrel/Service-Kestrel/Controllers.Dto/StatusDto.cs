@@ -1,8 +1,6 @@
-﻿using System;
-
-namespace MinMq.Service.Controllers.Dto
+﻿namespace MinMQ.Service.Controllers.Dto
 {
-    public class StatusDto
+	public class StatusDto
     {
         public string Text { get; set; }
     }
