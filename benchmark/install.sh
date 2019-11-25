@@ -97,7 +97,7 @@ echo ''
 echo '** JSON 400C **'
 ./wrk -t12 -c400 -d12s -s ./scripts/mmq-post.lua http://mmq-service:9000/faster
 echo ''
-echo '** HTTP-GET HANDLE 400c **'
+echo '** HTTP-POST HANDLE 400c **'
 ./wrk -t12 -c400 -d12s -s ./scripts/mmq-post.lua http://mmq-service:9000/faster-get
 EOF
 
