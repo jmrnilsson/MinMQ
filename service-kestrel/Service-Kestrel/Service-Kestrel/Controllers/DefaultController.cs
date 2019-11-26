@@ -59,7 +59,7 @@ namespace MinMQ.Service.Controllers
 		[HttpGet("/list")]
 		public async Task<IActionResult> List()
 		{
-			var result = await FasterOps.Instance.Value.GetList();
+			var result = await FasterOps.Instance.Value.GetListAsync();
 			return Ok(result.ToListResponse());
 		}
 	}
