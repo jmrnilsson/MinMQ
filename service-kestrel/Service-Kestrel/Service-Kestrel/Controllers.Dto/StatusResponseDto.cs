@@ -1,6 +1,6 @@
 ﻿namespace MinMQ.Service.Controllers.Dto
 {
-	public class StatusDto
+	public class StatusResponseDto
     {
         public string Text { get; set; }
     }

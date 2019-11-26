@@ -7,8 +7,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using MinMQ.Service.Configuration;
 using MinMQ.Service.Filters;
+using MinMQ.Service.HttpRequestHandlers;
 using MinMQ.Service.Models;
-using MinMQ.Service.RequestHandlers;
 
 namespace MinMQ.Service
 {
@@ -44,8 +44,6 @@ namespace MinMQ.Service
 
 		public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
 		{
-			app.Map("/faster", a => a.Run(FasterHttpHandler.HandleRequest));
-
 			new ConfigurationBuilder()
 				.AddJsonFile("appsettings.json")
 				.AddJsonFile($"appsettings.{env.EnvironmentName}.json")
@@ -64,7 +62,7 @@ namespace MinMQ.Service
 			app.UseEndpoints(endpoints =>
 			{
 				endpoints.MapControllers();
-				endpoints.MapPost("/faster-get", FasterHttpHandler.HandleRequest);
+				endpoints.MapPost("/send", FasterHttpHandler.HandleRequest);
 				endpoints.MapHealthChecks("/healthcheck");
 			});
 		}

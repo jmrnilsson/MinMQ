@@ -4,7 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 
-namespace MinMQ.Service.RequestHandlers
+namespace MinMQ.Service.HttpRequestHandlers
 {
 	public static class FasterHttpHandler
 	{
@@ -15,9 +15,9 @@ namespace MinMQ.Service.RequestHandlers
 				var body = await reader.ReadToEndAsync();
 				var bytes = Encoding.ASCII.GetBytes(body);
 				CancellationTokenSource cts = new CancellationTokenSource();
-				long address = await FasterWriter.Instance.Value.EnqueueAsync(bytes, cts.Token);
+				long address = await FasterOps.Instance.Value.EnqueueAsync(bytes, cts.Token);
 				// await FasterWriter.Instance.Value.CommitAsync(cts.Token);
-				await FasterWriter.Instance.Value.WaitForCommitAsync(address, cts.Token);
+				await FasterOps.Instance.Value.WaitForCommitAsync(address, cts.Token);
 				context.Response.StatusCode = 201;
 				await context.Response.WriteAsync("Created");
 			}

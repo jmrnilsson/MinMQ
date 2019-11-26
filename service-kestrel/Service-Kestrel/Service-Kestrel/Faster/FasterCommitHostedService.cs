@@ -47,7 +47,7 @@ namespace MinMQ.Service.Faster
 		{
 			logger.LogInformation("Commit Hosted Service running.");
 
-			var state = new FasterCommitState(FasterWriter.Instance.Value.CommitAsync, logger, GetLoggingInterval());
+			var state = new FasterCommitState(FasterOps.Instance.Value.CommitAsync, logger, GetLoggingInterval());
 			timer = new Timer(ExecuteAsync, state, TimeSpan.Zero, TimeSpan.FromMilliseconds(PeriodMs));
 
 			return Task.CompletedTask;
