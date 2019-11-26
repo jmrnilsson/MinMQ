@@ -1,42 +1,46 @@
-﻿using System;
+﻿using NodaTime;
+using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Net.Http;
-using System.Threading;
+using System.Text;
 using System.Threading.Tasks;
-using NodaTime;
+using System.Xml;
 
 namespace MinMQ.BenchmarkConsole
 {
 	public class Program
 	{
-		private const int ShowProgressEvery = 100;
-		private const int TotalNumberOfObject = 5000;
+		private const int ShowProgressEvery = 30;
+		private const int TotalNumberOfObject = 1000;
 		private const int NTree = 5;  // NTree = 2 == binary tree
 
 		public static async Task Main(string[] args)
 		{
 			var jsons = new List<string>();
 			var xmls = new List<string>();
+			var jsonGenerator = new JsonGenerator(NTree);
+			var xmlGenerator = new XmlGenerator(NTree);
 
 			Console.WriteLine("Preparing payload");
-			int completed = 0;
-			Parallel.For(0, TotalNumberOfObject, (i) =>
-			{
-				var jsonGenerator = new JsonGenerator(NTree);
-				var xmlGenerator = new XmlGenerator(NTree);
+			Instant start = SystemClock.Instance.GetCurrentInstant();
 
-				if (i > 0 && i % ShowProgressEvery == 0 && completed > 0)
+			for (int i = 0; i < TotalNumberOfObject; i++)
+			{
+				if (i > 0 && i % ShowProgressEvery == 0)
 				{
-					Console.WriteLine($"{Math.Floor((decimal)completed * 100 / TotalNumberOfObject)}%");
+					Console.WriteLine($"{Math.Floor((decimal)i * 100 / TotalNumberOfObject)}%");
 				}
 
 				jsons.Add(jsonGenerator.GenerateObject());
 				xmls.Add(xmlGenerator.GenerateObject());
-				Interlocked.Increment(ref completed);
-			});
+			}
+			Duration duration = SystemClock.Instance.GetCurrentInstant() - start;
+			Console.WriteLine("Done! {0:N2} documents/s", TotalNumberOfObject / (decimal)duration.TotalSeconds);
 
 			Console.Write($"Sending JSON...");
-			Instant start = SystemClock.Instance.GetCurrentInstant();
+			start = SystemClock.Instance.GetCurrentInstant();
 			for (int i = 0; i < jsons.Count; i++)
 			{
 				using (HttpClient httpClient = new HttpClient())
@@ -46,7 +50,7 @@ namespace MinMQ.BenchmarkConsole
 				}
 			}
 
-			Duration duration = SystemClock.Instance.GetCurrentInstant() - start;
+			 duration = SystemClock.Instance.GetCurrentInstant() - start;
 			Console.WriteLine("Done! {0:N2} requests/s", TotalNumberOfObject / (decimal)duration.TotalSeconds);
 
 			Console.Write("Sending XML..");
