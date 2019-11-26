@@ -16,7 +16,7 @@ namespace MinMQ.BenchmarkConsole
 		public static async Task Main(string[] args)
 		{
 			Console.WriteLine("Preparing payload");
-			(List<string> jsons, List<string> xmls) = await Compute.ComputeObjects(NTree, TotalNumberOfObject);
+			(List<string> jsons, List<string> xmls) = Compute.ComputeObjects(NTree, TotalNumberOfObject);
 
 			Console.Write($"Sending JSON...");
 			Instant start = SystemClock.Instance.GetCurrentInstant();
