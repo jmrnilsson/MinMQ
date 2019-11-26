@@ -8,7 +8,7 @@ namespace MinMQ.BenchmarkConsole
 	public static class Compute
 	{
 		private const int ThreadCount = 8;
-		// private static SemaphoreSlim semaphore = new SemaphoreSlim(116, 116);
+
 		public static (List<string> Jsons, List<string> Xmls) ComputeObjects(int ntree, int count)
 		{
 			var tasks = new List<Task<(List<string> Json, List<string> Xml)>>();
@@ -53,13 +53,6 @@ namespace MinMQ.BenchmarkConsole
 			{
 				thread.Join();
 			}
-
-			//for (int i = 0; i < iter; i++)
-			//{
-			//	await semaphore.WaitAsync();
-			//	tasks.Add(ComputeTask(taskSize, ntree, taskSize));
-			//	semaphore.Release();
-			//}
 
 			List<string> jsons = new List<string>();
 			List<string> xmls = new List<string>();
