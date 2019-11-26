@@ -1,9 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using MinMQ.Service.Controllers.Dto;
+using Optional;
 
 namespace MinMQ.Service.Controllers
 {
+	public delegate IAsyncEnumerable<(string, long, long)> ScanCollection();
+
 	public static class ControllerExtensions
 	{
 		public static PeekResponseDto ToPeekResponse(this (string, long, long) peek)
@@ -20,15 +25,30 @@ namespace MinMQ.Service.Controllers
 		/// <summary>
 		/// Hopefully runtime optimizers will have a look at this..
 		/// </summary>
-		/// <param name="list">Unformatted list</param>
-		/// <returns>Response of a message list</returns>
-		public static ListResponseDto ToListResponse(this List<(string, long, long)> list)
+		/// <param name="scan">Scanner items</param>
+		/// <returns>Returns an optional list of items</returns>
+		public static async Task<Option<ListResponseDto>> ToListResponse(this IAsyncEnumerable<(string, long, long)> scan)
 		{
-			long min = list.Min(e => e.Item2);
-			long max = list.Max(e => e.Item2);
-			long next = list.Max(e => e.Item3);
-			long[] addresses = list.Select(e => e.Item2).ToArray();
-			string[] contents = list.Select(e => e.Item1).ToArray();
+			long min = long.MaxValue;
+			long max = long.MinValue;
+			long next = long.MinValue;
+			List<long> addresses = new List<long>();
+			List<string> contents = new List<string>();
+
+			await foreach (var item in scan)
+			{
+				var (content, currentAddress, nextAddress) = item;
+				min = Math.Min(min, currentAddress);
+				max = Math.Max(max, currentAddress);
+				next = Math.Max(next, nextAddress);
+				addresses.Add(currentAddress);
+				contents.Add(content);
+			}
+
+			if (addresses.Count() < 1)
+			{
+				return Option.None<ListResponseDto>();
+			}
 
 			return new ListResponseDto
 			{
@@ -37,7 +57,7 @@ namespace MinMQ.Service.Controllers
 				NextAddress = next,
 				Addresses = addresses,
 				Contents = contents
-			};
+			}.Some();
 		}
 	}
 }

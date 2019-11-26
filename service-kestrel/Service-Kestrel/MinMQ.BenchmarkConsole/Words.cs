@@ -7,7 +7,7 @@ namespace MinMQ.BenchmarkConsole
 {
 	public static class Words
 	{
-		private static int wordIndex = 0;
+		// private static int wordIndex = 0;
 
 		public static Lazy<string[]> Instance { get; set; } = new Lazy<string[]>(WordFactory);
 
@@ -58,7 +58,7 @@ namespace MinMQ.BenchmarkConsole
 			return GetWords().ToArray();
 		}
 
-		public static string Pick()
+		public static string Pick(ref int wordIndex)
 		{
 			if (++wordIndex > 0 && wordIndex % Instance.Value.Length == 0)
 			{

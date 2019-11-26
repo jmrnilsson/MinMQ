@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 
 namespace MinMQ.Service.Faster
 {
+
 	internal delegate ValueTask CommitAsyncDelegate(CancellationToken token = default);
 
 	/// <summary>

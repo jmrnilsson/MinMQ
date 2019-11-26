@@ -45,23 +45,21 @@ namespace MinMQ.Service
 		#region Read
 		public async Task<Option<(string, long, long)>> GetNext()
 		{
-			using (FasterLogScanIterator iter = logger.Scan(nextAddress, 100_000_000))
+			using FasterLogScanIterator iter = logger.Scan(nextAddress, 100_000_000);
+			while (true)
 			{
-				while (true)
+				byte[] entry;
+				int entryLenght;
+
+				while (!iter.GetNext(out entry, out entryLenght))
 				{
-					byte[] entry;
-					int entryLenght;
-
-					while (!iter.GetNext(out entry, out entryLenght))
-					{
-						if (iter.CurrentAddress >= 100_000_000) return Option.None<(string, long, long)>();
-					}
-
-					ASCIIEncoding ascii = new ASCIIEncoding();
-					await iter.WaitAsync();
-					nextAddress = iter.NextAddress;
-					return Option.Some((ascii.GetString(entry), iter.CurrentAddress, iter.NextAddress));  // Possible to pipe
+					if (iter.CurrentAddress >= 100_000_000) return Option.None<(string, long, long)>();
 				}
+
+				ASCIIEncoding ascii = new ASCIIEncoding();
+				await iter.WaitAsync();
+				nextAddress = iter.NextAddress;
+				return Option.Some((ascii.GetString(entry), iter.CurrentAddress, iter.NextAddress));  // Possible to pipe
 			}
 		}
 
@@ -90,35 +88,46 @@ namespace MinMQ.Service
 			return result;
 		}
 
-		public async Task<List<(string, long, long)>> GetListAsync()
+		public async IAsyncEnumerable<(string, long, long)> GetListAsync()
 		{
-			// Examples:
-			// - https://github.com/microsoft/FASTER/blob/ff51d3c973634d043df08cd79e6ba5a0e1ffa6c1/cs/playground/FasterLogSample/Program.cs
-			// Implementation of awaiter:
-			// - https://github.com/microsoft/FASTER/blob/98889aeea31041aa03c056c61abfd3e559d53a21/cs/src/core/Index/FasterLog/FasterLogIterator.cs#L144
-			var result = new List<(string, long, long)>();
-
-			// using (FasterLogScanIterator iter = logger.Scan(logger.BeginAddress, 100_000_000, name: nameof(GetListAsync)))
 			using (FasterLogScanIterator iter = logger.Scan(nextAddress, 100_000_000))
 			{
 				int i = 0;
 				await foreach ((byte[] bytes, int length) in iter.GetAsyncEnumerable())
 				{
-					ASCIIEncoding ascii = new ASCIIEncoding();
-					if (iter.CurrentAddress >= 1568) Debugger.Break();
-					await iter.WaitAsync();
-					result.Add((ascii.GetString(bytes), iter.CurrentAddress, iter.NextAddress));
-					i++;
 					if (i > 50)
 					{
 						nextAddress = iter.NextAddress;
-						logger.TruncateUntil(iter.CurrentAddress);
 						break;
 					}
+
+					CancellationTokenSource cts = new CancellationTokenSource();
+					ASCIIEncoding ascii = new ASCIIEncoding();
+
+					try
+					{
+						await Task.WhenAny(WaitAsync(iter, cts.Token), SetTimeout(cts));
+						i++;
+					}
+					catch (Exception e)
+					{
+						break;
+					}
+
+					yield return (ascii.GetString(bytes), iter.CurrentAddress, iter.NextAddress);
 				}
 			}
+		}
 
-			return result;
+		private async Task SetTimeout(CancellationTokenSource cancellationTokenSource)
+		{
+			await Task.Delay(300);
+			cancellationTokenSource.Cancel();
+		}
+
+		private async Task<bool> WaitAsync(FasterLogScanIterator iter, CancellationToken cancellationToken)
+		{
+			return await iter.WaitAsync(cancellationToken);
 		}
 		#endregion
 	}

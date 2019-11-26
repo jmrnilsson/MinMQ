@@ -7,6 +7,8 @@ namespace MinMQ.BenchmarkConsole
 {
 	public class JsonGenerator : GeneratorBase<JObject>
 	{
+		private int wordIndex = 0;
+
 		public JsonGenerator(int n)
             : base(n)
         {
@@ -18,7 +20,7 @@ namespace MinMQ.BenchmarkConsole
 		/// <returns>JSON with random objects and values</returns>
 		public override string GenerateObject()
 		{
-			JObject child = new JObject(new JProperty(Words.Pick(), new JValue(Words.Pick())));
+			JObject child = new JObject(new JProperty(Words.Pick(ref wordIndex), new JValue(Words.Pick(ref wordIndex))));
 			int depth = 0;
 			IEnumerable<JObject> children = GenerateChildren(++depth);
 			AddChildren(children, child);
@@ -44,7 +46,7 @@ namespace MinMQ.BenchmarkConsole
 		protected override JObject GenerateChild(IEnumerable<JObject> innerChildren)
 		{
 			JToken value = GenerateJValue(Seed);
-			JProperty prop = new JProperty(Words.Pick(), value);
+			JProperty prop = new JProperty(Words.Pick(ref wordIndex), value);
 			JObject child = new JObject(prop);
 
 			AddChildren(innerChildren, child);
@@ -52,13 +54,13 @@ namespace MinMQ.BenchmarkConsole
 			return child;
 		}
 
-		private static void AddChildren(IEnumerable<JObject> innerChildren, JObject child)
+		private void AddChildren(IEnumerable<JObject> innerChildren, JObject child)
 		{
 			foreach (JObject innerChild in innerChildren)
 			{
 				try
 				{
-					child.Add(Words.Pick(), innerChild);
+					child.Add(Words.Pick(ref wordIndex), innerChild);
 				}
 				catch (ArgumentException)
 				{

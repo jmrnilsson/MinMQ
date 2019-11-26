@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using MinMQ.Service.Controllers.Dto;
 using MinMQ.Service.Models;
@@ -41,22 +42,22 @@ namespace MinMQ.Service.Controllers
 		{
 			var option = await FasterOps.Instance.Value.GetNext();
 
-			IActionResult response = null;
-
-			option.Match
+			return option.Match<IActionResult>
 			(
-				  some: value => response = Ok(value.ToPeekResponse()),
-				  none: () => response = NotFound()
+				  some: value => Ok(value.ToPeekResponse()),
+				  none: () => NotFound()
 			);
-
-			return response;
 		}
 
 		[HttpGet("/list")]
 		public async Task<IActionResult> List()
 		{
-			var result = await FasterOps.Instance.Value.GetListAsync();
-			return Ok(result.ToListResponse());
+			var scanner = FasterOps.Instance.Value.GetListAsync();
+			return (await ControllerExtensions.ToListResponse(scanner)).Match<IActionResult>
+			(
+				some: values => Ok(values),
+				none: () => NotFound()
+			);
 		}
 	}
 }

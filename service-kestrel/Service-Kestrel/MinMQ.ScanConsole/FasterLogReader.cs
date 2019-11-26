@@ -35,18 +35,11 @@ namespace MinMQ.ScanConsole
 						nextAddress = iter.NextAddress;
 						Console.WriteLine("Time={1} NextAddress={0}, Count={2}", iter.NextAddress, timeOfDay, i++);
 						var cts = new CancellationTokenSource();
-#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
-						Task.Factory.StartNew(async () =>
-						{
-							await Task.Delay(10000);
-							cts.Cancel();
-						});
-#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
-
 						ASCIIEncoding ascii = new ASCIIEncoding();
+
 						try
 						{
-							await iter.WaitAsync(cts.Token);
+							await Task.WhenAny(WaitAsync(iter), SetTimeout(cts));
 						}
 						catch (Exception e)
 						{
@@ -62,6 +55,17 @@ namespace MinMQ.ScanConsole
 			}
 
 			return result;
+		}
+
+		public async Task SetTimeout(CancellationTokenSource cancellationTokenSource)
+		{
+			await Task.Delay(300);
+			cancellationTokenSource.Cancel();
+		}
+
+		public async Task<bool> WaitAsync(FasterLogScanIterator iter)
+		{
+			return await iter.WaitAsync();
 		}
 	}
 }
