@@ -9,7 +9,7 @@ namespace MinMQ.BenchmarkConsole
 	public class XmlGenerator : GeneratorBase<XmlElement>
 	{
 		private XmlDocument doc;
-		private int wordIndex = 0;
+		private Words words = new Words();
 
 		public XmlGenerator(int n)
             : base(n)
@@ -23,7 +23,7 @@ namespace MinMQ.BenchmarkConsole
 		public override string GenerateObject()
 		{
 			doc = new XmlDocument();
-			doc.AppendChild(doc.CreateElement(Words.Pick(ref wordIndex)));
+			doc.AppendChild(doc.CreateElement(words.Pick()));
 			var root = doc.DocumentElement;
 
 			int depth = 0;
@@ -39,7 +39,7 @@ namespace MinMQ.BenchmarkConsole
 
 		protected override XmlElement GenerateChild(IEnumerable<XmlElement> innerChildren)
 		{
-			Func<string> wordFactory = () => Words.Pick(ref wordIndex);
+			Func<string> wordFactory = () => words.Pick();
 			int numberOfProps = NumberOfProperties();
 			var child = doc.CreateElement(wordFactory());
 

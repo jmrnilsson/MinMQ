@@ -5,11 +5,10 @@ using System.Text.RegularExpressions;
 
 namespace MinMQ.BenchmarkConsole
 {
-	public static class Words
+	public class Words
 	{
-		// private static int wordIndex = 0;
-
-		public static Lazy<string[]> Instance { get; set; } = new Lazy<string[]>(WordFactory);
+		private int wordIndex = 0;
+		private string[] words = WordFactory();
 
 		public static string[] WordFactory()
 		{
@@ -58,14 +57,14 @@ namespace MinMQ.BenchmarkConsole
 			return GetWords().ToArray();
 		}
 
-		public static string Pick(ref int wordIndex)
+		public string Pick()
 		{
-			if (++wordIndex > 0 && wordIndex % Instance.Value.Length == 0)
+			if (++wordIndex > 0 && wordIndex % words.Length == 0)
 			{
 				wordIndex = 0;
 			}
 
-			return Instance.Value[wordIndex];
+			return words[wordIndex];
 		}
 	}
 }
