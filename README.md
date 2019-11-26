@@ -71,6 +71,11 @@ Checkout out the Nodejs expression server
 
     curl -X GET http://localhost:4000/status
 
+Check the log
+
+    curl -X GET http://localhost:9000/list
+
+
 Troubleshoot with curl
 
     curl -H "Accept: application/json" -H "Content-type: application/json" -X POST -d '{"id":"asdad"}' http://localhost:9000/faster --trace-ascii /dev/stdout

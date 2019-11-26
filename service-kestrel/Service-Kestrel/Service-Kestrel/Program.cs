@@ -46,9 +46,10 @@ namespace MinMQ.Service
 					// - https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/hosted-services?view=aspnetcore-3.0&tabs=visual-studio
 					webBuilder.UseLibuv();
 					webBuilder.UseStartup<Startup>();
-				}).ConfigureServices(services =>
-				{
-					services.AddHostedService<FasterCommitHostedService>();
 				});
+		//.ConfigureServices(services =>
+		//		{
+		//			services.AddHostedService<FasterCommitHostedService>();
+		//		});
 	}
 }
