@@ -1,22 +1,39 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using NodaTime;
 
 namespace MinMQ.BenchmarkConsole
 {
-
 	public class Program
 	{
-		private const int GenerativeOperationShowProgressEvery = 30;
+		private const int ShowProgressEvery = 100;
 		private const int TotalNumberOfObject = 5000;
 		private const int NTree = 5;  // NTree = 2 == binary tree
 
 		public static async Task Main(string[] args)
 		{
+			var jsons = new List<string>();
+			var xmls = new List<string>();
+
 			Console.WriteLine("Preparing payload");
-			(List<string> jsons, List<string> xmls) = Compute.ComputeObjects(NTree, TotalNumberOfObject);
+			int completed = 0;
+			Parallel.For(0, TotalNumberOfObject, (i) =>
+			{
+				var jsonGenerator = new JsonGenerator(NTree);
+				var xmlGenerator = new XmlGenerator(NTree);
+
+				if (i > 0 && i % ShowProgressEvery == 0 && completed > 0)
+				{
+					Console.WriteLine($"{Math.Floor((decimal)completed * 100 / TotalNumberOfObject)}%");
+				}
+
+				jsons.Add(jsonGenerator.GenerateObject());
+				xmls.Add(xmlGenerator.GenerateObject());
+				Interlocked.Increment(ref completed);
+			});
 
 			Console.Write($"Sending JSON...");
 			Instant start = SystemClock.Instance.GetCurrentInstant();
@@ -30,7 +47,7 @@ namespace MinMQ.BenchmarkConsole
 			}
 
 			Duration duration = SystemClock.Instance.GetCurrentInstant() - start;
-			Console.WriteLine("Done! {0:N2} requests/s",  TotalNumberOfObject / (decimal)duration.TotalSeconds);
+			Console.WriteLine("Done! {0:N2} requests/s", TotalNumberOfObject / (decimal)duration.TotalSeconds);
 
 			Console.Write("Sending XML..");
 			start = SystemClock.Instance.GetCurrentInstant();
