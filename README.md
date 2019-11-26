@@ -73,7 +73,7 @@ Checkout out the Nodejs expression server
 
 Troubleshoot with curl
 
-    curl -H "Accept: application/json" -H "Content-type: application/json" -X POST -d '{"id":100}' http://localhost:9000/faster --trace-ascii /dev/stdout
+    curl -H "Accept: application/json" -H "Content-type: application/json" -X POST -d '{"id":"asdad"}' http://localhost:9000/faster --trace-ascii /dev/stdout
 
 ## Some preliminary benchmarks
 

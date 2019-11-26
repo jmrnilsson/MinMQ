@@ -105,13 +105,14 @@ namespace MinMQ.Service
 				await foreach ((byte[] bytes, int length) in iter.GetAsyncEnumerable())
 				{
 					ASCIIEncoding ascii = new ASCIIEncoding();
-					// if (iter.CurrentAddress >= 1568) Debugger.Break();
+					if (iter.CurrentAddress >= 1568) Debugger.Break();
 					await iter.WaitAsync();
 					result.Add((ascii.GetString(bytes), iter.CurrentAddress, iter.NextAddress));
 					i++;
 					if (i > 50)
 					{
 						nextAddress = iter.NextAddress;
+						logger.TruncateUntil(iter.CurrentAddress);
 						break;
 					}
 				}

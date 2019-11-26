@@ -67,17 +67,14 @@ echo ''
 echo '** EF CORE IN-MEMORY DB **'
 ./wrk -t1 -c5 -d5s -s ./scripts/mmq-post.lua http://mmq-service:9000/efcore-in-mem-text
 echo ''
-echo '** HTTP-GET HANDLE 400c **'
-./wrk -t12 -c400 -d3s -s ./scripts/mmq-post.lua http://mmq-service:9000/faster-get
-echo ''
 echo '** XML 15C **'
-./wrk -t2 -c15 -d7s -s ./scripts/mmq-post-xml.lua http://mmq-service:9000/faster
+./wrk -t2 -c15 -d7s -s ./scripts/mmq-post-xml.lua http://mmq-service:9000/send
 echo ''
 echo '** LARGE JSON 15C **'
-./wrk -t2 -c15 -d7s -s ./scripts/mmq-post-json-2.lua http://mmq-service:9000/faster
+./wrk -t2 -c15 -d7s -s ./scripts/mmq-post-json-2.lua http://mmq-service:9000/send
 echo ''
 echo '** JSON 400C **'
-./wrk -t12 -c400 -d7s -s ./scripts/mmq-post.lua http://mmq-service:9000/faster
+./wrk -t12 -c400 -d7s -s ./scripts/mmq-post.lua http://mmq-service:9000/send
 EOF
 
 chmod +x /app/wrk/misc.sh
@@ -95,10 +92,7 @@ echo '** EF CORE IN-MEMORY DB **'
 ./wrk -t1 -c5 -d5s -s ./scripts/mmq-post.lua http://mmq-service:9000/efcore-in-mem-text
 echo ''
 echo '** JSON 400C **'
-./wrk -t12 -c400 -d12s -s ./scripts/mmq-post.lua http://mmq-service:9000/faster
-echo ''
-echo '** HTTP-POST HANDLE 400c **'
-./wrk -t12 -c400 -d12s -s ./scripts/mmq-post.lua http://mmq-service:9000/faster-get
+./wrk -t12 -c400 -d12s -s ./scripts/mmq-post.lua http://mmq-service:9000/send
 EOF
 
 chmod +x /app/wrk/post_message.sh
@@ -111,7 +105,7 @@ echo ''
 echo '- Make sure to check CPU and RAM saturation.'
 echo ''
 ./http-ready.sh
-./wrk -t1 -c5 -d7s -s ./scripts/mmq-post.lua http://mmq-service:9000/faster
+./wrk -t1 -c5 -d7s -s ./scripts/mmq-post.lua http://mmq-service:9000/send
 EOF
 
 chmod +x /app/wrk/arm.sh
