@@ -1,12 +1,8 @@
-﻿using NodaTime;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
-using System.Xml;
+using NodaTime;
 
 namespace MinMQ.BenchmarkConsole
 {
@@ -50,7 +46,7 @@ namespace MinMQ.BenchmarkConsole
 				}
 			}
 
-			 duration = SystemClock.Instance.GetCurrentInstant() - start;
+			duration = SystemClock.Instance.GetCurrentInstant() - start;
 			Console.WriteLine("Done! {0:N2} requests/s", TotalNumberOfObject / (decimal)duration.TotalSeconds);
 
 			Console.Write("Sending XML..");
