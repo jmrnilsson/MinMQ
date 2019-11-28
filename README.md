@@ -1,4 +1,5 @@
-<img src="./logo-033.png" width="337" height="56">
+<img src="./logo-025.png" width="337" height="56" />
+
 # MinMQ
 
 **Note:** _This is a work-in-progress. So far only prototype API is in place for write queries. Nothing exists in terms a
