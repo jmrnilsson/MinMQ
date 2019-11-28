@@ -1,4 +1,4 @@
-![logo-025.png](logo-large.png)
+![logo-033.png](logo-large.png)
 # MinMQ
 
 **Note:** _This is a work-in-progress. So far only prototype API is in place for write queries. Nothing exists in terms a
