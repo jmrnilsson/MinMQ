@@ -25,8 +25,8 @@ Further more, this version reverts back from Managed sockets to the
 Libuv-transport previously was used in AspNetCore 1.0 and [restored](https://github.com/aspnet/KestrelHttpServer/issues/2104) in AspNet 2.*. Similar to [this article](https://github.com/aspnet/KestrelHttpServer/issues/2104) it's found that performance drops
 significantly in high-contention scenarios.
 
-Future aspirations may include:
-- A formal API (perhaps somthing reminiscent to MSMQ or IronMQ)
+## Future aspirations may include:
+- A formal API (perhaps something reminiscent to MSMQ or IronMQ)
   - `Send` (or Post)
   - Explicit two-phase commits for retrieving messages:
     - `Peek` (or Reserve)
@@ -102,3 +102,10 @@ unstructured logs of benchmarks runs can be found in [performance.md](./performa
 ## Links 
 - https://docs.microsoft.com/en-us/aspnet/core/fundamentals/middleware/write?view=aspnetcore-3.0#per-request-middleware-dependencies
 - https://docs.microsoft.com/en-us/aspnet/core/fundamentals/dependency-injection?view=aspnetcore-3.0
+
+## N-tiered queue provisioning
+_Note: Work in progress._
+
+This serves as an outline for a distributed approach of the FASTER Log rather than a KV-store in the end. It requires message metadata to be included prepended to the written log message.
+
+![ntiered-diagram.svg](ntiered-diagram.svg)

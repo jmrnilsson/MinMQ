@@ -1,0 +1,90 @@
+<svg version="1.1" baseProfile="full" width="791.5" height="481" viewbox="0 0 791.5 481" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ev="http://www.w3.org/2001/xml-events" style="font-weight:bold; font-size:12pt; font-family:'Calibri', Helvetica, sans-serif;;stroke-width:3;stroke-linejoin:round;stroke-linecap:round">
+  <title >nomnoml</title>
+  <desc >[&lt;start&gt;message_recieved]-&gt;[instance 1]
+[instance 1]-&gt;[&lt;choice&gt;queue]
+[&lt;choice&gt;queue]-&gt;[instance 2]
+[&lt;choice&gt;queue]-&gt;[instance 4]
+[&lt;choice&gt;queue]-&gt;[instance 3]
+[instance 2]-&gt;[&lt;choice&gt;mime-type]
+[&lt;choice&gt;mime-type]-&gt;[instance 5]
+[&lt;choice&gt;mime-type]-&gt;[instance 6]
+[instance 2]-&gt;[&lt;choice&gt;validate]
+[&lt;choice&gt;validate]-&gt;[instance 7]
+[&lt;choice&gt;validate]-&gt;[instance 8]
+[instance 6]-&gt;[&lt;end&gt;e6]
+[instance 3]-&gt;[&lt;end&gt;e3]
+[instance 4]-&gt;[&lt;end&gt;e4]
+[instance 5]-&gt;[&lt;end&gt;e5]
+[instance 7]-&gt;[&lt;end&gt;e7]
+[instance 8]-&gt;[&lt;end&gt;e8]
+</desc>
+  <path d="M572.5 43.5 L572.5 63.5 L572.5 83.5 L572.5 83.5 " style="stroke:#33322E;fill:none;stroke-dasharray:none;"></path>
+  <path d="M567.2 70.2 L572.5 76.8 L577.8 70.2 L572.5 83.5 Z" style="stroke:#33322E;fill:#33322E;stroke-dasharray:none;"></path>
+  <path d="M572.5 114.5 L572.5 134.5 L572.5 154.5 L572.5 154.5 " style="stroke:#33322E;fill:none;stroke-dasharray:none;"></path>
+  <path d="M567.2 141.2 L572.5 147.8 L577.8 141.2 L572.5 154.5 Z" style="stroke:#33322E;fill:#33322E;stroke-dasharray:none;"></path>
+  <path d="M540.5 174.1 L295.5 205.5 L295.5 225.5 L295.5 225.5 " style="stroke:#33322E;fill:none;stroke-dasharray:none;"></path>
+  <path d="M290.2 212.2 L295.5 218.8 L300.8 212.2 L295.5 225.5 Z" style="stroke:#33322E;fill:#33322E;stroke-dasharray:none;"></path>
+  <path d="M604.5 177.5 L723.5 205.5 L723.5 225.5 L723.5 225.5 " style="stroke:#33322E;fill:none;stroke-dasharray:none;"></path>
+  <path d="M718.2 212.2 L723.5 218.8 L728.8 212.2 L723.5 225.5 Z" style="stroke:#33322E;fill:#33322E;stroke-dasharray:none;"></path>
+  <path d="M572.5 185.5 L572.5 205.5 L572.5 225.5 L572.5 225.5 " style="stroke:#33322E;fill:none;stroke-dasharray:none;"></path>
+  <path d="M567.2 212.2 L572.5 218.8 L577.8 212.2 L572.5 225.5 Z" style="stroke:#33322E;fill:#33322E;stroke-dasharray:none;"></path>
+  <path d="M240 254 L144.5 276.5 L144.5 296.5 L144.5 296.5 " style="stroke:#33322E;fill:none;stroke-dasharray:none;"></path>
+  <path d="M139.2 283.2 L144.5 289.8 L149.8 283.2 L144.5 296.5 Z" style="stroke:#33322E;fill:#33322E;stroke-dasharray:none;"></path>
+  <path d="M111.5 327.5 L69 347.5 L69 367.5 L69 367.5 " style="stroke:#33322E;fill:none;stroke-dasharray:none;"></path>
+  <path d="M63.7 354.2 L69 360.8 L74.3 354.2 L69 367.5 Z" style="stroke:#33322E;fill:#33322E;stroke-dasharray:none;"></path>
+  <path d="M177.5 327.5 L220 347.5 L220 367.5 L220 367.5 " style="stroke:#33322E;fill:none;stroke-dasharray:none;"></path>
+  <path d="M214.7 354.2 L220 360.8 L225.3 354.2 L220 367.5 Z" style="stroke:#33322E;fill:#33322E;stroke-dasharray:none;"></path>
+  <path d="M351 254 L446.5 276.5 L446.5 296.5 L446.5 296.5 " style="stroke:#33322E;fill:none;stroke-dasharray:none;"></path>
+  <path d="M441.2 283.2 L446.5 289.8 L451.8 283.2 L446.5 296.5 Z" style="stroke:#33322E;fill:#33322E;stroke-dasharray:none;"></path>
+  <path d="M413.5 327.5 L371 347.5 L371 367.5 L371 367.5 " style="stroke:#33322E;fill:none;stroke-dasharray:none;"></path>
+  <path d="M365.7 354.2 L371 360.8 L376.3 354.2 L371 367.5 Z" style="stroke:#33322E;fill:#33322E;stroke-dasharray:none;"></path>
+  <path d="M479.5 327.5 L522 347.5 L522 367.5 L522 367.5 " style="stroke:#33322E;fill:none;stroke-dasharray:none;"></path>
+  <path d="M516.7 354.2 L522 360.8 L527.3 354.2 L522 367.5 Z" style="stroke:#33322E;fill:#33322E;stroke-dasharray:none;"></path>
+  <path d="M220 398.5 L220 418.5 L220 438.5 L220 438.5 " style="stroke:#33322E;fill:none;stroke-dasharray:none;"></path>
+  <path d="M214.7 425.2 L220 431.8 L225.3 425.2 L220 438.5 Z" style="stroke:#33322E;fill:#33322E;stroke-dasharray:none;"></path>
+  <path d="M572.5 256.5 L572.5 276.5 L572.5 297 L572.5 297 " style="stroke:#33322E;fill:none;stroke-dasharray:none;"></path>
+  <path d="M567.2 283.7 L572.5 290.3 L577.8 283.7 L572.5 297 Z" style="stroke:#33322E;fill:#33322E;stroke-dasharray:none;"></path>
+  <path d="M723.5 256.5 L723.5 276.5 L723.5 297 L723.5 297 " style="stroke:#33322E;fill:none;stroke-dasharray:none;"></path>
+  <path d="M718.2 283.7 L723.5 290.3 L728.8 283.7 L723.5 297 Z" style="stroke:#33322E;fill:#33322E;stroke-dasharray:none;"></path>
+  <path d="M69 398.5 L69 418.5 L69 438.5 L69 438.5 " style="stroke:#33322E;fill:none;stroke-dasharray:none;"></path>
+  <path d="M63.7 425.2 L69 431.8 L74.3 425.2 L69 438.5 Z" style="stroke:#33322E;fill:#33322E;stroke-dasharray:none;"></path>
+  <path d="M371 398.5 L371 418.5 L371 438.5 L371 438.5 " style="stroke:#33322E;fill:none;stroke-dasharray:none;"></path>
+  <path d="M365.7 425.2 L371 431.8 L376.3 425.2 L371 438.5 Z" style="stroke:#33322E;fill:#33322E;stroke-dasharray:none;"></path>
+  <path d="M522 398.5 L522 418.5 L522 438.5 L522 438.5 " style="stroke:#33322E;fill:none;stroke-dasharray:none;"></path>
+  <path d="M516.7 425.2 L522 431.8 L527.3 425.2 L522 438.5 Z" style="stroke:#33322E;fill:#33322E;stroke-dasharray:none;"></path>
+  <circle r="12" cx="572.5" cy="28.5" style="stroke:none; fill:#33322E;"></circle>
+  <rect x="517.5" y="83.5" height="31" width="111" style="stroke:#33322E;fill:#eee8d5;stroke-dasharray:none;"></rect>
+  <text x="573" y="105" style="fill: #33322E;text-anchor: middle;">instance 1</text>
+  <path d="M572.5 146.5 L612.5 170 L572.5 193.5 L532.5 170 Z" style="stroke:#33322E;fill:#eee8d5;stroke-dasharray:none;"></path>
+  <text x="572.5" y="176" style="fill: #33322E;font-weight:normal;text-anchor: middle;">queue</text>
+  <rect x="240.5" y="225.5" height="31" width="111" style="stroke:#33322E;fill:#eee8d5;stroke-dasharray:none;"></rect>
+  <text x="296" y="247" style="fill: #33322E;text-anchor: middle;">instance 2</text>
+  <rect x="668.5" y="225.5" height="31" width="111" style="stroke:#33322E;fill:#eee8d5;stroke-dasharray:none;"></rect>
+  <text x="724" y="247" style="fill: #33322E;text-anchor: middle;">instance 4</text>
+  <rect x="517.5" y="225.5" height="31" width="111" style="stroke:#33322E;fill:#eee8d5;stroke-dasharray:none;"></rect>
+  <text x="573" y="247" style="fill: #33322E;text-anchor: middle;">instance 3</text>
+  <path d="M144.5 288.5 L203.5 312 L144.5 335.5 L85.5 312 Z" style="stroke:#33322E;fill:#eee8d5;stroke-dasharray:none;"></path>
+  <text x="144.5" y="318" style="fill: #33322E;font-weight:normal;text-anchor: middle;">mime-type</text>
+  <rect x="13.5" y="367.5" height="31" width="111" style="stroke:#33322E;fill:#eee8d5;stroke-dasharray:none;"></rect>
+  <text x="69" y="389" style="fill: #33322E;text-anchor: middle;">instance 5</text>
+  <rect x="164.5" y="367.5" height="31" width="111" style="stroke:#33322E;fill:#eee8d5;stroke-dasharray:none;"></rect>
+  <text x="220" y="389" style="fill: #33322E;text-anchor: middle;">instance 6</text>
+  <path d="M446.5 288.5 L500.5 312 L446.5 335.5 L392.5 312 Z" style="stroke:#33322E;fill:#eee8d5;stroke-dasharray:none;"></path>
+  <text x="446.5" y="318" style="fill: #33322E;font-weight:normal;text-anchor: middle;">validate</text>
+  <rect x="315.5" y="367.5" height="31" width="111" style="stroke:#33322E;fill:#eee8d5;stroke-dasharray:none;"></rect>
+  <text x="371" y="389" style="fill: #33322E;text-anchor: middle;">instance 7</text>
+  <rect x="466.5" y="367.5" height="31" width="111" style="stroke:#33322E;fill:#eee8d5;stroke-dasharray:none;"></rect>
+  <text x="522" y="389" style="fill: #33322E;text-anchor: middle;">instance 8</text>
+  <circle r="10" cx="220" cy="453.5" style="stroke:#33322E;fill:#eee8d5;stroke-dasharray:none;"></circle>
+  <circle r="6" cx="220" cy="453.5" style="stroke:none; fill:#33322E;"></circle>
+  <circle r="10" cx="572.5" cy="312.5" style="stroke:#33322E;fill:#eee8d5;stroke-dasharray:none;"></circle>
+  <circle r="6" cx="572.5" cy="312.5" style="stroke:none; fill:#33322E;"></circle>
+  <circle r="10" cx="723.5" cy="312.5" style="stroke:#33322E;fill:#eee8d5;stroke-dasharray:none;"></circle>
+  <circle r="6" cx="723.5" cy="312.5" style="stroke:none; fill:#33322E;"></circle>
+  <circle r="10" cx="69" cy="453.5" style="stroke:#33322E;fill:#eee8d5;stroke-dasharray:none;"></circle>
+  <circle r="6" cx="69" cy="453.5" style="stroke:none; fill:#33322E;"></circle>
+  <circle r="10" cx="371" cy="453.5" style="stroke:#33322E;fill:#eee8d5;stroke-dasharray:none;"></circle>
+  <circle r="6" cx="371" cy="453.5" style="stroke:none; fill:#33322E;"></circle>
+  <circle r="10" cx="522" cy="453.5" style="stroke:#33322E;fill:#eee8d5;stroke-dasharray:none;"></circle>
+  <circle r="6" cx="522" cy="453.5" style="stroke:none; fill:#33322E;"></circle>
+</svg>
