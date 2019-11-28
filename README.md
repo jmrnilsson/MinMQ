@@ -1,4 +1,4 @@
-<img src="./logo-025.png" width="337" height="56" />
+<img src="./logo-large.png" width="337" height="56" />
 
 # MinMQ
 
