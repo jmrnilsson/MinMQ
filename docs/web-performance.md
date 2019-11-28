@@ -1,29 +1,30 @@
-# EFCore In-Memory Database
+# Benchmark machine
+As a general case tests are normally conducted on a _Kingston SSDNow_. However it's intended to add plenty more storage options (and even SD-cards) along with more architectures like ARM64v8 and ARM32v7 to the suite.
 
-Warning: The file name argument '-I' looks like a flag.
-Warning: The file name argument '-I' looks like a flag.
-Warning: The file name argument '-I' looks like a flag.
-Running 5s test @ http://mmq-service-kestrel:9000/message-text
-  2 threads and 3 connections
-  Thread Stats   Avg      Stdev     Max   +/- Stdev
-    Latency     9.01ms   44.44ms 369.75ms   95.97%
-    Req/Sec     2.79k   758.75     3.78k    86.46%
-  26670 requests in 5.10s, 2.34MB read
-Requests/sec:   5229.63
-Transfer/sec:    469.85KB
+## EFCore In-Memory Database
 
-# Faster
+    Running 5s test @ http://mmq-service-kestrel:9000/message-text
+      2 threads and 3 connections
+      Thread Stats   Avg      Stdev     Max   +/- Stdev
+        Latency     9.01ms   44.44ms 369.75ms   95.97%
+        Req/Sec     2.79k   758.75     3.78k    86.46%
+      26670 requests in 5.10s, 2.34MB read
+    Requests/sec:   5229.63
+    Transfer/sec:    469.85KB
 
-Running 5s test @ http://mmq-service-kestrel:9000/faster
-  2 threads and 13 connections
-  Thread Stats   Avg      Stdev     Max   +/- Stdev
-    Latency     1.12ms    2.69ms  45.34ms   97.36%
-    Req/Sec     6.87k     2.12k    9.85k    75.00%
-  32854 requests in 5.01s, 4.01MB read
-Requests/sec:   6561.83
-Transfer/sec:    820.23KB
+## Faster
 
-# HTTP GET Compared
+    Running 5s test @ http://mmq-service-kestrel:9000/faster
+      2 threads and 13 connections
+      Thread Stats   Avg      Stdev     Max   +/- Stdev
+        Latency     1.12ms    2.69ms  45.34ms   97.36%
+        Req/Sec     6.87k     2.12k    9.85k    75.00%
+      32854 requests in 5.01s, 4.01MB read
+    Requests/sec:   6561.83
+    Transfer/sec:    820.23KB
+
+## HTTP GET Compared
+
 ```
 Running 10s test @ http://mmq-service-nodejs:8000/status
   12 threads and 400 connections
@@ -54,8 +55,8 @@ Transfer/sec:      2.77MB
 PS M:\devwork\MinMQ>
 ``` 
 
-# Kestrel HTTP POST - In-memory EFCore database - 1000 pre-loaded records
-## A test message
+## Kestrel HTTP POST - In-memory EFCore database - 1000 pre-loaded records
+### A test message
 
     Running 10s test @ http://mmq-service-kestrel:9000/message-text
       12 threads and 400 connections
@@ -66,7 +67,7 @@ PS M:\devwork\MinMQ>
     Requests/sec:   7841.49
     Transfer/sec:    704.51KB
 
-## A very large message
+### A very large message
 
     Running 10s test @ http://mmq-service-kestrel:9000/message-text
       12 threads and 400 connections
@@ -78,7 +79,7 @@ PS M:\devwork\MinMQ>
     Requests/sec:   7052.28
     Transfer/sec:    633.60KB
 
-## JSON body
+### JSON body
 
     Running 10s test @ http://mmq-service-kestrel:9000/message
       12 threads and 400 connections
