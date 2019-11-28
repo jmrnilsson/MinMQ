@@ -1,3 +1,4 @@
+![logo-025.png](logo-025.png)
 # MinMQ
 
 **Note:** _This is a work-in-progress. So far only prototype API is in place for write queries. Nothing exists in terms a
@@ -39,7 +40,7 @@ significantly in high-contention scenarios.
 - Limitation to small messages (<256kB).
 - Possibly a client, or and example implementation of set of atomic yet composite messages.
 - Materialized views, cached responses or read models.
-
+- [N-tiered provisioning](docs/ntiered.md)
 
 ## Setup
 **NOTE:** Linux/OSX may have to add sudo some of the Docker commands.
@@ -92,20 +93,9 @@ Troubleshoot with curl
 
     curl -H "Accept: application/json" -H "Content-type: application/json" -X POST -d '{"id":"asdad"}' http://localhost:9000/faster --trace-ascii /dev/stdout
 
-## Some preliminary benchmarks
-
-Some ad-hoc performance comparisons have been made [comparing both different web servers]
-(./web-performance.md); Mostly those kinds that rely on Libuv. Moreover, benchmarks are mainly focused towards
-seeing commit-over-commit performance hits. Metrics in focus are really just _throughput_ and _latency_. Some
-unstructured logs of benchmarks runs can be found in [performance.md](./performance.md).
-
 ## Links 
 - https://docs.microsoft.com/en-us/aspnet/core/fundamentals/middleware/write?view=aspnetcore-3.0#per-request-middleware-dependencies
 - https://docs.microsoft.com/en-us/aspnet/core/fundamentals/dependency-injection?view=aspnetcore-3.0
 
-## N-tiered queue provisioning
-_Note: Work in progress._
-
-This serves as an outline for a distributed approach of the FASTER Log rather than a KV-store in the end. It requires message metadata to be included prepended to the written log message.
-
-![ntiered-diagram.svg](ntiered-diagram.svg)
+## Performance
+This is continiously measured and some sparse unstructed working documenets are available in [docs/perf.md](docs/perf.md).
