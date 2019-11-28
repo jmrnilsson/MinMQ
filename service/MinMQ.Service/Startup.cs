@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using MinMq.Service.Models;
+using MinMq.Service.Repository;
 using MinMQ.Service.Configuration;
 using MinMQ.Service.Filters;
 using MinMQ.Service.HttpRequestHandlers;
@@ -38,6 +39,7 @@ namespace MinMQ.Service
 			services.AddScoped<CancellationTokenSourceFactory>(_ => () => new CancellationTokenSource());
 			// services.AddDbContext<MessageQueueContext>(options => options.UseNpgsql(Configuration.GetConnectionString("MessageQueueContext")));
 			services.AddDbContext<MessageQueueContext>(options => options.UseNpgsql(Configuration.GetConnectionString("MessageQueueContext")));
+			services.AddScoped<IMessageRepository, MessageRepository>();
 		}
 
 		private static void SetOptions(MinMQConfiguration o)

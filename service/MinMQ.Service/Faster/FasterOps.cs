@@ -40,6 +40,11 @@ namespace MinMQ.Service
 		{
 			return await logger.EnqueueAsync(entry, token);
 		}
+
+		public void TruncateUntil(long address)
+		{
+			logger.TruncateUntil(address);
+		}
 		#endregion
 
 		#region Read
@@ -107,6 +112,37 @@ namespace MinMQ.Service
 					try
 					{
 						await Task.WhenAny(WaitAsync(iter, cts.Token), SetTimeout(cts));
+						i++;
+					}
+					catch (Exception e)
+					{
+						break;
+					}
+
+					yield return (ascii.GetString(bytes), iter.CurrentAddress, iter.NextAddress);
+				}
+			}
+		}
+
+		public async IAsyncEnumerable<(string, long, long)> ListenAsync()
+		{
+			using (FasterLogScanIterator iter = logger.Scan(nextAddress, 100_000_000))
+			{
+				int i = 0;
+				await foreach ((byte[] bytes, int length) in iter.GetAsyncEnumerable())
+				{
+					if (i > 50)
+					{
+						nextAddress = iter.NextAddress;
+						break;
+					}
+
+					CancellationTokenSource cts = new CancellationTokenSource();
+					ASCIIEncoding ascii = new ASCIIEncoding();
+
+					try
+					{
+						await WaitAsync(iter, cts.Token);
 						i++;
 					}
 					catch (Exception e)

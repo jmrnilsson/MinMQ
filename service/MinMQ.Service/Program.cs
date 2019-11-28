@@ -48,7 +48,8 @@ namespace MinMQ.Service
 					webBuilder.UseStartup<Startup>();
 				}).ConfigureServices(services =>
 				{
-					services.AddHostedService<FasterCommitHostedService>();
+					services.AddHostedService<FasterHostedServiceCommit>();
+					services.AddHostedService<FasterHostedServiceMoveData>();
 				});
 	}
 }

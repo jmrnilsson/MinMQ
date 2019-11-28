@@ -1,15 +1,16 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace MinMq.Service.Models
 {
 	public class MessageQueueContext : DbContext
 	{
 		public MessageQueueContext(DbContextOptions<MessageQueueContext> options)
-            : base(options)
+			: base(options)
 		{
 		}
 
@@ -26,6 +27,24 @@ namespace MinMq.Service.Models
 				.WithMany(b => b.Messages)
 				.HasForeignKey(p => p.QueueId)
 				.HasConstraintName("FK_Message_Queue");
+
+			modelBuilder.Entity<Message>()
+				.Property(f => f.MessageId)
+				.ValueGeneratedOnAdd();
+
+			modelBuilder.Entity<Queue>()
+				.Property(f => f.QueueId)
+				.ValueGeneratedOnAdd();
+
+			modelBuilder.Entity<MimeType>()
+				.Property(f => f.ByteKey)
+				.ValueGeneratedOnAdd();
+
+			modelBuilder.Entity<Queue>()
+				.Property(f => f.ByteKey)
+				.ValueGeneratedOnAdd();
+
+			// No FK for mime-type yet
 		}
 	}
 
@@ -33,18 +52,27 @@ namespace MinMq.Service.Models
 	{
 		public int QueueId { get; set; }
 		public string Name { get; set; }
+		public byte ByteKey { get; set; }
 
 		public List<Message> Messages { get; set; }
 	}
 
 	public class Message
 	{
+		[Key]
 		public int MessageId { get; set; }
 		public long ReferenceId { get; set; }
+		public long NextReferenceId { get; set; }
 		public string MimeType { get; set; }
 		public string Content { get; set; }
 		public int QueueId { get; set; }
 		public Queue Queue { get; set; }
+	}
 
+	public class MimeType
+	{
+		[Key]
+		public string MimeTypeId { get; set; }
+		public byte ByteKey { get; set; }
 	}
 }
