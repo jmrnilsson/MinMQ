@@ -37,11 +37,16 @@ significantly in high-contention scenarios.
 - More [advanced benchmarks suites](https://github.com/aspnet/Benchmarks).
 - A Docker image and/or [Helm charts](https://helm.sh/).
 - Error-queues.
-- Named queues for concurrency control.
-- Limitation to small messages (<256kB).
+- Named queues.
+- Limitation to small messages (<1 MB).
 - Possibly a client, or and example implementation of set of atomic yet composite messages.
 - Materialized views, cached responses or read models.
-- [N-tiered provisioning](docs/ntiered.md)
+- Some kind of tiered solution
+  - [N-tiered service provisioning](docs/ntiered.md)
+  - Multiple IDevices (however, how to saturate a SSD over HTTP is beyond me).
+  - Inbound FlatBuffers or Protobuf from a single or multiple HTTP-hosts.
+- Authentication
+- Dynamic latency-scaling.
 
 ## Setup
 **NOTE:** Linux/OSX may have to add sudo some of the Docker commands.
