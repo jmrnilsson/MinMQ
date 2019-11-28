@@ -7,7 +7,7 @@ services:
   #   volumes:
   #   - mongodata:/data/db
   mmq-service:
-    build: ./service-kestrel
+    build: ./service
     ports:
     - "9000:9000"
     environment:
@@ -32,6 +32,20 @@ services:
     - "mmq-service"
     - "mmq-service-nodejs"
     - "mmq-service-express"
+  mmq-db:
+    # https://docs.docker.com/compose/environment-variables/
+    # https://hub.docker.com/_/postgres
+    image: postgres:12.1
+    restart: always
+    ports:
+    - "5432:5432"
+    volumes:
+    - postgresdata:/var/lib/postgresql/data
+    env_file:
+    - .env
+    environment:
+      - PGDATA=/var/lib/postgresql/data/pgdata
+      - POSTGRES_DB=mmq
 volumes:
   # mongodata: {}
   fasterdbo:
@@ -42,3 +56,5 @@ volumes:
       # o: size=1200m
       # device: K://docker-faster-hlog
     external: true
+  postgresdata: {}
+  

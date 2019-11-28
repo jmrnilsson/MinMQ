@@ -1,7 +1,7 @@
 FROM mcr.microsoft.com/dotnet/core/sdk AS build
 WORKDIR /src
-COPY ./Service-Kestrel/Service-Kestrel .
-COPY ./Service-Kestrel/StyleCop.ruleset ./
+COPY ./MinMQ.Service .
+COPY ./StyleCop.ruleset ../
 RUN dotnet build "MinMQ.Service.csproj"
 RUN dotnet publish "MinMQ.Service.csproj" -c Release -o /app
 
