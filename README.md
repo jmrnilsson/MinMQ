@@ -38,7 +38,7 @@ significantly in high-contention scenarios.
 - A Docker image and/or [Helm charts](https://helm.sh/).
 - Error-queues.
 - Named queues.
-- Limitation to small messages (<1 MB).
+- Message content limit (<1 MB).
 - Possibly a client, or and example implementation of set of atomic yet composite messages.
 - Materialized views, cached responses or read models.
 - Some kind of tiered solution
