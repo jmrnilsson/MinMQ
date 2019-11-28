@@ -58,7 +58,7 @@ local IDevices can be configured.
 
 *Everyone else*
 > If you plan to run the service without a container service a FasterDevice-path must be set as in
-> [appsettings.Development.json](./service-kestrel/Service-Kestrel/Service-Kestrel/appsettings.Development.json). It
+> [appsettings.Development.json](./service/MinMQ.Service/appsettings.Development.json). It
 > must be assigned before starting.
 
 ## Performance
