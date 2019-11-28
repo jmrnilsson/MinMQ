@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using MinMq.Service.Entities;
 using MinMq.Service.Repository;
 
 namespace MinMQ.Service.Faster
@@ -36,25 +37,34 @@ namespace MinMQ.Service.Faster
 					{
 						await Task.Delay(DelayMs);
 						var scanner = FasterOps.Instance.Value.ListenAsync();
-						var messages = await ToList(scanner);
+						var messages = ToListAsync(scanner);
 						var lastReferenceId = await messageRepository.AddRange(messages);
 						lastReferenceId.MatchSome(referenceId => FasterOps.Instance.Value.TruncateUntil(referenceId));
-						logger.LogInformation("Flushed records to some EF-providers data context");
+						logger.LogInformation("Flushed records");
 					}
 				}
 			}
 		}
 
-		private async Task<List<MinMq.Service.Entities.Message>> ToList(IAsyncEnumerable<(string, long, long)> scan)
+		// Maybe this also should be IAsyncEnumerable
+		private async Task<List<Message>> ToList(IAsyncEnumerable<(string, long, long)> scan)
 		{
-			var messages = new List<MinMq.Service.Entities.Message>();
+			var messages = new List<Message>();
 
 			await foreach ((string content, long referenceId, long nextReferenceId) in scan)
 			{
-				messages.Add(new MinMq.Service.Entities.Message(content, referenceId, nextReferenceId));
+				messages.Add(new Message(content, referenceId, nextReferenceId));
 			}
 
 			return messages;
+		}
+
+		private async IAsyncEnumerable<Message> ToListAsync(IAsyncEnumerable<(string, long, long)> scan)
+		{
+			await foreach ((string content, long referenceId, long nextReferenceId) in scan)
+			{
+				yield return new Message(content, referenceId, nextReferenceId);
+			}
 		}
 
 		public Task StopAsync(CancellationToken stoppingToken)

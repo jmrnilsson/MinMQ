@@ -61,10 +61,10 @@ namespace MinMQ.Service
 					if (iter.CurrentAddress >= 100_000_000) return Option.None<(string, long, long)>();
 				}
 
-				ASCIIEncoding ascii = new ASCIIEncoding();
+				UTF8Encoding encoding = new UTF8Encoding();
 				await iter.WaitAsync();
 				nextAddress = iter.NextAddress;
-				return Option.Some((ascii.GetString(entry), iter.CurrentAddress, iter.NextAddress));  // Possible to pipe
+				return Option.Some((encoding.GetString(entry), iter.CurrentAddress, iter.NextAddress));  // Possible to pipe
 			}
 		}
 
@@ -78,10 +78,10 @@ namespace MinMQ.Service
 				int entryLenght;
 				while (iter.GetNext(out entry, out entryLenght))
 				{
-					ASCIIEncoding ascii = new ASCIIEncoding();
+					UTF8Encoding encoding = new UTF8Encoding();
 					if (iter.CurrentAddress >= 1568) Debugger.Break();
 					await iter.WaitAsync();
-					result.Add((ascii.GetString(entry), iter.CurrentAddress, iter.NextAddress));
+					result.Add((encoding.GetString(entry), iter.CurrentAddress, iter.NextAddress));
 					i++;
 					if (i > 50)
 					{
@@ -107,7 +107,7 @@ namespace MinMQ.Service
 					}
 
 					CancellationTokenSource cts = new CancellationTokenSource();
-					ASCIIEncoding ascii = new ASCIIEncoding();
+					UTF8Encoding encoding = new UTF8Encoding();
 
 					try
 					{
@@ -119,7 +119,7 @@ namespace MinMQ.Service
 						break;
 					}
 
-					yield return (ascii.GetString(bytes), iter.CurrentAddress, iter.NextAddress);
+					yield return (encoding.GetString(bytes), iter.CurrentAddress, iter.NextAddress);
 				}
 			}
 		}
@@ -138,7 +138,7 @@ namespace MinMQ.Service
 					}
 
 					CancellationTokenSource cts = new CancellationTokenSource();
-					ASCIIEncoding ascii = new ASCIIEncoding();
+					UTF8Encoding encoding = new UTF8Encoding();
 
 					try
 					{
@@ -150,7 +150,7 @@ namespace MinMQ.Service
 						break;
 					}
 
-					yield return (ascii.GetString(bytes), iter.CurrentAddress, iter.NextAddress);
+					yield return (encoding.GetString(bytes), iter.CurrentAddress, iter.NextAddress);
 				}
 			}
 		}
