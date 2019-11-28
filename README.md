@@ -1,4 +1,4 @@
-![logo-033.png](logo-033.png){:height="56px" width="337px"}
+<img src="./logo-033.png" width="337" height="56">
 # MinMQ
 
 **Note:** _This is a work-in-progress. So far only prototype API is in place for write queries. Nothing exists in terms a
