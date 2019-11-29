@@ -41,28 +41,18 @@ namespace MinMQ.Service.Faster
 				{
 					while (true)
 					{
-						//try
-						//{
-							// await entityFrameworkFlushSemaphore.WaitAsync();
-							await Task.Delay(DelayMs * delayCoefficient);
-							delayCoefficient = 1;
-							var scanner = FasterOps.Instance.Value.ListenAsync();
-							var messages = await ToList(scanner, FasterOps.Instance.Value.TruncateUntil);
-							messages.Match
-							(
-								some: async msgs =>
-								{
-									var lastReferenceId = await messageRepository.AddRange(msgs);
-									lastReferenceId.MatchSome(referenceId => FasterOps.Instance.Value.TruncateUntil(referenceId));
-									logger.LogInformation("Flushed records");
-								},
-								none: () => delayCoefficient = 10
-							);
-						// }
-						//finally
-						//{
-						//	entityFrameworkFlushSemaphore.Release();
-						//}
+						await Task.Delay(DelayMs * delayCoefficient);
+						delayCoefficient = 1;
+						var scanner = FasterOps.Instance.Value.ListenAsync();
+						var messages = await ToList(scanner, FasterOps.Instance.Value.TruncateUntil);
+						if (!messages.Any())
+						{
+							delayCoefficient = 10;
+							continue;
+						}
+						var lastReferenceId = await messageRepository.AddRange(messages);
+						lastReferenceId.MatchSome(referenceId => FasterOps.Instance.Value.TruncateUntil(referenceId));
+						logger.LogInformation("Flushed records");
 					}
 				}
 			}
