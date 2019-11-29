@@ -8,7 +8,7 @@ namespace MinMQ.BenchmarkConsole
 {
 	public class Program
 	{
-		private const int ShowProgressEvery = 30;
+		private const int ShowProgressEvery = 200;
 		private const int TotalNumberOfObject = 1000;
 		private const int NTree = 5;  // NTree = 2 == binary tree
 

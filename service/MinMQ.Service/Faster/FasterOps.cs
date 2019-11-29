@@ -20,7 +20,7 @@ namespace MinMQ.Service
 		{
 			string devicePath = Startup.Configuration[nameof(MinMQConfiguration.FasterDevice)];
 			device = Devices.CreateLogDevice(devicePath);
-			logger = new FasterLog(new FasterLogSettings { LogDevice = device });
+			logger = new FasterLog(new FasterLogSettings { LogDevice = device, });
 		}
 
 		public static Lazy<FasterOps> Instance { get; set; } = new Lazy<FasterOps>(() => new FasterOps());
@@ -131,7 +131,7 @@ namespace MinMQ.Service
 				int i = 0;
 				await foreach ((byte[] bytes, int length) in iter.GetAsyncEnumerable())
 				{
-					if (i > 50)
+					if (i > 49)
 					{
 						nextAddress = iter.NextAddress;
 						break;

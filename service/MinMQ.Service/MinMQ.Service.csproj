@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
     <RootNamespace>MinMq.Service</RootNamespace>
+    <Configurations>Debug;Release;Troubleshoot</Configurations>
   </PropertyGroup>
 
 
