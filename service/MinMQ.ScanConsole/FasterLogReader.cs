@@ -35,7 +35,7 @@ namespace MinMQ.ScanConsole
 						nextAddress = iter.NextAddress;
 						Console.WriteLine("Time={1} NextAddress={0}, Count={2}", iter.NextAddress, timeOfDay, i++);
 						var cts = new CancellationTokenSource();
-						ASCIIEncoding ascii = new ASCIIEncoding();
+						UTF8Encoding encoding = new UTF8Encoding();
 
 						try
 						{
@@ -48,7 +48,7 @@ namespace MinMQ.ScanConsole
 						}
 
 						timeOfDay = SystemClock.Instance.GetCurrentInstant().InZone(tz).TimeOfDay;
-						Console.WriteLine("Time={2} Content={0}", ascii.GetString(bytes), iter.NextAddress, timeOfDay);
+						Console.WriteLine("Time={2} Content={0}", encoding.GetString(bytes), iter.NextAddress, timeOfDay);
 					}
 				}
 

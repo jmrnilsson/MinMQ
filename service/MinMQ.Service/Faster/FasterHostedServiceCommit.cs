@@ -35,7 +35,7 @@ namespace MinMQ.Service.Faster
 			if (state.InvokationCount > 0 && state.InvokationCount % state.LoggingInterval == 0)
 			{
 				state.InvokationCount = 0;
-				state.Logger.LogInformation("Polling commits. state.InvokationCount % {0} == 0", state.LoggingInterval);
+				state.Logger.LogInformation("Polling commits every {0} ms", state.PeriodMs);
 			}
 			else
 			{
@@ -46,10 +46,8 @@ namespace MinMQ.Service.Faster
 		public Task StartAsync(CancellationToken stoppingToken)
 		{
 			logger.LogInformation("{0} service running.", nameof(FasterHostedServiceCommit));
-
-			var state = new FasterHostedServiceCommitState(FasterOps.Instance.Value.CommitAsync, logger, GetLoggingInterval());
+			var state = new FasterHostedServiceCommitState(FasterOps.Instance.Value.CommitAsync, logger, GetLoggingInterval(), PeriodMs);
 			timer = new Timer(ExecuteAsync, state, TimeSpan.Zero, TimeSpan.FromMilliseconds(PeriodMs));
-
 			return Task.CompletedTask;
 		}
 

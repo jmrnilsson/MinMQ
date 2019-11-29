@@ -3,6 +3,7 @@
   <!-- <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' "> -->
   <PropertyGroup>
     <CodeAnalysisRuleSet>..\StyleCop.ruleset</CodeAnalysisRuleSet>
+    <Configurations>Debug;Release;Troubleshoot</Configurations>
   </PropertyGroup>
 
   <PropertyGroup>
