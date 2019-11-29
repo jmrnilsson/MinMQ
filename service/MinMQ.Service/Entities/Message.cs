@@ -14,6 +14,7 @@ namespace MinMq.Service.Entities
 			NextReferenceId = nextReferenceId;
 			MimeTypeByteKey = 0x01;
 			QueueByteKey = 0x00;
+			HashCode = content.ToFnv1aHashInt64();
 		}
 
 		public string Content { get; }
@@ -21,5 +22,6 @@ namespace MinMq.Service.Entities
 		public long NextReferenceId { get; }
 		public byte MimeTypeByteKey { get; }
 		public byte QueueByteKey { get; }
+		public string HashCode { get; set; }
 	}
 }

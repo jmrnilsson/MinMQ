@@ -19,14 +19,20 @@ namespace MinMq.Service.Repository
 			this.logger = logger;
 		}
 
-		// public async Task<Option<long>> AddRange(IAsyncEnumerable<Entities.Message> messages)
 		public async Task<Option<long>> AddRange(List<Entities.Message> messages)
 		{
 			Option<long> lastReferenceId = Option.None<long>();
+			List<long> ids = messages.Select(mm => mm.ReferenceId).ToList();
 
-			//await foreach (var message in messages)
+			Dictionary<long, KeyValuePair<long, string>> messageDos = await IntersectMessages(ids);
+
 			foreach (var message in messages)
 			{
+				if (messageDos.TryGetValue(message.ReferenceId, out KeyValuePair<long, string> kvp) && kvp.Value == message.HashCode)
+				{
+					continue;
+				}
+
 				var queue = await messageQueueContext.Queues.SingleOrDefaultAsync(q => q.ByteKey == message.QueueByteKey);
 
 				if (queue == null)
@@ -46,12 +52,13 @@ namespace MinMq.Service.Repository
 					ReferenceId = message.ReferenceId,
 					NextReferenceId = message.NextReferenceId,
 					Content = message.Content,
-					Queue = queue
+					Queue = queue,
+					HashCode = message.HashCode
 				};
 
 				messageQueueContext.Messages.Add(messageDo);
 
-#if TROUBLESHOOT || DEBUG
+#if TROUBLESHOOT
 				try
 				{
 					await messageQueueContext.SaveChangesAsync();
@@ -68,10 +75,19 @@ namespace MinMq.Service.Repository
 					some: m => Math.Max(message.ReferenceId, m).Some()
 				);
 			}
-#if RELEASE
+#if RELEASE || DEBUG
 			await messageQueueContext.SaveChangesAsync();
 #endif
 			return lastReferenceId;
+		}
+
+		private async Task<Dictionary<long, KeyValuePair<long, string>>> IntersectMessages(List<long> ids)
+		{
+			return await (
+				from m in (IAsyncEnumerable<Message>)messageQueueContext.Messages
+				where ids.Any(id => id == m.ReferenceId)
+				select new KeyValuePair<long, string>(m.ReferenceId, m.HashCode)
+			).ToDictionaryAsync(m => m.Key);
 		}
 
 		public void Dispose()

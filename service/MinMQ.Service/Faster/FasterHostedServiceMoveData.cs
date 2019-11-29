@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using MinMq.Service.Entities;
 using MinMq.Service.Repository;
+using MinMQ.Service.Configuration;
 using Optional;
 
 namespace MinMQ.Service.Faster
@@ -22,13 +25,14 @@ namespace MinMQ.Service.Faster
 		private const int DelayMs = 1000;
 		private readonly ILogger<FasterHostedServiceMoveData> logger;
 		private readonly IServiceScopeFactory scopeFactory;
+		private readonly IOptionsMonitor<MinMQConfiguration> optionsMonitor;
 		private int delayCoefficient = 1;
-		private SemaphoreSlim entityFrameworkFlushSemaphore = new SemaphoreSlim(1, 1);
 
-		public FasterHostedServiceMoveData(ILogger<FasterHostedServiceMoveData> logger, IServiceScopeFactory scopeFactory)
+		public FasterHostedServiceMoveData(ILogger<FasterHostedServiceMoveData> logger, IServiceScopeFactory scopeFactory, IOptionsMonitor<MinMQConfiguration> optionsMonitor)
 		{
 			this.logger = logger;
 			this.scopeFactory = scopeFactory;
+			this.optionsMonitor = optionsMonitor;
 		}
 
 		public async Task StartAsync(CancellationToken stoppingToken)
@@ -43,11 +47,13 @@ namespace MinMQ.Service.Faster
 					{
 						await Task.Delay(DelayMs * delayCoefficient);
 						delayCoefficient = 1;
-						var scanner = FasterOps.Instance.Value.ListenAsync();
+						// Have a sneaking suspicions we should keep the nextAddress from the last iteration
+						var scanner = FasterOps.Instance.Value.ListenAsync(optionsMonitor.CurrentValue.ScanFlushSize);
 						var messages = await ToList(scanner, FasterOps.Instance.Value.TruncateUntil);
 						if (!messages.Any())
 						{
 							delayCoefficient = 10;
+							logger.LogInformation("Nothing to flush");
 							continue;
 						}
 						var lastReferenceId = await messageRepository.AddRange(messages);
@@ -68,6 +74,8 @@ namespace MinMQ.Service.Faster
 				// I'm guessing this is out of bounds for the current storage config
 				if (nextReferenceId > 100_000_000)
 				{
+					logger.LogError("Reached end of IDevice");
+					Debugger.Break();
 					eofCallback(nextReferenceId);
 					continue;
 				}

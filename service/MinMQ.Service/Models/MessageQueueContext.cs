@@ -67,6 +67,7 @@ namespace MinMq.Service.Models
 		public string Content { get; set; }
 		public int QueueId { get; set; }
 		public Queue Queue { get; set; }
+		public string HashCode { get; set; }
 	}
 
 	public class MimeType

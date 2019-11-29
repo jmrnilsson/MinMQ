@@ -124,14 +124,15 @@ namespace MinMQ.Service
 			}
 		}
 
-		public async IAsyncEnumerable<(string, long, long)> ListenAsync()
+		public async IAsyncEnumerable<(string, long, long)> ListenAsync(int flushSize)
 		{
-			using (FasterLogScanIterator iter = logger.Scan(nextAddress, 100_000_000))
+			// Always start from beginning. Assume it is refilled or truncate works.
+			using (FasterLogScanIterator iter = logger.Scan(0, 100_000_000))
 			{
 				int i = 0;
 				await foreach ((byte[] bytes, int length) in iter.GetAsyncEnumerable())
 				{
-					if (i > 49)
+					if (i >= flushSize)
 					{
 						nextAddress = iter.NextAddress;
 						break;

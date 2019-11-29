@@ -45,6 +45,7 @@ namespace MinMQ.Service
 		private static void SetOptions(MinMQConfiguration o)
 		{
 			o.FasterDevice = Configuration[nameof(o.FasterDevice)];
+			o.ScanFlushSize = int.Parse(Configuration[nameof(o.ScanFlushSize)]);
 		}
 
 		public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
