@@ -12,8 +12,8 @@ namespace MinMQ.BenchmarkConsole
 		{
 			this.n = n;
 		}
-		protected Random Seed { get; set; } = new Random();
 
+		protected Random Seed { get; set; } = new Random();
 		protected abstract T GenerateChild(IEnumerable<T> innerChildren);
 		public abstract string GenerateObject();
 
