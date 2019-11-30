@@ -75,7 +75,7 @@ namespace MinMQ.Service.Faster
 				if (nextReferenceId > 100_000_000)
 				{
 					logger.LogError("Reached end of IDevice");
-					Debugger.Break();
+					// Debugger.Break();
 					eofCallback(nextReferenceId);
 					continue;
 				}
