@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,37 +9,38 @@ namespace MinMQ.BenchmarkConsole
 {
 	public sealed class Benchmarker
 	{
-		private readonly SemaphoreSlim httpSemaphore = new SemaphoreSlim(6, 6);
+		private const int ConcurrentHttpRequests = 400;
 		private readonly IHttpClientFactory httpClientFactory;
 		private readonly int ntree;
 		private readonly int showProgressEvery;
 		private readonly int numberOfObjects;
+		private readonly CancellationToken cancellationToken;
 
-		public Benchmarker(IHttpClientFactory httpClientFactory, int ntree, int showProgressEvery, int numberOfObjects)
+		public Benchmarker(IHttpClientFactory httpClientFactory, int ntree, int showProgressEvery, int numberOfObjects, CancellationToken cancellationToken)
 		{
 			this.httpClientFactory = httpClientFactory;
 			this.ntree = ntree;
 			this.showProgressEvery = showProgressEvery;
 			this.numberOfObjects = numberOfObjects;
+			this.cancellationToken = cancellationToken;
 		}
+
+		public event OnCompleteDelegate OnComplete;
 
 		internal async Task Start()
 		{
 			(List<string> jsons, List<string> xmls) = TimedFunction(() => GenerateObjects(numberOfObjects, out jsons, out xmls));
 
-			//await TimedFunction(() => PostSendAsStringContent(jsons), "Sending JSON..");
-			//await TimedFunction(() => PostSendAsStringContent(xmls), "Sending XML..");
-
 			Console.Write("Sending JSON and XML..");
 			Instant start = SystemClock.Instance.GetCurrentInstant();
 
 			// Old-school non-blocking
-			List<Task> tasks = await PostSendAsStringContent(jsons);
-			tasks.AddRange(await PostSendAsStringContent(xmls));
-			await Task.WhenAll(tasks);
-
+			await PostSendAsStringContent(jsons);
+			await PostSendAsStringContent(xmls);
 			Duration duration = SystemClock.Instance.GetCurrentInstant() - start;
-			Console.WriteLine("Done! {0:N2} documents/s", tasks.Count / (decimal)duration.TotalSeconds);
+			Console.WriteLine("Done! {0:N2} documents/s", (jsons.Count + xmls.Count) / (decimal)duration.TotalSeconds);
+
+			OnComplete?.Invoke();
 		}
 
 		private (List<string>, List<string>) GenerateObjects(int numberOfObjects, out List<string> jsons, out List<string> xmls)
@@ -53,6 +53,8 @@ namespace MinMQ.BenchmarkConsole
 			Console.WriteLine("Preparing payload");
 			for (int i = 0; i < numberOfObjects; i++)
 			{
+				if (cancellationToken.IsCancellationRequested) return (new List<string>(), new List<string>());
+
 				if (i > 0 && i % showProgressEvery == 0)
 				{
 					Console.WriteLine("{0}%", Math.Floor((decimal)i * 100 / numberOfObjects));
@@ -84,32 +86,29 @@ namespace MinMQ.BenchmarkConsole
 			Console.WriteLine("Done! {0:N2} documents/s", count / (decimal)duration.TotalSeconds);
 		}
 
-		private async Task<List<Task>> PostSendAsStringContent(List<string> documents)
+		private async Task PostSendAsStringContent(List<string> documents)
 		{
-			List<Task> tasks = new List<Task>();
-
-			try
+			int j = 0;
+			while (j < documents.Count)
 			{
-				await httpSemaphore.WaitAsync();
+				List<Task> tasks = new List<Task>();
 
-				foreach (string document in documents)
+				for (int i = 0; i < ConcurrentHttpRequests && j < documents.Count; i++)
 				{
-					HttpClient httpClient = httpClientFactory.CreateClient();
+					if (cancellationToken.IsCancellationRequested) return;
 
-					//using (HttpClient httpClient = httpClientFactory.CreateClient())
-					//{
-						StringContent content = new StringContent(document);
-						tasks.Add(httpClient.PostAsync("http://localhost:9000/send", content));
-					//}
+					HttpClient httpClient = httpClientFactory.CreateClient();
+					StringContent content = new StringContent(documents[i]);
+					tasks.Add(httpClient.PostAsync("http://localhost:9000/send", content)); // It seems a CancellationToken here will fail the service.
+					if (i == 5)
+					{
+						await Task.WhenAll(tasks);
+						tasks.Clear();
+					}
+
+					j++;
 				}
 			}
-			finally
-			{
-				httpSemaphore.Release();
-			}
-
-			return tasks;
-
 		}
 	}
 }

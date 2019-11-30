@@ -12,10 +12,13 @@ using Polly.Registry;
 
 namespace MinMQ.BenchmarkConsole
 {
+	public delegate void OnCompleteDelegate();
+
 	public class Program
 	{
 		public static readonly int ShowProgressEvery = 200;
 		public static readonly int NTree = 5;  // NTree = 2 == binary tree
+		private static readonly CancellationTokenSource CancellationTokenSource = new CancellationTokenSource();
 		public static int NumberOfObjects { get; set; } = 1000;
 
 		public static async Task Main(string[] args)
@@ -26,11 +29,15 @@ namespace MinMQ.BenchmarkConsole
 				.ConfigureServices((hostContext, services) =>
 				{
 					services.AddHttpClient();
-					services.AddSingleton<IHostedService, HostedService>();
 					services.AddHostedService<HostedService>();
 				});
 
-			await builder.RunConsoleAsync();
+			await builder.RunConsoleAsync(CancellationTokenSource.Token);
+		}
+
+		public static void OnCompletedEvent()
+		{
+			CancellationTokenSource.Cancel();
 		}
 
 		private static Option<int> ParseArguments(string[] args)
@@ -46,22 +53,43 @@ namespace MinMQ.BenchmarkConsole
 
 	public class HostedService : IHostedService
 	{
-		public HostedService(IHttpClientFactory httpClientFactory)
+		private readonly IHostApplicationLifetime hostApplicationLifetime;
+
+		public HostedService(IHttpClientFactory httpClientFactory, IHostApplicationLifetime hostApplicationLifetime)
 		{
 			HttpClientFactory = httpClientFactory;
+			this.hostApplicationLifetime = hostApplicationLifetime;
 		}
 
 		public IHttpClientFactory HttpClientFactory { get; }
 
 		public async Task StartAsync(CancellationToken cancellationToken)
 		{
-			var benchmarker = new Benchmarker(HttpClientFactory, Program.NTree, Program.ShowProgressEvery, Program.NumberOfObjects);
+			// hostApplicationLifetime.ApplicationStarted.Register(OnStarted);
+			hostApplicationLifetime.ApplicationStopping.Register(OnStopping);
+			// hostApplicationLifetime.ApplicationStopped.Register(OnStopped);
+
+			var benchmarker = new Benchmarker(HttpClientFactory, Program.NTree, Program.ShowProgressEvery, Program.NumberOfObjects, cancellationToken);
+			benchmarker.OnComplete += Program.OnCompletedEvent;
 			await benchmarker.Start();
+			await StopAsync(cancellationToken);
 		}
 
-		public Task StopAsync(CancellationToken cancellationToken)
+		public async Task StopAsync(CancellationToken cancellationToken)
 		{
-			throw new NotImplementedException();
+			await Task.CompletedTask;
 		}
+
+		// private void OnStarted()
+		// {
+		// }
+
+		private void OnStopping()
+		{
+		}
+
+		// private void OnStopped()
+		// {
+		// }
 	}
 }
