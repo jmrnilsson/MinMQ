@@ -72,7 +72,7 @@ namespace MinMQ.Service.Faster
 			await foreach ((string content, long referenceId, long nextReferenceId) in scan)
 			{
 				// I'm guessing this is out of bounds for the current storage config
-				if (nextReferenceId > 100_000_000)
+				if (nextReferenceId > 1000_000_000)
 				{
 					logger.LogError("Reached end of IDevice");
 					// Debugger.Break();

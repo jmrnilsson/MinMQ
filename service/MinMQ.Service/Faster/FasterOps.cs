@@ -54,9 +54,9 @@ namespace MinMQ.Service
 			while (true)
 			{
 				byte[] entry;
-				int entryLenght;
+				int length;
 
-				while (!iter.GetNext(out entry, out entryLenght))
+				while (!iter.GetNext(out entry, out length))
 				{
 					if (iter.CurrentAddress >= 100_000_000) return Option.None<(string, long, long)>();
 				}
@@ -75,8 +75,8 @@ namespace MinMQ.Service
 			{
 				int i = 0;
 				byte[] entry;
-				int entryLenght;
-				while (iter.GetNext(out entry, out entryLenght))
+				int length;
+				while (iter.GetNext(out entry, out length))
 				{
 					UTF8Encoding encoding = new UTF8Encoding();
 					if (iter.CurrentAddress >= 1568) Debugger.Break();
@@ -127,7 +127,7 @@ namespace MinMQ.Service
 		public async IAsyncEnumerable<(string, long, long)> ListenAsync(int flushSize)
 		{
 			// Always start from beginning. Assume it is refilled or truncate works.
-			using (FasterLogScanIterator iter = logger.Scan(0, 100_000_000))
+			using (FasterLogScanIterator iter = logger.Scan(0, 1000_000_000, name: "listen"))
 			{
 				int i = 0;
 				await foreach ((byte[] bytes, int length) in iter.GetAsyncEnumerable())
