@@ -8,12 +8,14 @@ namespace MinMQ.BenchmarkConsole
 {
 	public sealed class Benchmarker
 	{
+		private readonly IHttpClientFactory httpClientFactory;
 		private readonly int ntree;
 		private readonly int showProgressEvery;
 		private readonly int numberOfObjects;
 
-		public Benchmarker(int ntree, int showProgressEvery, int numberOfObjects)
+		public Benchmarker(IHttpClientFactory httpClientFactory, int ntree, int showProgressEvery, int numberOfObjects)
 		{
+			this.httpClientFactory = httpClientFactory;
 			this.ntree = ntree;
 			this.showProgressEvery = showProgressEvery;
 			this.numberOfObjects = numberOfObjects;
@@ -22,8 +24,8 @@ namespace MinMQ.BenchmarkConsole
 		internal async Task Start()
 		{
 			(List<string> jsons, List<string> xmls) = TimedFunction(() => GenerateObjects(numberOfObjects, out jsons, out xmls));
-			await TimedFunction(() => SendAsStringContent(jsons), "Sending JSON..");
-			await TimedFunction(() => SendAsStringContent(xmls), "Sending XML..");
+			await TimedFunction(() => PostSendAsStringContent(jsons), "Sending JSON..");
+			await TimedFunction(() => PostSendAsStringContent(xmls), "Sending XML..");
 		}
 
 		private (List<string>, List<string>) GenerateObjects(int numberOfObjects, out List<string> jsons, out List<string> xmls)
@@ -67,11 +69,11 @@ namespace MinMQ.BenchmarkConsole
 			Console.WriteLine("Done! {0:N2} documents/s", count / (decimal)duration.TotalSeconds);
 		}
 
-		private async Task<int> SendAsStringContent(List<string> documents)
+		private async Task<int> PostSendAsStringContent(List<string> documents)
 		{
 			foreach (string document in documents)
 			{
-				using (HttpClient httpClient = new HttpClient())
+				using (HttpClient httpClient = httpClientFactory.CreateClient())
 				{
 					StringContent content = new StringContent(document);
 					await httpClient.PostAsync("http://localhost:9000/send", content);
