@@ -100,7 +100,8 @@ namespace MinMQ.BenchmarkConsole
 					HttpClient httpClient = httpClientFactory.CreateClient();
 					StringContent content = new StringContent(documents[i]);
 					tasks.Add(httpClient.PostAsync("http://localhost:9000/send", content)); // It seems a CancellationToken here will fail the service.
-					if (i == 5)
+
+					if (i == ConcurrentHttpRequests)
 					{
 						await Task.WhenAll(tasks);
 						tasks.Clear();
