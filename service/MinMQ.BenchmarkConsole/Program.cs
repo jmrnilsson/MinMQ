@@ -1,85 +1,95 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using NodaTime;
+using Optional;
+using Polly;
+using Polly.Registry;
 
 namespace MinMQ.BenchmarkConsole
 {
+	public delegate void OnCompleteDelegate();
+
 	public class Program
 	{
-		private const int ShowProgressEvery = 200;
-		private const int NTree = 5;  // NTree = 2 == binary tree
+		public static readonly int ShowProgressEvery = 200;
+		public static readonly int NTree = 5;  // NTree = 2 == binary tree
+		private static readonly CancellationTokenSource CancellationTokenSource = new CancellationTokenSource();
+		public static int NumberOfObjects { get; set; } = 1000;
 
 		public static async Task Main(string[] args)
 		{
-			int numberOfObjects = 1000;
+			ParseArguments(args).MatchSome(value => NumberOfObjects = value);
 
+			var builder = new HostBuilder()
+				.ConfigureServices((hostContext, services) =>
+				{
+					services.AddHttpClient();
+					services.AddHostedService<HostedService>();
+				});
+
+			await builder.RunConsoleAsync(CancellationTokenSource.Token);
+		}
+
+		public static void OnCompletedEvent()
+		{
+			CancellationTokenSource.Cancel();
+		}
+
+		private static Option<int> ParseArguments(string[] args)
+		{
 			if (args.Length == 1 && int.TryParse(args[0], out int numberOfObjects_))
 			{
-				numberOfObjects = numberOfObjects_;
+				return numberOfObjects_.Some();
 			}
 
-			var jsons = new List<string>();
-			var xmls = new List<string>();
-			var jsonGenerator = new JsonGenerator(NTree);
-			var xmlGenerator = new XmlGenerator(NTree);
-
-			Console.WriteLine("Preparing payload");
-			Instant start = SystemClock.Instance.GetCurrentInstant();
-
-			for (int i = 0; i < numberOfObjects; i++)
-			{
-				if (i > 0 && i % ShowProgressEvery == 0)
-				{
-					Console.WriteLine("{0}%", Math.Floor((decimal)i * 100 / numberOfObjects));
-				}
-
-				jsons.Add(jsonGenerator.GenerateObject());
-				xmls.Add(xmlGenerator.GenerateObject());
-			}
-			Duration duration = SystemClock.Instance.GetCurrentInstant() - start;
-			Console.WriteLine("Done! {0:N2} documents/s", numberOfObjects * 2 / (decimal)duration.TotalSeconds);
-
-			#region SendJson
-			Console.Write($"Sending JSON...");
-			start = SystemClock.Instance.GetCurrentInstant();
-			for (int i = 0; i < jsons.Count; i++)
-			{
-				using (HttpClient httpClient = new HttpClient())
-				{
-					StringContent content = new StringContent(jsons[i]);
-					await httpClient.PostAsync("http://localhost:9000/send", content);
-				}
-			}
-			#endregion
-
-			#region SendXml
-			duration = SystemClock.Instance.GetCurrentInstant() - start;
-			Console.WriteLine("Done! {0:N2} requests/s", numberOfObjects / (decimal)duration.TotalSeconds);
-
-			Console.Write("Sending XML..");
-			start = SystemClock.Instance.GetCurrentInstant();
-			for (int i = 0; i < xmls.Count; i++)
-			{
-				using (HttpClient httpClient = new HttpClient())
-				{
-					StringContent content = new StringContent(xmls[i]);
-					await httpClient.PostAsync("http://localhost:9000/send", content);
-				}
-			}
-			duration = SystemClock.Instance.GetCurrentInstant() - start;
-			Console.WriteLine("Done! {0:N2} requests/s", numberOfObjects / (decimal)duration.TotalSeconds);
-			#endregion
-
-			//Console.WriteLine("-----------------JSON----------------");
-			//Console.WriteLine();
-			//Console.WriteLine(jsons[0]);
-			//Console.WriteLine();
-			//Console.WriteLine("-----------------XML-----------------");
-			//Console.WriteLine();
-			//Console.WriteLine(xmls[0]);
-			//Console.WriteLine();
+			return Option.None<int>();
 		}
+	}
+
+	public class HostedService : IHostedService
+	{
+		private readonly IHostApplicationLifetime hostApplicationLifetime;
+
+		public HostedService(IHttpClientFactory httpClientFactory, IHostApplicationLifetime hostApplicationLifetime)
+		{
+			HttpClientFactory = httpClientFactory;
+			this.hostApplicationLifetime = hostApplicationLifetime;
+		}
+
+		public IHttpClientFactory HttpClientFactory { get; }
+
+		public async Task StartAsync(CancellationToken cancellationToken)
+		{
+			// hostApplicationLifetime.ApplicationStarted.Register(OnStarted);
+			hostApplicationLifetime.ApplicationStopping.Register(OnStopping);
+			// hostApplicationLifetime.ApplicationStopped.Register(OnStopped);
+
+			var benchmarker = new Benchmarker(HttpClientFactory, Program.NTree, Program.ShowProgressEvery, Program.NumberOfObjects, cancellationToken);
+			benchmarker.OnComplete += Program.OnCompletedEvent;
+			await benchmarker.Start();
+			await StopAsync(cancellationToken);
+		}
+
+		public async Task StopAsync(CancellationToken cancellationToken)
+		{
+			await Task.CompletedTask;
+		}
+
+		// private void OnStarted()
+		// {
+		// }
+
+		private void OnStopping()
+		{
+		}
+
+		// private void OnStopped()
+		// {
+		// }
 	}
 }

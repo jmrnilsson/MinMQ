@@ -33,6 +33,7 @@ flushing to a durable disk later on.
 - Named queues.
 - Message content limit (<1 MB).
 - Mime-Types.
+- Flushing to multiple IDevices. Currently, all records are flushing to Postgres. 
 
 ## In a more distant future the following things may also be explored:
 - Faster Materialized views, cached responses or read models.
