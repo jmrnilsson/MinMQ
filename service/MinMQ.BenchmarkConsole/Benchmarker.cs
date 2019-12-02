@@ -10,6 +10,7 @@ namespace MinMQ.BenchmarkConsole
 	public sealed class Benchmarker
 	{
 		private const int ConcurrentHttpRequests = 400;
+		private const int SchedularLimit = 14;
 		private readonly IHttpClientFactory httpClientFactory;
 		private readonly int ntree;
 		private readonly int showProgressEvery;
@@ -98,25 +99,52 @@ namespace MinMQ.BenchmarkConsole
 
 		private async Task PostSendAsStringContent(List<string> documents)
 		{
-			int j = 0;
-			while (j < documents.Count)
-			{
-				List<Task> tasks = new List<Task>();
+			var tasks = new List<Task>();
+			var limitedScheduler = new LimitedConcurrencyLevelTaskScheduler(SchedularLimit);
+			TaskFactory factory = new TaskFactory(limitedScheduler);
+			int batch = documents.Count / SchedularLimit;
+			int modulus = documents.Count % SchedularLimit;
+			Func<int, int> length = startIndex => Math.Min(startIndex + ConcurrentHttpRequests + modulus, documents.Count);
 
-				if (cancellationToken.IsCancellationRequested) return;
+			{
+				var task = factory.StartNew(async () =>
+				{
+					await PostSendAsStringContentPart(documents, 0, ConcurrentHttpRequests + modulus);
+				}, TaskCreationOptions.LongRunning);
+
+				tasks.Add(task);
+			}
+
+			for (int i = 1; i < batch; i++)
+			{
+				var task = factory.StartNew(async () =>
+				{
+					await PostSendAsStringContentPart(documents, batch, length(0));
+				}, TaskCreationOptions.LongRunning);
+
+				tasks.Add(task);
+			}
+
+			await Task.WhenAll(tasks);
+		}
+
+		private async Task PostSendAsStringContentPart(List<string> documents, int startIndex, int length)
+		{
+			List<Task> tasks = new List<Task>();
+			int j = startIndex;
+
+			while (j < length)
+			{
+				if (cancellationToken.IsCancellationRequested) return;  // Task.FromCanceled(cancellationToken);
 
 				HttpClient httpClient = httpClientFactory.CreateClient();
 				StringContent content = new StringContent(documents[j]);
 				tasks.Add(httpClient.PostAsync("http://localhost:9000/send", content)); // It seems a CancellationToken here will fail the service.
 
-				if (j % ConcurrentHttpRequests == 0)
-				{
-					await Task.WhenAll(tasks);
-					tasks.Clear();
-				}
-
 				j++;
 			}
+
+			await Task.WhenAll(tasks);
 		}
 	}
 }
