@@ -86,6 +86,16 @@ namespace MinMQ.BenchmarkConsole
 			Console.WriteLine("Done! {0:N2} documents/s", count / (decimal)duration.TotalSeconds);
 		}
 
+		//			{
+		//		var task = Task.Factory.StartNew(() =>
+		//		{
+		//			var jsonGenerator = new JsonGenerator(ntree);
+		//			var xmlGenerator = new XmlGenerator(ntree);
+		//			return GenerateObjects(xmlGenerator, jsonGenerator, modulus);
+		//		}, TaskCreationOptions.LongRunning);
+		//tasks.Add(task.Unwrap());
+		//	}
+
 		private async Task PostSendAsStringContent(List<string> documents)
 		{
 			int j = 0;
