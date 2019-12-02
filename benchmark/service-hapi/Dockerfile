@@ -16,6 +16,6 @@ RUN npm install
 RUN npm run build
 RUN rm -dr src
 
-EXPOSE 4000
+EXPOSE 1000
 
 CMD ["node", "./dist/index.js"]

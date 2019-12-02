@@ -3,7 +3,7 @@ import { logger } from './logger';
 
 const config = {
   name: 'mmq-service-hapi',
-  port: 4000,
+  port: 1000,
   host: '0.0.0.0',
   // host: 'localhost'
 };

@@ -29,6 +29,12 @@ do
     sleep 1
 done
 
+while [ $(curl -o -I -L -s -w "%{http_code}" http://mmq-service-hapi:1000/status) -ne 200 ]
+do
+    echo -n "hapi"
+    sleep 1
+done
+
 EOF
 
 chmod +x /app/wrk/http-ready.sh
@@ -45,8 +51,6 @@ echo ''
 ./wrk -t12 -c400 -d10s http://mmq-service-hapi:1000/status
 ./wrk -t12 -c400 -d10s http://mmq-service:9000/status
 ./wrk -t12 -c400 -d10s http://mmq-service:9000/healthcheck
-./wrk -t12 -c400 -d10s -s ./scripts/mmq-post.lua http://mmq-service:9000/efcore-in-mem-text
-./wrk -t12 -c400 -d10s -s ./scripts/mmq-post.lua http://mmq-service:9000/faster
 EOF
 
 chmod +x /app/wrk/status.sh
