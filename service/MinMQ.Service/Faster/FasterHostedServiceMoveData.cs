@@ -10,6 +10,7 @@ using Microsoft.Extensions.Options;
 using MinMQ.Service.Configuration;
 using MinMq.Service.Entities;
 using MinMq.Service.Repository;
+using Npgsql;
 
 namespace MinMQ.Service.Faster
 {
@@ -43,20 +44,27 @@ namespace MinMQ.Service.Faster
 				{
 					while (true)
 					{
-						await Task.Delay(DelayMs * delayCoefficient);
-						delayCoefficient = 1;
-						// Have a sneaking suspicions we should keep the nextAddress from the last iteration
-						var scanner = FasterOps.Instance.Value.ListenAsync(optionsMonitor.CurrentValue.ScanFlushSize);
-						var messages = await ToList(scanner, FasterOps.Instance.Value.TruncateUntil);
-						if (!messages.Any())
+						try
 						{
-							delayCoefficient = 10;
-							logger.LogInformation("Nothing to flush");
-							continue;
+							await Task.Delay(DelayMs * delayCoefficient);
+							delayCoefficient = 1;
+							// Have a sneaking suspicions we should keep the nextAddress from the last iteration
+							var scanner = FasterOps.Instance.Value.ListenAsync(optionsMonitor.CurrentValue.ScanFlushSize);
+							var messages = await ToList(scanner, FasterOps.Instance.Value.TruncateUntil);
+							if (!messages.Any())
+							{
+								delayCoefficient = 10;
+								logger.LogInformation("Nothing to flush");
+								continue;
+							}
+							var lastReferenceId = await messageRepository.AddRange(messages);
+							lastReferenceId.MatchSome(referenceId => FasterOps.Instance.Value.TruncateUntil(referenceId));
+							logger.LogInformation("Flushed records");
 						}
-						var lastReferenceId = await messageRepository.AddRange(messages);
-						lastReferenceId.MatchSome(referenceId => FasterOps.Instance.Value.TruncateUntil(referenceId));
-						logger.LogInformation("Flushed records");
+						catch (NpgsqlException error) when (error.ToString().Contains("(10061): No connection could be made because the target machine"))
+						{
+							logger.LogInformation("Socket busy. Waiting...");
+						}
 					}
 				}
 			}

@@ -87,39 +87,36 @@ namespace MinMQ.BenchmarkConsole
 			Console.WriteLine("Done! {0:N2} documents/s", count / (decimal)duration.TotalSeconds);
 		}
 
-		//			{
-		//		var task = Task.Factory.StartNew(() =>
-		//		{
-		//			var jsonGenerator = new JsonGenerator(ntree);
-		//			var xmlGenerator = new XmlGenerator(ntree);
-		//			return GenerateObjects(xmlGenerator, jsonGenerator, modulus);
-		//		}, TaskCreationOptions.LongRunning);
-		//tasks.Add(task.Unwrap());
-		//	}
-
 		private async Task PostSendAsStringContent(List<string> documents)
 		{
 			var tasks = new List<Task>();
 			var limitedScheduler = new LimitedConcurrencyLevelTaskScheduler(SchedularLimit);
 			TaskFactory factory = new TaskFactory(limitedScheduler);
-			int batch = documents.Count / SchedularLimit;
-			int modulus = documents.Count % SchedularLimit;
-			Func<int, int> length = startIndex => Math.Min(startIndex + ConcurrentHttpRequests + modulus, documents.Count);
 
+			List<ConcurrencyPlan> plans = documents.ToConcurrencyPlan(SchedularLimit, ConcurrentHttpRequests);
+
+			//int batch = documents.Count / SchedularLimit;
+			//int modulus = documents.Count % SchedularLimit;
+			//int concurrencyPerBatch = ConcurrentHttpRequests / batch;
+			//int concurrencyPerBatchModulus = ConcurrentHttpRequests % batch;
+			// Func<int, int> length = startIndex => Math.Min(startIndex + concurrencyPerBatch + modulus + concurrencyPerBatchModulus, documents.Count);
+
+			//{
+			//	var task = factory.StartNew(async () =>
+			//	{
+			//		await PostSendAsStringContentPart(documents, 0, concurrencyPerBatch + modulus + concurrencyPerBatchModulus);
+			//	}, TaskCreationOptions.LongRunning);
+
+			//	tasks.Add(task);
+			//}
+
+
+
+			foreach (ConcurrencyPlan plan in plans)
 			{
 				var task = factory.StartNew(async () =>
 				{
-					await PostSendAsStringContentPart(documents, 0, ConcurrentHttpRequests + modulus);
-				}, TaskCreationOptions.LongRunning);
-
-				tasks.Add(task);
-			}
-
-			for (int i = 1; i < batch; i++)
-			{
-				var task = factory.StartNew(async () =>
-				{
-					await PostSendAsStringContentPart(documents, batch, length(0));
+					await PostSendAsStringContentPart(documents, plan.Index, plan.Length);
 				}, TaskCreationOptions.LongRunning);
 
 				tasks.Add(task);
@@ -128,10 +125,10 @@ namespace MinMQ.BenchmarkConsole
 			await Task.WhenAll(tasks);
 		}
 
-		private async Task PostSendAsStringContentPart(List<string> documents, int startIndex, int length)
+		private async Task PostSendAsStringContentPart(List<string> documents, int index, int length)
 		{
 			List<Task> tasks = new List<Task>();
-			int j = startIndex;
+			int j = index;
 
 			while (j < length)
 			{
