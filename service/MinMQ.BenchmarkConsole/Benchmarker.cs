@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -39,8 +40,11 @@ namespace MinMQ.BenchmarkConsole
 			await PostSendAsStringContent(jsons);
 			await PostSendAsStringContent(xmls);
 			Duration duration = SystemClock.Instance.GetCurrentInstant() - start;
-			Console.WriteLine("Done! {0:N2} documents/s", (jsons.Count + xmls.Count) / (decimal)duration.TotalSeconds);
+			decimal throughtput = (jsons.Count + xmls.Count) / (decimal)duration.TotalSeconds;
+			var xmlsCount = xmls.Where(x => !string.IsNullOrWhiteSpace(x));
+			Console.WriteLine("Done! {0:N2} documents/s (Xmls: {1}, Jsons={2}))", throughtput, xmlsCount.Count(), jsons.Count);
 
+			await Task.Delay(5);
 			OnComplete?.Invoke();
 		}
 
@@ -62,6 +66,7 @@ namespace MinMQ.BenchmarkConsole
 				}
 
 				jsons.Add(jsonGenerator.GenerateObject());
+				// xmls.Add(jsonGenerator.GenerateObject());
 				xmls.Add(xmlGenerator.GenerateObject());
 			}
 
@@ -95,23 +100,6 @@ namespace MinMQ.BenchmarkConsole
 
 			List<ConcurrencyPlan> plans = documents.ToConcurrencyPlan(SchedularLimit, ConcurrentHttpRequests);
 
-			//int batch = documents.Count / SchedularLimit;
-			//int modulus = documents.Count % SchedularLimit;
-			//int concurrencyPerBatch = ConcurrentHttpRequests / batch;
-			//int concurrencyPerBatchModulus = ConcurrentHttpRequests % batch;
-			// Func<int, int> length = startIndex => Math.Min(startIndex + concurrencyPerBatch + modulus + concurrencyPerBatchModulus, documents.Count);
-
-			//{
-			//	var task = factory.StartNew(async () =>
-			//	{
-			//		await PostSendAsStringContentPart(documents, 0, concurrencyPerBatch + modulus + concurrencyPerBatchModulus);
-			//	}, TaskCreationOptions.LongRunning);
-
-			//	tasks.Add(task);
-			//}
-
-
-
 			foreach (ConcurrencyPlan plan in plans)
 			{
 				var task = factory.StartNew(async () =>
@@ -128,9 +116,8 @@ namespace MinMQ.BenchmarkConsole
 		private async Task PostSendAsStringContentPart(List<string> documents, int index, int length)
 		{
 			List<Task> tasks = new List<Task>();
-			int j = index;
-
-			while (j < length)
+			
+			for (int j = 0;  j < documents.Count; j++)
 			{
 				if (cancellationToken.IsCancellationRequested) return;  // Task.FromCanceled(cancellationToken);
 
@@ -142,6 +129,7 @@ namespace MinMQ.BenchmarkConsole
 			}
 
 			await Task.WhenAll(tasks);
+
 		}
 	}
 }

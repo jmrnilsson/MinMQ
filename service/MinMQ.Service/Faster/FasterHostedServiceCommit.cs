@@ -26,11 +26,18 @@ namespace MinMQ.Service.Faster
 			this.logger = logger;
 		}
 
-		private static async void ExecuteAsync(object stateInfo)
+		private async void ExecuteAsync(object stateInfo)
 		{
 			FasterHostedServiceCommitState state = stateInfo as FasterHostedServiceCommitState;
 
-			await state.CommitAsync();
+			try
+			{
+				await state.CommitAsync();
+			}
+			catch (Exception e)
+			{
+				logger.LogError("Commit failed: {0}", e);
+			}
 
 			if (state.InvokationCount > 0 && state.InvokationCount % state.LoggingInterval == 0)
 			{

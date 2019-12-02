@@ -44,41 +44,56 @@ namespace MinMQ.Service.Faster
 				{
 					while (true)
 					{
-						try
+						await Task.Delay(DelayMs * delayCoefficient);
+						delayCoefficient = 1;
+						// Have a sneaking suspicions we should keep the nextAddress from the last iteration. If we remove truncate
+						// then the cursor doesn't progress and flush next batch.
+						var scanner = FasterOps.Instance.Value.Listen(optionsMonitor.CurrentValue.ScanFlushSize);
+						// var messages = await ToListAsync(scanner, FasterOps.Instance.Value.TruncateUntil);
+						var messages = ToList(scanner, FasterOps.Instance.Value.TruncateUntil);
+						if (!messages.Any())
 						{
-							await Task.Delay(DelayMs * delayCoefficient);
-							delayCoefficient = 1;
-							// Have a sneaking suspicions we should keep the nextAddress from the last iteration
-							var scanner = FasterOps.Instance.Value.ListenAsync(optionsMonitor.CurrentValue.ScanFlushSize);
-							var messages = await ToList(scanner, FasterOps.Instance.Value.TruncateUntil);
-							if (!messages.Any())
-							{
-								delayCoefficient = 10;
-								logger.LogInformation("Nothing to flush");
-								continue;
-							}
-							var lastReferenceId = await messageRepository.AddRange(messages);
-							lastReferenceId.MatchSome(referenceId => FasterOps.Instance.Value.TruncateUntil(referenceId));
-							logger.LogInformation("Flushed records");
+							delayCoefficient = 10;
+							logger.LogInformation("Nothing to flush");
+							continue;
 						}
-						catch (NpgsqlException error) when (error.ToString().Contains("(10061): No connection could be made because the target machine"))
-						{
-							logger.LogInformation("Socket busy. Waiting...");
-						}
+						var lastReferenceId = await messageRepository.AddRange(messages);
+						lastReferenceId.MatchSome(referenceId => FasterOps.Instance.Value.TruncateUntil(referenceId));
+						logger.LogInformation("Flushed records");
 					}
 				}
 			}
 		}
 
 		// Maybe this also should be IAsyncEnumerable. Or, maybe not yet..
-		private async Task<List<Message>> ToList(IAsyncEnumerable<(string, long, long)> scan, EndOfFileCallback endOfFileCallback)
+		private async Task<List<Message>> ToListAsync(IAsyncEnumerable<(string, long, long)> scan, EndOfFileCallback endOfFileCallback)
 		{
 			var messages = new List<Message>();
 
 			await foreach ((string content, long referenceId, long nextReferenceId) in scan)
 			{
 				// I'm guessing this is out of bounds for the current storage config
-				if (nextReferenceId > 1000_000_000)
+				if (nextReferenceId > 1_000_000_000)
+				{
+					logger.LogError("Reached end of IDevice");
+					// Debugger.Break();
+					endOfFileCallback(nextReferenceId);
+					continue;
+				}
+				messages.Add(new Message(content, referenceId, nextReferenceId));
+			}
+
+			return messages;
+		}
+
+		private List<Message> ToList(List<(string, long, long)> scan, EndOfFileCallback endOfFileCallback)
+		{
+			var messages = new List<Message>();
+
+			foreach ((string content, long referenceId, long nextReferenceId) in scan)
+			{
+				// I'm guessing this is out of bounds for the current storage config
+				if (nextReferenceId > 1_000_000_000)
 				{
 					logger.LogError("Reached end of IDevice");
 					// Debugger.Break();

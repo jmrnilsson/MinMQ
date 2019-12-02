@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using NodaTime;
 using Optional;
-using Polly;
-using Polly.Registry;
 
 namespace MinMQ.BenchmarkConsole
 {
@@ -29,7 +23,7 @@ namespace MinMQ.BenchmarkConsole
 				.ConfigureServices((hostContext, services) =>
 				{
 					services.AddHttpClient();
-					services.AddHostedService<HostedService>();
+					services.AddHostedService<BenchmarkHostedService>();
 				});
 
 			await builder.RunConsoleAsync(CancellationTokenSource.Token);
@@ -49,47 +43,5 @@ namespace MinMQ.BenchmarkConsole
 
 			return Option.None<int>();
 		}
-	}
-
-	public class HostedService : IHostedService
-	{
-		private readonly IHostApplicationLifetime hostApplicationLifetime;
-
-		public HostedService(IHttpClientFactory httpClientFactory, IHostApplicationLifetime hostApplicationLifetime)
-		{
-			HttpClientFactory = httpClientFactory;
-			this.hostApplicationLifetime = hostApplicationLifetime;
-		}
-
-		public IHttpClientFactory HttpClientFactory { get; }
-
-		public async Task StartAsync(CancellationToken cancellationToken)
-		{
-			// hostApplicationLifetime.ApplicationStarted.Register(OnStarted);
-			hostApplicationLifetime.ApplicationStopping.Register(OnStopping);
-			// hostApplicationLifetime.ApplicationStopped.Register(OnStopped);
-
-			var benchmarker = new Benchmarker(HttpClientFactory, Program.NTree, Program.ShowProgressEvery, Program.NumberOfObjects, cancellationToken);
-			benchmarker.OnComplete += Program.OnCompletedEvent;
-			await benchmarker.Start();
-			await StopAsync(cancellationToken);
-		}
-
-		public async Task StopAsync(CancellationToken cancellationToken)
-		{
-			await Task.CompletedTask;
-		}
-
-		// private void OnStarted()
-		// {
-		// }
-
-		private void OnStopping()
-		{
-		}
-
-		// private void OnStopped()
-		// {
-		// }
 	}
 }
