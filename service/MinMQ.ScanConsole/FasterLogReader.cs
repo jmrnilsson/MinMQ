@@ -21,7 +21,7 @@ namespace MinMQ.ScanConsole
 			var result = new List<(string, long, long)>();
 
 			// using (FasterLogScanIterator iter = logger.Scan(logger.BeginAddress, 100_000_000, name: nameof(GetListAsync)))
-			using (FasterLogScanIterator iter = logger.Scan(nextAddress, 100_000_000))
+			using (FasterLogScanIterator iter = logger.Scan(nextAddress, 1_000_000_000))
 			{
 				while(keepGoing)
 				{
@@ -48,8 +48,9 @@ namespace MinMQ.ScanConsole
 						}
 
 						timeOfDay = SystemClock.Instance.GetCurrentInstant().InZone(tz).TimeOfDay;
-						Console.WriteLine("Time={2} Content={0}", encoding.GetString(bytes), iter.NextAddress, timeOfDay);
+						Console.WriteLine("Time={2} ContentLength={0}", bytes.Length, iter.NextAddress, timeOfDay);
 					}
+					await Task.Delay(5000);
 				}
 
 			}

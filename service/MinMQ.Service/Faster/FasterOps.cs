@@ -124,10 +124,11 @@ namespace MinMQ.Service
 			}
 		}
 
-		public async IAsyncEnumerable<(string, long, long)> ListenAsync(int flushSize)
+		// TODO: Currenly the last items are omitted with this variant. Use Listen() instead.
+		public async IAsyncEnumerable<(string, long, long)> __ListenAsync(int flushSize)
 		{
 			// Always start from beginning. Assume it is refilled or truncate works.
-			using (FasterLogScanIterator iter = logger.Scan(0, 1000_000_000, name: "listen"))
+			using (FasterLogScanIterator iter = logger.Scan(0, 1_000_000_000, name: "listen"))
 			{
 				int i = 0;
 				await foreach ((byte[] bytes, int length) in iter.GetAsyncEnumerable())
@@ -141,17 +142,49 @@ namespace MinMQ.Service
 					CancellationTokenSource cts = new CancellationTokenSource();
 					UTF8Encoding encoding = new UTF8Encoding();
 
-					try
-					{
-						await WaitAsync(iter, cts.Token);
-						i++;
-					}
-					catch (Exception e)
-					{
-						break;
-					}
+					i++;
+
+					// Probably shouldn't wait
+					// - https://microsoft.github.io/FASTER/docs/fasterlog#iteration
 
 					yield return (encoding.GetString(bytes), iter.CurrentAddress, iter.NextAddress);
+				}
+			}
+		}
+
+		public List<(string, long, long)> Listen(int flushSize)
+		{
+			List<(string, long, long)> entries = new List<(string, long, long)>();
+			// CancellationTokenSource cts = new CancellationTokenSource();
+			UTF8Encoding encoding = new UTF8Encoding();
+
+			int i = 0;
+			using (FasterLogScanIterator iter = logger.Scan(0, 1_000_000_000))
+			{
+				while (true)
+				{
+					byte[] bytes;
+					while (!iter.GetNext(out bytes, out int entryLength))
+					{
+						// TODO: Cursor keeps an item at the end for some reason. Fix this!
+						if (entries.Count > 1)
+						{
+							return entries;
+						}
+						return new List<(string, long, long)>();
+						// TODO: for the moment make sure to return the final items instead of awaiting more results.
+						// if (iter.CurrentAddress >= 1_000_000_000) break;
+						// await iter.WaitAsync(cts.Token);
+					}
+
+					entries.Add((encoding.GetString(bytes), iter.CurrentAddress, iter.NextAddress));
+
+					i++;
+
+					if (i >= flushSize)
+					{
+						return entries;
+					}
 				}
 			}
 		}
