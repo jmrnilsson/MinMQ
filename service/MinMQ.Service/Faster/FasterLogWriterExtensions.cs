@@ -4,6 +4,8 @@ using FASTER.core;
 
 namespace MinMQ.Service
 {
+
+	// TODO: Not use. Prehaps not great byt I like the proxy/nearest neighbour approach rather than direct logger access.
 	public static class FasterLogWriterExtensions
 	{
 		public static async ValueTask CommitAsync(this FasterLog logger, CancellationToken token = default)

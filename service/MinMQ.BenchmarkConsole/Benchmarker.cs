@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -38,8 +39,11 @@ namespace MinMQ.BenchmarkConsole
 			await PostSendAsStringContent(jsons);
 			await PostSendAsStringContent(xmls);
 			Duration duration = SystemClock.Instance.GetCurrentInstant() - start;
-			Console.WriteLine("Done! {0:N2} documents/s", (jsons.Count + xmls.Count) / (decimal)duration.TotalSeconds);
+			decimal throughtput = (jsons.Count + xmls.Count) / (decimal)duration.TotalSeconds;
+			var xmlsCount = xmls.Where(x => !string.IsNullOrWhiteSpace(x));
+			Console.WriteLine("Done! {0:N2} documents/s (Xmls: {1}, Jsons={2}))", throughtput, xmlsCount.Count(), jsons.Count);
 
+			await Task.Delay(5);
 			OnComplete?.Invoke();
 		}
 
@@ -61,6 +65,7 @@ namespace MinMQ.BenchmarkConsole
 				}
 
 				jsons.Add(jsonGenerator.GenerateObject());
+				// xmls.Add(jsonGenerator.GenerateObject());
 				xmls.Add(xmlGenerator.GenerateObject());
 			}
 
@@ -86,30 +91,50 @@ namespace MinMQ.BenchmarkConsole
 			Console.WriteLine("Done! {0:N2} documents/s", count / (decimal)duration.TotalSeconds);
 		}
 
+		//			{
+		//		var task = Task.Factory.StartNew(() =>
+		//		{
+		//			var jsonGenerator = new JsonGenerator(ntree);
+		//			var xmlGenerator = new XmlGenerator(ntree);
+		//			return GenerateObjects(xmlGenerator, jsonGenerator, modulus);
+		//		}, TaskCreationOptions.LongRunning);
+		//tasks.Add(task.Unwrap());
+		//	}
+
 		private async Task PostSendAsStringContent(List<string> documents)
 		{
-			int j = 0;
-			while (j < documents.Count)
+			string contentType = documents.First().StartsWith("<") ? "xml" : "json";
+			Console.WriteLine("");
+			Console.WriteLine("Document count ({1}): {0}", documents.Count, contentType);
+
+			int sent = 0;
+			List<Task> tasks = new List<Task>();
+
+			for (int j = 0;  j < documents.Count; j++)
 			{
-				List<Task> tasks = new List<Task>();
+				if (cancellationToken.IsCancellationRequested) return;
 
-				for (int i = 0; i < ConcurrentHttpRequests && j < documents.Count; i++)
+				HttpClient httpClient = httpClientFactory.CreateClient();
+				StringContent content = new StringContent(documents[j]);
+				tasks.Add(httpClient.PostAsync("http://localhost:9000/send", content)); // It seems a CancellationToken here will fail the service.
+
+				if (j % ConcurrentHttpRequests == 0 && j > 0)
 				{
-					if (cancellationToken.IsCancellationRequested) return;
-
-					HttpClient httpClient = httpClientFactory.CreateClient();
-					StringContent content = new StringContent(documents[i]);
-					tasks.Add(httpClient.PostAsync("http://localhost:9000/send", content)); // It seems a CancellationToken here will fail the service.
-
-					if (i == ConcurrentHttpRequests)
-					{
-						await Task.WhenAll(tasks);
-						tasks.Clear();
-					}
-
-					j++;
+					sent += tasks.Count;
+					await Task.WhenAll(tasks);
+					tasks.Clear();
 				}
 			}
+
+			// Were missing some documents at the tail.
+			if (tasks.Count > 0)
+			{
+				sent += tasks.Count;
+				await Task.WhenAll(tasks);
+				tasks.Clear();
+			}
+
+			Console.WriteLine("Sent ({1}): {0}", sent, contentType);
 		}
 	}
 }

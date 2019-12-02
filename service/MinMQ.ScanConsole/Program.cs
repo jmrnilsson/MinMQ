@@ -7,7 +7,7 @@ namespace MinMQ.ScanConsole
     {
 		public static async Task Main(string[] args)
 		{
-			string devicePath = "K:\\faster-hlog.log";
+			string devicePath = "K:\\hlog.log";
 
 			if (args.Length > 0)
 			{

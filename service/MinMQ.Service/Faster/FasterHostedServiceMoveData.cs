@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -8,14 +7,13 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using MinMQ.Service.Configuration;
 using MinMq.Service.Entities;
 using MinMq.Service.Repository;
-using MinMQ.Service.Configuration;
-using Optional;
 
 namespace MinMQ.Service.Faster
 {
-	delegate void EndOfFileCallback(long address);
+	internal delegate void EndOfFileCallback(long address);
 
 	/// <summary>
 	/// A hosted service that moves stuff from the FASTER log to some EF-providers data context.
@@ -47,9 +45,11 @@ namespace MinMQ.Service.Faster
 					{
 						await Task.Delay(DelayMs * delayCoefficient);
 						delayCoefficient = 1;
-						// Have a sneaking suspicions we should keep the nextAddress from the last iteration
-						var scanner = FasterOps.Instance.Value.ListenAsync(optionsMonitor.CurrentValue.ScanFlushSize);
-						var messages = await ToList(scanner, FasterOps.Instance.Value.TruncateUntil);
+						// Have a sneaking suspicions we should keep the nextAddress from the last iteration. If we remove truncate
+						// then the cursor doesn't progress and flush next batch.
+						var scanner = FasterOps.Instance.Value.Listen(optionsMonitor.CurrentValue.ScanFlushSize);
+						// var messages = await ToListAsync(scanner, FasterOps.Instance.Value.TruncateUntil);
+						var messages = ToList(scanner, FasterOps.Instance.Value.TruncateUntil);
 						if (!messages.Any())
 						{
 							delayCoefficient = 10;
@@ -65,18 +65,18 @@ namespace MinMQ.Service.Faster
 		}
 
 		// Maybe this also should be IAsyncEnumerable. Or, maybe not yet..
-		private async Task<List<Message>> ToList(IAsyncEnumerable<(string, long, long)> scan, EndOfFileCallback eofCallback)
+		private async Task<List<Message>> ToListAsync(IAsyncEnumerable<(string, long, long)> scan, EndOfFileCallback endOfFileCallback)
 		{
 			var messages = new List<Message>();
 
 			await foreach ((string content, long referenceId, long nextReferenceId) in scan)
 			{
 				// I'm guessing this is out of bounds for the current storage config
-				if (nextReferenceId > 1000_000_000)
+				if (nextReferenceId > 1_000_000_000)
 				{
 					logger.LogError("Reached end of IDevice");
 					// Debugger.Break();
-					eofCallback(nextReferenceId);
+					endOfFileCallback(nextReferenceId);
 					continue;
 				}
 				messages.Add(new Message(content, referenceId, nextReferenceId));
@@ -85,12 +85,24 @@ namespace MinMQ.Service.Faster
 			return messages;
 		}
 
-		private async IAsyncEnumerable<Message> ToListAsync(IAsyncEnumerable<(string, long, long)> scan)
+		private List<Message> ToList(List<(string, long, long)> scan, EndOfFileCallback endOfFileCallback)
 		{
-			await foreach ((string content, long referenceId, long nextReferenceId) in scan)
+			var messages = new List<Message>();
+
+			foreach ((string content, long referenceId, long nextReferenceId) in scan)
 			{
-				yield return new Message(content, referenceId, nextReferenceId);
+				// I'm guessing this is out of bounds for the current storage config
+				if (nextReferenceId > 1_000_000_000)
+				{
+					logger.LogError("Reached end of IDevice");
+					// Debugger.Break();
+					endOfFileCallback(nextReferenceId);
+					continue;
+				}
+				messages.Add(new Message(content, referenceId, nextReferenceId));
 			}
+
+			return messages;
 		}
 
 		public Task StopAsync(CancellationToken stoppingToken)

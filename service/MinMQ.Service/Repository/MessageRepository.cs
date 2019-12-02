@@ -21,7 +21,7 @@ namespace MinMq.Service.Repository
 
 		public async Task<Option<long>> AddRange(List<Entities.Message> messages)
 		{
-			Option<long> lastReferenceId = Option.None<long>();
+			Option<long> nextReferenceId = Option.None<long>();
 			List<long> ids = messages.Select(mm => mm.ReferenceId).ToList();
 
 			Dictionary<long, KeyValuePair<long, string>> messageDos = await IntersectMessages(ids);
@@ -69,16 +69,16 @@ namespace MinMq.Service.Repository
 					continue;
 				}
 #endif
-				lastReferenceId = lastReferenceId.Match
+				nextReferenceId = nextReferenceId.Match
 				(
-					none: () => message.ReferenceId.Some(),
-					some: m => Math.Max(message.ReferenceId, m).Some()
+					none: () => message.NextReferenceId.Some(),
+					some: m => Math.Max(message.NextReferenceId, m).Some()
 				);
 			}
 #if RELEASE || DEBUG
 			await messageQueueContext.SaveChangesAsync();
 #endif
-			return lastReferenceId;
+			return nextReferenceId;
 		}
 
 		private async Task<Dictionary<long, KeyValuePair<long, string>>> IntersectMessages(List<long> ids)
