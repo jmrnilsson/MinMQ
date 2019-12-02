@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -8,19 +6,18 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using MinMQ.Service.Configuration;
 using MinMq.Service.Entities;
 using MinMq.Service.Repository;
-using MinMQ.Service.Configuration;
-using Optional;
 
 namespace MinMQ.Service.Faster
 {
-	delegate void EndOfFileCallback(long address);
+	internal delegate void EndOfFileCallback(long address);
 
 	/// <summary>
 	/// A hosted service that moves stuff from the FASTER log to some EF-providers data context.
 	/// </summary>
-	public class FasterHostedServiceMoveData : IHostedService, IDisposable
+	public class FasterHostedServiceMoveData : IHostedService, 
 	{
 		private const int DelayMs = 1000;
 		private readonly ILogger<FasterHostedServiceMoveData> logger;
@@ -65,7 +62,7 @@ namespace MinMQ.Service.Faster
 		}
 
 		// Maybe this also should be IAsyncEnumerable. Or, maybe not yet..
-		private async Task<List<Message>> ToList(IAsyncEnumerable<(string, long, long)> scan, EndOfFileCallback eofCallback)
+		private async Task<List<Message>> ToList(IAsyncEnumerable<(string, long, long)> scan, EndOfFileCallback endOfFileCallback)
 		{
 			var messages = new List<Message>();
 
@@ -76,21 +73,13 @@ namespace MinMQ.Service.Faster
 				{
 					logger.LogError("Reached end of IDevice");
 					// Debugger.Break();
-					eofCallback(nextReferenceId);
+					endOfFileCallback(nextReferenceId);
 					continue;
 				}
 				messages.Add(new Message(content, referenceId, nextReferenceId));
 			}
 
 			return messages;
-		}
-
-		private async IAsyncEnumerable<Message> ToListAsync(IAsyncEnumerable<(string, long, long)> scan)
-		{
-			await foreach ((string content, long referenceId, long nextReferenceId) in scan)
-			{
-				yield return new Message(content, referenceId, nextReferenceId);
-			}
 		}
 
 		public Task StopAsync(CancellationToken stoppingToken)
