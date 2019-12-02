@@ -91,23 +91,8 @@ namespace MinMQ.BenchmarkConsole
 			Console.WriteLine("Done! {0:N2} documents/s", count / (decimal)duration.TotalSeconds);
 		}
 
-		//			{
-		//		var task = Task.Factory.StartNew(() =>
-		//		{
-		//			var jsonGenerator = new JsonGenerator(ntree);
-		//			var xmlGenerator = new XmlGenerator(ntree);
-		//			return GenerateObjects(xmlGenerator, jsonGenerator, modulus);
-		//		}, TaskCreationOptions.LongRunning);
-		//tasks.Add(task.Unwrap());
-		//	}
-
 		private async Task PostSendAsStringContent(List<string> documents)
 		{
-			string contentType = documents.First().StartsWith("<") ? "xml" : "json";
-			Console.WriteLine("");
-			Console.WriteLine("Document count ({1}): {0}", documents.Count, contentType);
-
-			int sent = 0;
 			List<Task> tasks = new List<Task>();
 
 			for (int j = 0;  j < documents.Count; j++)
@@ -120,7 +105,6 @@ namespace MinMQ.BenchmarkConsole
 
 				if (j % ConcurrentHttpRequests == 0 && j > 0)
 				{
-					sent += tasks.Count;
 					await Task.WhenAll(tasks);
 					tasks.Clear();
 				}
@@ -129,12 +113,9 @@ namespace MinMQ.BenchmarkConsole
 			// Were missing some documents at the tail.
 			if (tasks.Count > 0)
 			{
-				sent += tasks.Count;
 				await Task.WhenAll(tasks);
 				tasks.Clear();
 			}
-
-			Console.WriteLine("Sent ({1}): {0}", sent, contentType);
 		}
 	}
 }
