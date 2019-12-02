@@ -93,22 +93,19 @@ namespace MinMQ.BenchmarkConsole
 			{
 				List<Task> tasks = new List<Task>();
 
-				for (int i = 0; i < ConcurrentHttpRequests && j < documents.Count; i++)
+				if (cancellationToken.IsCancellationRequested) return;
+
+				HttpClient httpClient = httpClientFactory.CreateClient();
+				StringContent content = new StringContent(documents[j]);
+				tasks.Add(httpClient.PostAsync("http://localhost:9000/send", content)); // It seems a CancellationToken here will fail the service.
+
+				if (j % ConcurrentHttpRequests == 0)
 				{
-					if (cancellationToken.IsCancellationRequested) return;
-
-					HttpClient httpClient = httpClientFactory.CreateClient();
-					StringContent content = new StringContent(documents[i]);
-					tasks.Add(httpClient.PostAsync("http://localhost:9000/send", content)); // It seems a CancellationToken here will fail the service.
-
-					if (i == ConcurrentHttpRequests)
-					{
-						await Task.WhenAll(tasks);
-						tasks.Clear();
-					}
-
-					j++;
+					await Task.WhenAll(tasks);
+					tasks.Clear();
 				}
+
+				j++;
 			}
 		}
 	}

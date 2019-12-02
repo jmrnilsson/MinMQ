@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,7 +18,7 @@ namespace MinMQ.Service.Faster
 	/// <summary>
 	/// A hosted service that moves stuff from the FASTER log to some EF-providers data context.
 	/// </summary>
-	public class FasterHostedServiceMoveData : IHostedService, 
+	public class FasterHostedServiceMoveData : IHostedService, IDisposable
 	{
 		private const int DelayMs = 1000;
 		private readonly ILogger<FasterHostedServiceMoveData> logger;
