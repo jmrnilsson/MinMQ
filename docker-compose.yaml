@@ -50,7 +50,7 @@ services:
     env_file:
     - .env
     environment:
-      - PGDATA=/var/lib/postgresql/data/pgdata
+      # - PGDATA=/var/lib/postgresql/data/pgdata
       - POSTGRES_DB=mmq
 volumes:
   # mongodata: {}

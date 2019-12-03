@@ -11,6 +11,7 @@ using MinMQ.Service.HttpRequestHandlers;
 using MinMq.Service.Models;
 using MinMQ.Service.Models;
 using MinMq.Service.Repository;
+using System;
 
 namespace MinMQ.Service
 {
@@ -46,10 +47,13 @@ namespace MinMQ.Service
 		{
 			o.FasterDevice = Configuration[nameof(o.FasterDevice)];
 			o.ScanFlushSize = int.Parse(Configuration[nameof(o.ScanFlushSize)]);
+			o.ConnectionStringPostgres = Configuration.GetSection("ConnectionStrings")["MessageQueueContext"];
 		}
 
 		public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
 		{
+			Console.WriteLine("Environment setting {0}", env.EnvironmentName);
+
 			new ConfigurationBuilder()
 				.AddJsonFile("appsettings.json")
 				.AddJsonFile($"appsettings.{env.EnvironmentName}.json")
