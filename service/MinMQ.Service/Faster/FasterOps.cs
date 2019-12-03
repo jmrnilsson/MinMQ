@@ -152,7 +152,7 @@ namespace MinMQ.Service
 			}
 		}
 
-		public List<(string, long, long)> Listen(int flushSize)
+		public List<(string, long, long)> Listen(int flushSize, CancellationToken cancellationToken)
 		{
 			List<(string, long, long)> entries = new List<(string, long, long)>();
 			// CancellationTokenSource cts = new CancellationTokenSource();
@@ -166,6 +166,8 @@ namespace MinMQ.Service
 					byte[] bytes;
 					while (!iter.GetNext(out bytes, out int entryLength))
 					{
+						if (cancellationToken.IsCancellationRequested) throw new TaskCanceledException("Listen cancelled");
+
 						// TODO: Cursor keeps an item at the end for some reason. Fix this!
 						if (entries.Count > 1)
 						{

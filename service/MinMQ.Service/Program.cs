@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,8 +13,13 @@ namespace MinMQ.Service
 
 	public class Program
 	{
+		private static HashSet<string> stoppingProcesses = new HashSet<string>();
+		// private static IHost host;
+		// private static Task started;
+
 		public static async Task Main(string[] args)
 		{
+			// started = Task.Delay(10_000);
 			var host = CreateHostBuilder(args).Build();
 
 			using (var scope = host.Services.CreateScope())
@@ -35,6 +41,24 @@ namespace MinMQ.Service
 			}
 
 			await host.RunAsync();
+			// started = Task.CompletedTask;
+		}
+
+		public static void Close(string nameOfStoppingProcess)
+		{
+			Console.WriteLine("Program recieved stop notication from {0}", nameOfStoppingProcess);
+			stoppingProcesses.Add(nameOfStoppingProcess);
+
+			if (stoppingProcesses.Contains(nameof(FasterHostedServiceCommit)) && stoppingProcesses.Contains(nameof(FasterHostedServiceMoveData)))
+			{
+				Console.WriteLine("Stopping program");
+
+				// throw new ApplicationException("Stopping application");
+
+				// await started;
+				// await host.StopAsync();
+				// Environment.Exit(1);
+			}
 		}
 
 		public static IHostBuilder CreateHostBuilder(string[] args) =>

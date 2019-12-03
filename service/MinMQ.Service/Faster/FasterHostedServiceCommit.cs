@@ -19,11 +19,13 @@ namespace MinMQ.Service.Faster
 		private const int PeriodMs = 5;
 		private const int LogCommitTimerEverySeconds = 3000;
 		private readonly ILogger<FasterHostedServiceCommit> logger;
+		private readonly IHostApplicationLifetime hostApplicationLifetime;
 		private Timer timer;
 
-		public FasterHostedServiceCommit(ILogger<FasterHostedServiceCommit> logger)
+		public FasterHostedServiceCommit(ILogger<FasterHostedServiceCommit> logger, IHostApplicationLifetime hostApplicationLifetime)
 		{
 			this.logger = logger;
+			this.hostApplicationLifetime = hostApplicationLifetime;
 		}
 
 		private async void ExecuteAsync(object stateInfo)
@@ -52,15 +54,23 @@ namespace MinMQ.Service.Faster
 
 		public Task StartAsync(CancellationToken stoppingToken)
 		{
+			hostApplicationLifetime.ApplicationStopping.Register(OnStopping);
 			logger.LogInformation("{0} service running.", nameof(FasterHostedServiceCommit));
 			var state = new FasterHostedServiceCommitState(FasterOps.Instance.Value.CommitAsync, logger, GetLoggingInterval(), PeriodMs);
 			timer = new Timer(ExecuteAsync, state, TimeSpan.Zero, TimeSpan.FromMilliseconds(PeriodMs));
 			return Task.CompletedTask;
 		}
 
+		private void OnStopping()
+		{
+			logger.LogInformation("Cancelling service={0}", nameof(FasterHostedServiceCommit));
+			Program.Close(nameof(FasterHostedServiceCommit));
+			// await StopAsync(new CancellationTokenSource().Token);
+		}
+
 		public Task StopAsync(CancellationToken stoppingToken)
 		{
-			logger.LogInformation("Timed Hosted' Service is stopping.");
+			logger.LogInformation("Stopping service={0}", nameof(FasterHostedServiceCommit));
 			timer?.Change(Timeout.Infinite, 0);
 			return Task.CompletedTask;
 		}

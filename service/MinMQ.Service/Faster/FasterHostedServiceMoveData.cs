@@ -24,18 +24,28 @@ namespace MinMQ.Service.Faster
 		private readonly ILogger<FasterHostedServiceMoveData> logger;
 		private readonly IServiceScopeFactory scopeFactory;
 		private readonly IOptionsMonitor<MinMQConfiguration> optionsMonitor;
+		private readonly IHostApplicationLifetime hostApplicationLifetime;
+		private readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
 		private int delayCoefficient = 1;
 
-		public FasterHostedServiceMoveData(ILogger<FasterHostedServiceMoveData> logger, IServiceScopeFactory scopeFactory, IOptionsMonitor<MinMQConfiguration> optionsMonitor)
+		public FasterHostedServiceMoveData
+		(
+			ILogger<FasterHostedServiceMoveData> logger,
+			IServiceScopeFactory scopeFactory,
+			IOptionsMonitor<MinMQConfiguration> optionsMonitor,
+			IHostApplicationLifetime hostApplicationLifetime
+		)
 		{
 			this.logger = logger;
 			this.scopeFactory = scopeFactory;
 			this.optionsMonitor = optionsMonitor;
+			this.hostApplicationLifetime = hostApplicationLifetime;
 		}
 
 		public async Task StartAsync(CancellationToken stoppingToken)
 		{
 			logger.LogInformation("{0} service running.", nameof(FasterHostedServiceMoveData));
+			hostApplicationLifetime.ApplicationStopping.Register(OnStopping);
 
 			using (var scope = scopeFactory.CreateScope())
 			{
@@ -47,7 +57,7 @@ namespace MinMQ.Service.Faster
 						delayCoefficient = 1;
 						// Have a sneaking suspicions we should keep the nextAddress from the last iteration. If we remove truncate
 						// then the cursor doesn't progress and flush next batch.
-						var scanner = FasterOps.Instance.Value.Listen(optionsMonitor.CurrentValue.ScanFlushSize);
+						var scanner = FasterOps.Instance.Value.Listen(optionsMonitor.CurrentValue.ScanFlushSize, cancellationTokenSource.Token);
 						// var messages = await ToListAsync(scanner, FasterOps.Instance.Value.TruncateUntil);
 						var messages = ToList(scanner, FasterOps.Instance.Value.TruncateUntil);
 						if (!messages.Any())
@@ -91,6 +101,8 @@ namespace MinMQ.Service.Faster
 
 			foreach ((string content, long referenceId, long nextReferenceId) in scan)
 			{
+				if (cancellationTokenSource.Token.IsCancellationRequested) return new List<Message>();
+
 				// I'm guessing this is out of bounds for the current storage config
 				if (nextReferenceId > 1_000_000_000)
 				{
@@ -107,8 +119,16 @@ namespace MinMQ.Service.Faster
 
 		public Task StopAsync(CancellationToken stoppingToken)
 		{
-			logger.LogInformation("{0} Service is stopping.", nameof(FasterHostedServiceMoveData));
+			logger.LogInformation("Stopping service={0}", nameof(FasterHostedServiceMoveData));
+			cancellationTokenSource.Cancel();
 			return Task.CompletedTask;
+		}
+
+		private void OnStopping()
+		{
+			logger.LogInformation("Cancelling service={0}", nameof(FasterHostedServiceMoveData));
+			Program.Close(nameof(FasterHostedServiceMoveData));
+			//await StopAsync(new CancellationTokenSource().Token);
 		}
 
 		public void Dispose()
