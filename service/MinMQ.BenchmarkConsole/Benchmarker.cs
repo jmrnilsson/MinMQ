@@ -11,7 +11,7 @@ namespace MinMQ.BenchmarkConsole
 	public sealed class Benchmarker
 	{
 		private const int ConcurrentHttpRequests = 400;
-		private const int SchedularLimit = 14;
+		private const int SchedulerLimit = 14;
 		private readonly IHttpClientFactory httpClientFactory;
 		private readonly int ntree;
 		private readonly int showProgressEvery;
@@ -95,10 +95,10 @@ namespace MinMQ.BenchmarkConsole
 		private async Task PostSendAsStringContent(List<string> documents)
 		{
 			var tasks = new List<Task>();
-			var limitedScheduler = new LimitedConcurrencyLevelTaskScheduler(SchedularLimit);
+			var limitedScheduler = new LimitedConcurrencyLevelTaskScheduler(SchedulerLimit);
 			TaskFactory factory = new TaskFactory(limitedScheduler);
 
-			List<ConcurrencyPlan> plans = documents.ToConcurrencyPlan(SchedularLimit, ConcurrentHttpRequests);
+			List<ConcurrencyPlan> plans = documents.ToConcurrencyPlan(SchedulerLimit, ConcurrentHttpRequests);
 
 			foreach (ConcurrencyPlan plan in plans)
 			{
@@ -116,7 +116,7 @@ namespace MinMQ.BenchmarkConsole
 		private async Task PostSendAsStringContentPart(List<string> documents, int index, int length)
 		{
 			List<Task> tasks = new List<Task>();
-			
+
 			for (int j = 0;  j < documents.Count; j++)
 			{
 				if (cancellationToken.IsCancellationRequested) return;  // Task.FromCanceled(cancellationToken);
