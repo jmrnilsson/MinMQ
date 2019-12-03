@@ -32,7 +32,7 @@ namespace MinMq.Service.Repository
 
 				if (queue == null)
 				{
-					queue = new Queue
+					queue = new tQueue
 					{
 						ByteKey = message.QueueByteKey,
 						Name = "default"
@@ -42,7 +42,7 @@ namespace MinMq.Service.Repository
 					await messageQueueContext.SaveChangesAsync();
 				}
 
-				var messageDo = new Models.Message
+				var messageDo = new Models.tMessage
 				{
 					ReferenceId = message.ReferenceId,
 					NextReferenceId = message.NextReferenceId,
@@ -78,7 +78,7 @@ namespace MinMq.Service.Repository
 
 		private async Task<IEnumerable<Entities.Message>> Find(FindMessagesQuery findMessageQuery)
 		{
-			IAsyncEnumerable<Message> messages = messageQueueContext.Messages;
+			IAsyncEnumerable<tMessage> messages = messageQueueContext.Messages;
 
 			var query =
 				from m in messages
