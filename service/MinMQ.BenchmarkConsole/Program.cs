@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Optional;
+using Serilog;
 
 namespace MinMQ.BenchmarkConsole
 {
@@ -18,10 +19,14 @@ namespace MinMQ.BenchmarkConsole
 		{
 			ParseArguments(args).MatchSome(value => NumberOfObjects = value);
 
+			Log.Logger = new LoggerConfiguration()
+				.MinimumLevel.Information()
+				.WriteTo.Console()
+				.CreateLogger();
+
 			var builder = new HostBuilder()
 				.ConfigureServices((hostContext, services) =>
 				{
-					services.AddTransient<BenchmarkerFactory>();
 					services.AddHttpClient();
 					services.AddHostedService<BenchmarkHostedService>();
 				});

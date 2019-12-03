@@ -5,12 +5,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using MinMq.Service.Models;
-using MinMq.Service.Repository;
 using MinMQ.Service.Configuration;
 using MinMQ.Service.Filters;
 using MinMQ.Service.HttpRequestHandlers;
+using MinMq.Service.Models;
 using MinMQ.Service.Models;
+using MinMq.Service.Repository;
 
 namespace MinMQ.Service
 {

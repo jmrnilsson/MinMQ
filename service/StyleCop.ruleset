@@ -97,6 +97,7 @@
     <Rule Id="SA1509" Action="None" />
     <Rule Id="SA1516" Action="None" />
     <Rule Id="SA1600" Action="None" />
+    <Rule Id="SA1601" Action="None" />
     <Rule Id="SA1633" Action="None" />
   </Rules>
   <Rules AnalyzerId="StyleCop.CSharp.LayoutRules" RuleNamespace="StyleCop.CSharp.LayoutRules">

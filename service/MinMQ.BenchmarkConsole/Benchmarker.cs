@@ -6,24 +6,22 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using NodaTime;
+using Serilog;
 
 namespace MinMQ.BenchmarkConsole
 {
-
 	public sealed class Benchmarker
 	{
 		private const int ConcurrentHttpRequests = 400;
 		private readonly IHttpClientFactory httpClientFactory;
-		private readonly ILogger<Benchmarker> logger;
 		private readonly int ntree;
 		private readonly Duration showProgressEvery = Duration.FromMilliseconds(400);
 		private readonly int numberOfObjects;
 		private readonly CancellationToken cancellationToken;
 
-		internal Benchmarker(IHttpClientFactory httpClientFactory, ILogger<Benchmarker> logger,  int ntree, int numberOfObjects, CancellationToken cancellationToken)
+		internal Benchmarker(IHttpClientFactory httpClientFactory, int ntree, int numberOfObjects, CancellationToken cancellationToken)
 		{
 			this.httpClientFactory = httpClientFactory;
-			this.logger = logger;
 			this.ntree = ntree;
 			this.numberOfObjects = numberOfObjects;
 			this.cancellationToken = cancellationToken;
@@ -42,14 +40,15 @@ namespace MinMQ.BenchmarkConsole
 				xmlCount = xmls.Count;
 			}
 
-			logger.LogInformation("Sending JSON and XML..");
+			Log.Information("Sending JSON and XML..");
 			Instant start = SystemClock.Instance.GetCurrentInstant();
 
 			// Old-school non-blocking
 			await PostSendAsStringContent(documents);
 			Duration duration = SystemClock.Instance.GetCurrentInstant() - start;
 			decimal throughtput = (jsonCount + xmlCount) / (decimal)duration.TotalSeconds;
-			logger.LogInformation("Done! {0:N2} documents/s (Xmls: {1}, Jsons={2}))", throughtput, xmlCount, jsonCount);
+			Log.Information("Done! {0:N2} documents/s (Xmls: {1}, Jsons={2}))", throughtput, xmlCount, jsonCount);
+			OnComplete?.Invoke();
 		}
 
 		private (List<string>, List<string>) GenerateObjects(int numberOfObjects, out List<string> jsons, out List<string> xmls)
@@ -60,16 +59,16 @@ namespace MinMQ.BenchmarkConsole
 			var jsonGenerator = new JsonGenerator(ntree);
 			var xmlGenerator = new XmlGenerator(ntree);
 
-			logger.LogInformation("Preparing payload");
+			Log.Information("Preparing payload");
 			for (int i = 0; i < numberOfObjects; i++)
 			{
 				if (cancellationToken.IsCancellationRequested) return (new List<string>(), new List<string>());
 
 				Instant now = SystemClock.Instance.GetCurrentInstant();
-				if (lastShowProgress - now > showProgressEvery)
+				if (now - lastShowProgress > showProgressEvery)
 				{
 					lastShowProgress = now;
-					logger.LogInformation("{0}%", Math.Floor((decimal)i * 100 / numberOfObjects));
+					Log.Information("{0} %", Math.Floor((decimal)i * 100 / numberOfObjects));
 				}
 
 				jsons.Add(jsonGenerator.GenerateObject());
@@ -85,17 +84,17 @@ namespace MinMQ.BenchmarkConsole
 			var objects = action();
 			Duration duration = SystemClock.Instance.GetCurrentInstant() - start;
 			var perf = (objects.Item1.Count + objects.Item2.Count) / (decimal)duration.TotalSeconds;
-			logger.LogInformation("Done! {0:N2} documents/s", perf);
+			Log.Information("Done! {0:N2} documents/s", perf);
 			return objects;
 		}
 
 		private async Task TimedFunction(Func<Task<int>> action, string name)
 		{
-			logger.LogInformation("Sending XML..");
+			Log.Information("Sending XML..");
 			Instant start = SystemClock.Instance.GetCurrentInstant();
 			var count = await action();
 			Duration duration = SystemClock.Instance.GetCurrentInstant() - start;
-			logger.LogInformation("Done! {0:N2} documents/s", count / (decimal)duration.TotalSeconds);
+			Log.Information("Done! {0:N2} documents/s", count / (decimal)duration.TotalSeconds);
 		}
 
 		private async Task PostSendAsStringContent(List<string> documents)
