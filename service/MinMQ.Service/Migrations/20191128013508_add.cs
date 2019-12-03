@@ -2,8 +2,10 @@
 
 namespace MinMq.Service.Migrations
 {
-    public partial class add : Migration
-    {
+#pragma warning disable SA1300 // Element should begin with upper-case letter
+	public partial class add : Migration
+#pragma warning restore SA1300 // Element should begin with upper-case letter
+	{
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropForeignKey(
