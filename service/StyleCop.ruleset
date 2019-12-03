@@ -66,6 +66,7 @@
   </Rules>
   <Rules AnalyzerId="Microsoft.CodeAnalysis.CSharp" RuleNamespace="Microsoft.CodeAnalysis.CSharp">
     <Rule Id="CS1998" Action="Error" />
+    <Rule Id="CS4014" Action="Error" />
     <Rule Id="CS8622" Action="Error" />
   </Rules>
   <Rules AnalyzerId="Microsoft.CodeAnalysis.CSharp.Features" RuleNamespace="Microsoft.CodeAnalysis.CSharp.Features">
@@ -97,6 +98,7 @@
     <Rule Id="SA1509" Action="None" />
     <Rule Id="SA1516" Action="None" />
     <Rule Id="SA1600" Action="None" />
+    <Rule Id="SA1601" Action="None" />
     <Rule Id="SA1633" Action="None" />
   </Rules>
   <Rules AnalyzerId="StyleCop.CSharp.LayoutRules" RuleNamespace="StyleCop.CSharp.LayoutRules">

@@ -114,7 +114,7 @@ namespace MinMQ.Service
 						await Task.WhenAny(WaitAsync(iter, cts.Token), SetTimeout(cts));
 						i++;
 					}
-					catch (Exception e)
+					catch (Exception)
 					{
 						break;
 					}
@@ -125,7 +125,7 @@ namespace MinMQ.Service
 		}
 
 		// TODO: Currenly the last items are omitted with this variant. Use Listen() instead.
-		public async IAsyncEnumerable<(string, long, long)> __ListenAsync(int flushSize)
+		public async IAsyncEnumerable<(string, long, long)> ListenAsync_(int flushSize)
 		{
 			// Always start from beginning. Assume it is refilled or truncate works.
 			using (FasterLogScanIterator iter = logger.Scan(0, 1_000_000_000, name: "listen"))

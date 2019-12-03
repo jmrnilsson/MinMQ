@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Optional;
+using Serilog;
 
 namespace MinMQ.BenchmarkConsole
 {
@@ -10,7 +11,6 @@ namespace MinMQ.BenchmarkConsole
 
 	public class Program
 	{
-		public static readonly int ShowProgressEvery = 200;
 		public static readonly int NTree = 5;  // NTree = 2 == binary tree
 		private static readonly CancellationTokenSource CancellationTokenSource = new CancellationTokenSource();
 		public static int NumberOfObjects { get; set; } = 1000;
@@ -18,6 +18,11 @@ namespace MinMQ.BenchmarkConsole
 		public static async Task Main(string[] args)
 		{
 			ParseArguments(args).MatchSome(value => NumberOfObjects = value);
+
+			Log.Logger = new LoggerConfiguration()
+				.MinimumLevel.Information()
+				.WriteTo.Console()
+				.CreateLogger();
 
 			var builder = new HostBuilder()
 				.ConfigureServices((hostContext, services) =>
