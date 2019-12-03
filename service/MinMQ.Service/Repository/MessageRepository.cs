@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MinMq.Service.Models;
@@ -22,17 +23,11 @@ namespace MinMq.Service.Repository
 		public async Task<Option<long>> AddRange(List<Entities.Message> messages)
 		{
 			Option<long> nextReferenceId = Option.None<long>();
-			List<long> ids = messages.Select(mm => mm.ReferenceId).ToList();
+			var savedMessages = await Find(new FindMessagesQuery(messages));
+			var newMessages = messages.Except(savedMessages, new MessageComparer());
 
-			Dictionary<long, KeyValuePair<long, string>> messageDos = await IntersectMessages(ids);
-
-			foreach (var message in messages)
+			foreach (var message in newMessages)
 			{
-				if (messageDos.TryGetValue(message.ReferenceId, out KeyValuePair<long, string> kvp) && kvp.Value == message.HashCode)
-				{
-					continue;
-				}
-
 				var queue = await messageQueueContext.Queues.SingleOrDefaultAsync(q => q.ByteKey == message.QueueByteKey);
 
 				if (queue == null)
@@ -47,7 +42,7 @@ namespace MinMq.Service.Repository
 					await messageQueueContext.SaveChangesAsync();
 				}
 
-				var messageDo = new Message
+				var messageDo = new Models.Message
 				{
 					ReferenceId = message.ReferenceId,
 					NextReferenceId = message.NextReferenceId,
@@ -81,18 +76,43 @@ namespace MinMq.Service.Repository
 			return nextReferenceId;
 		}
 
-		private async Task<Dictionary<long, KeyValuePair<long, string>>> IntersectMessages(List<long> ids)
+		private async Task<IEnumerable<Entities.Message>> Find(FindMessagesQuery findMessageQuery)
 		{
-			return await (
-				from m in (IAsyncEnumerable<Message>)messageQueueContext.Messages
-				where ids.Any(id => id == m.ReferenceId)
-				select new KeyValuePair<long, string>(m.ReferenceId, m.HashCode)
-			).ToDictionaryAsync(m => m.Key);
+			IAsyncEnumerable<Message> messages = messageQueueContext.Messages;
+
+			var query =
+				from m in messages
+				where findMessageQuery.Messages.Any(pm => pm.ReferenceId == m.ReferenceId && pm.HashCode == m.HashCode)
+				select new Entities.Message
+				(
+					m.Content,
+					m.ReferenceId,
+					m.NextReferenceId,
+					m.HashCode,
+					0x02,
+					m.Queue.ByteKey
+				);
+
+			return await query.ToListAsync();
 		}
 
 		public void Dispose()
 		{
 			messageQueueContext?.Dispose();
+		}
+
+		public class MessageComparer : IEqualityComparer<Entities.Message>
+		{
+			bool IEqualityComparer<Entities.Message>.Equals(Entities.Message x, Entities.Message y)
+			{
+				return x.ReferenceId == y.ReferenceId
+					&& x.HashCode == y.HashCode;
+			}
+
+			int IEqualityComparer<Entities.Message>.GetHashCode(Entities.Message obj)
+			{
+				return new StringBuilder().Append(obj.ReferenceId).Append(obj.HashCode).ToString().GetHashCode();
+			}
 		}
 	}
 }

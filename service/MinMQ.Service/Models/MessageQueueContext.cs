@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using MinMq.Service.Repository;
 using MinMQ.Service.Configuration;
 using Optional;
 
@@ -67,7 +68,7 @@ namespace MinMq.Service.Models
 		public List<Message> Messages { get; set; }
 	}
 
-	public class Message
+	public class Message : IMessage
 	{
 		[Key]
 		public int MessageId { get; set; }

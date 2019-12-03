@@ -17,6 +17,16 @@ namespace MinMq.Service.Entities
 			HashCode = content.ToFnv1aHashInt64();
 		}
 
+		public Message(string content, long referenceId, long nextReferenceId, string hashCode, byte mimeTypeByteKey, byte queueByteKey)
+		{
+			Content = content;
+			ReferenceId = referenceId;
+			NextReferenceId = nextReferenceId;
+			MimeTypeByteKey = mimeTypeByteKey;
+			QueueByteKey = queueByteKey;
+			HashCode = hashCode;
+		}
+
 		public string Content { get; }
 		public long ReferenceId { get; }
 		public long NextReferenceId { get; }

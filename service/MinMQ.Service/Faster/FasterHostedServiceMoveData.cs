@@ -10,6 +10,7 @@ using Microsoft.Extensions.Options;
 using MinMQ.Service.Configuration;
 using MinMq.Service.Entities;
 using MinMq.Service.Repository;
+using NodaTime;
 
 namespace MinMQ.Service.Faster
 {
@@ -47,6 +48,7 @@ namespace MinMQ.Service.Faster
 						delayCoefficient = 1;
 						// Have a sneaking suspicions we should keep the nextAddress from the last iteration. If we remove truncate
 						// then the cursor doesn't progress and flush next batch.
+						Instant start = SystemClock.Instance.GetCurrentInstant();
 						var scanner = FasterOps.Instance.Value.Listen(optionsMonitor.CurrentValue.ScanFlushSize);
 						// var messages = await ToListAsync(scanner, FasterOps.Instance.Value.TruncateUntil);
 						var messages = ToList(scanner, FasterOps.Instance.Value.TruncateUntil);
@@ -58,7 +60,8 @@ namespace MinMQ.Service.Faster
 						}
 						var lastReferenceId = await messageRepository.AddRange(messages);
 						lastReferenceId.MatchSome(referenceId => FasterOps.Instance.Value.TruncateUntil(referenceId));
-						logger.LogInformation("Flushed records. Count={0}", messages.Count);
+						Duration elapsed = SystemClock.Instance.GetCurrentInstant() - start;
+						logger.LogInformation("Flushed {0} records at {0:N2} documents/s", messages.Count, messages.Count / elapsed.TotalSeconds);
 					}
 				}
 			}
