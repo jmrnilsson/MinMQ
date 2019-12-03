@@ -10,7 +10,6 @@ namespace MinMQ.BenchmarkConsole
 
 	public class Program
 	{
-		public static readonly int ShowProgressEvery = 200;
 		public static readonly int NTree = 5;  // NTree = 2 == binary tree
 		private static readonly CancellationTokenSource CancellationTokenSource = new CancellationTokenSource();
 		public static int NumberOfObjects { get; set; } = 1000;
@@ -22,6 +21,7 @@ namespace MinMQ.BenchmarkConsole
 			var builder = new HostBuilder()
 				.ConfigureServices((hostContext, services) =>
 				{
+					services.AddTransient<BenchmarkerFactory>();
 					services.AddHttpClient();
 					services.AddHostedService<BenchmarkHostedService>();
 				});

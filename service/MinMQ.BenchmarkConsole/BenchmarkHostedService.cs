@@ -8,11 +8,13 @@ namespace MinMQ.BenchmarkConsole
 	public class BenchmarkHostedService : IHostedService
 	{
 		private readonly IHostApplicationLifetime hostApplicationLifetime;
+		private readonly BenchmarkerFactory benchmarkerFactory;
 
-		public BenchmarkHostedService(IHttpClientFactory httpClientFactory, IHostApplicationLifetime hostApplicationLifetime)
+		public BenchmarkHostedService(IHttpClientFactory httpClientFactory, IHostApplicationLifetime hostApplicationLifetime, BenchmarkerFactory benchmarkerFactory)
 		{
 			HttpClientFactory = httpClientFactory;
 			this.hostApplicationLifetime = hostApplicationLifetime;
+			this.benchmarkerFactory = benchmarkerFactory;
 		}
 
 		public IHttpClientFactory HttpClientFactory { get; }
@@ -23,7 +25,7 @@ namespace MinMQ.BenchmarkConsole
 			hostApplicationLifetime.ApplicationStopping.Register(OnStopping);
 			// hostApplicationLifetime.ApplicationStopped.Register(OnStopped);
 
-			var benchmarker = new Benchmarker(HttpClientFactory, Program.NTree, Program.ShowProgressEvery, Program.NumberOfObjects, cancellationToken);
+			var benchmarker = benchmarkerFactory.Create(Program.NTree, Program.NumberOfObjects, cancellationToken);
 			benchmarker.OnComplete += Program.OnCompletedEvent;
 			await benchmarker.Start();
 			await StopAsync(cancellationToken);
