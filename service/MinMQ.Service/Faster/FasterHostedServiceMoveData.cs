@@ -52,13 +52,13 @@ namespace MinMQ.Service.Faster
 						var messages = ToList(scanner, FasterOps.Instance.Value.TruncateUntil);
 						if (!messages.Any())
 						{
-							delayCoefficient = 10;
+							delayCoefficient = 5;
 							logger.LogInformation("Nothing to flush");
 							continue;
 						}
 						var lastReferenceId = await messageRepository.AddRange(messages);
 						lastReferenceId.MatchSome(referenceId => FasterOps.Instance.Value.TruncateUntil(referenceId));
-						logger.LogInformation("Flushed records");
+						logger.LogInformation("Flushed records. Count={0}", messages.Count);
 					}
 				}
 			}
