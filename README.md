@@ -66,3 +66,8 @@ local IDevices can be configured.
 This is continiously measured and some sparse unstructed working documenets are available in [docs/perf.md](docs/perf.md).
 
 More information on how to continue the development work can be found [here](docs/development_work.md) 
+
+## TL;DR
+Here are some useful commands. _Create a new queue._
+
+    curl -X PUT -d "" http://localhost:9000/queue/merde --trace-asci /dev/stdout
