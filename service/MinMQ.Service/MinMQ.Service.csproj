@@ -12,12 +12,30 @@
     <CodeAnalysisRuleSet>..\StyleCop.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="Migrations\20191128012311_Create database.cs" />
+    <Compile Remove="Migrations\20191128012311_Create database.Designer.cs" />
+    <Compile Remove="Migrations\20191128013508_add.cs" />
+    <Compile Remove="Migrations\20191128013508_add.Designer.cs" />
+    <Compile Remove="Migrations\20191128015724_Add MimeType lookup table.cs" />
+    <Compile Remove="Migrations\20191128015724_Add MimeType lookup table.Designer.cs" />
+    <Compile Remove="Migrations\20191128033113_Add byte lookup key to Queue as well.cs" />
+    <Compile Remove="Migrations\20191128033113_Add byte lookup key to Queue as well.Designer.cs" />
+    <Compile Remove="Migrations\20191129021147_Add HashCode.cs" />
+    <Compile Remove="Migrations\20191129021147_Add HashCode.Designer.cs" />
+    <Compile Remove="Migrations\20191129024216_Change data type for HashCode.cs" />
+    <Compile Remove="Migrations\20191129024216_Change data type for HashCode.Designer.cs" />
+    <Compile Remove="Migrations\20191203185939_Old_school_table_names_Add_FK_MimeType_Cursor_Added_Changed..cs" />
+    <Compile Remove="Migrations\20191203185939_Old_school_table_names_Add_FK_MimeType_Cursor_Added_Changed..Designer.cs" />
     <Compile Remove="Migrations\20191204070427_Change queue name temporarily.cs" />
     <Compile Remove="Migrations\20191204070427_Change queue name temporarily.Designer.cs" />
     <Compile Remove="Migrations\20191204070632_Change queue name temporarily.cs" />
     <Compile Remove="Migrations\20191204070632_Change queue name temporarily.Designer.cs" />
     <Compile Remove="Migrations\20191204070940_Change queue name temporarily.cs" />
     <Compile Remove="Migrations\20191204070940_Change queue name temporarily.Designer.cs" />
+    <Compile Remove="Migrations\20191204071555_Change queue name temporarily.cs" />
+    <Compile Remove="Migrations\20191204071555_Change queue name temporarily.Designer.cs" />
+    <Compile Remove="Migrations\20191204071755_Change queue name part 2.cs" />
+    <Compile Remove="Migrations\20191204071755_Change queue name part 2.Designer.cs" />
     <Compile Remove="Migrations\20191204072027_Add cursor part 1.cs" />
     <Compile Remove="Migrations\20191204072027_Add cursor part 1.Designer.cs" />
     <Compile Remove="Migrations\20191204072055_Add cursor...cs" />
@@ -28,6 +46,10 @@
     <Compile Remove="Migrations\20191204073650_Add cursor...Designer.cs" />
     <Compile Remove="Migrations\20191204073751_Add cursor.cs" />
     <Compile Remove="Migrations\20191204073751_Add cursor.Designer.cs" />
+    <Compile Remove="Migrations\20191204194824_Replace byte with short int.cs" />
+    <Compile Remove="Migrations\20191204194824_Replace byte with short int.Designer.cs" />
+    <Compile Remove="Migrations\20191204202552_Change Id and bytekey to short%27s. Also add expression to mimetype.cs" />
+    <Compile Remove="Migrations\20191204202552_Change Id and bytekey to short%27s. Also add expression to mimetype.Designer.cs" />
   </ItemGroup>
 
 

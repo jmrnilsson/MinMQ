@@ -4,11 +4,17 @@
 	{
 		public Queue(short byteKey, string name)
 		{
-			ByteKey = byteKey;
+			QueueId = byteKey;
 			Name = name;
 		}
 
-		public short ByteKey { get; }
+		public Queue(string name)
+		{
+			QueueId = null;
+			Name = name;
+		}
+
+		public short? QueueId { get; }
 		public string Name { get; set; }
 	}
 }

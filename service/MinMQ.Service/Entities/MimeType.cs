@@ -2,13 +2,13 @@
 {
 	public class MimeType
 	{
-		public MimeType(short byteKey, string expression)
+		public MimeType(short mimeTypeId, string expression)
 		{
-			ByteKey = byteKey;
+			MimeTypeId = mimeTypeId;
 			Expression = expression;
 		}
 
-		public short ByteKey { get; }
+		public short MimeTypeId { get; }
 		public string Expression { get; set; }
 	}
 }

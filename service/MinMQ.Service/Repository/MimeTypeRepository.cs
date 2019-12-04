@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using MinMq.Service.Entities;
 using MinMq.Service.Models;
 using NodaTime;
+using Optional;
 
 namespace MinMq.Service.Repository
 {
@@ -39,6 +40,17 @@ namespace MinMq.Service.Repository
 			await messageQueueContext.SaveChangesAsync();
 			mimeTypeDo = await messageQueueContext.tMimeTypes.SingleOrDefaultAsync(q => q.Expression == mimeType.Expression);
 			return mimeTypeDo.MimeTypeId;
+		}
+
+		public async Task<Option<MimeType>> Find(string expression)
+		{
+			var mimeType = (await messageQueueContext.tMimeTypes.SingleOrDefaultAsync(q => q.Expression == expression)).SomeNotNull();
+
+			return mimeType.Match
+			(
+				some: mt => new MimeType(mt.MimeTypeId, mt.Expression).Some(),
+				none: () => Option.None<MimeType>()
+			);
 		}
 
 		public void Dispose()

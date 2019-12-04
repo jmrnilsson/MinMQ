@@ -2,31 +2,32 @@
 {
 	public class Message
 	{
-		public Message(string content, long referenceId, long nextReferenceId)
+		public Message(string content, long referenceId, long nextReferenceId, short mimeTypeId, short queueId)
 		{
 			Content = content;
 			ReferenceId = referenceId;
 			NextReferenceId = nextReferenceId;
-			MimeTypeByteKey = 0x01;
-			QueueId = 0x00;
+			MimeTypeId = mimeTypeId;
+			QueueId = queueId;
 			HashCode = content.ToFnv1aHashInt64();
 		}
 
-		public Message(string content, long referenceId, long nextReferenceId, string hashCode, short mimeTypeByteKey, short queueByteKey)
+		public Message(string content, long referenceId, long nextReferenceId, string hashCode, short mimeTypeId, short queueId)
 		{
 			Content = content;
 			ReferenceId = referenceId;
 			NextReferenceId = nextReferenceId;
-			MimeTypeByteKey = mimeTypeByteKey;
-			QueueId = queueByteKey;
+			MimeTypeId = mimeTypeId;
+			QueueId = queueId;
 			HashCode = hashCode;
 		}
 
 		public string Content { get; }
 		public long ReferenceId { get; }
 		public long NextReferenceId { get; }
-		public short MimeTypeByteKey { get; }
-		public short QueueId { get; }
+		public short MimeTypeId { get; }
+		// Work-around since queue should be probably be created before
+		public short QueueId { get; set; }
 		public string HashCode { get; set; }
 	}
 }

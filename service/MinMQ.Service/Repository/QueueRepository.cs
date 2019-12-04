@@ -17,7 +17,7 @@ namespace MinMq.Service.Repository
 
 		public async Task<short> Add(Queue queue)
 		{
-			var queueDo = await messageQueueContext.tQueues.SingleOrDefaultAsync(q => q.Name == queue.Name);
+			tQueue queueDo = await messageQueueContext.tQueues.SingleOrDefaultAsync(q => q.Name == queue.Name);
 
 			var now = SystemClock.Instance.GetCurrentInstant().InUtc().ToDateTimeUtc();
 
@@ -35,7 +35,7 @@ namespace MinMq.Service.Repository
 				Added = now
 			};
 
-			await messageQueueContext.AddAsync(queue);
+			await messageQueueContext.AddAsync(queueDo);
 			await messageQueueContext.SaveChangesAsync();
 			queueDo = await messageQueueContext.tQueues.SingleOrDefaultAsync(q => q.Name == queue.Name);
 			return queueDo.QueueId;

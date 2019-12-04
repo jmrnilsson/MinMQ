@@ -37,7 +37,8 @@ namespace MinMq.Service.Repository
 					Queue = queue,
 					HashCode = message.HashCode,
 					Added = now,
-					Changed = now
+					Changed = now,
+					MimeTypeId = message.MimeTypeId
 				};
 
 				messageQueueContext.tMessages.Add(messageDo);
@@ -78,7 +79,7 @@ namespace MinMq.Service.Repository
 					m.ReferenceId,
 					m.NextReferenceId,
 					m.HashCode,
-					0x02,
+					m.MimeTypeId,
 					m.Queue.QueueId
 				);
 
