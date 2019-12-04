@@ -71,3 +71,13 @@ More information on how to continue the development work can be found [here](doc
 Here are some useful commands. _Create a new queue._
 
     curl -X PUT -d "" http://localhost:9000/queue/merde --trace-asci /dev/stdout
+
+Clear out the database and starting it again:
+
+    docker-compose.exe down
+    docker volume rm minmq_postgresdata
+    docker-compose.exe up mmq-db
+
+Then open Visual Studio Pro/Community and PMC: 
+
+    update-database -context messagequeuecontext
