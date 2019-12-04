@@ -3,7 +3,6 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using MinMQ.Service.Configuration;
-using MinMq.Service.Repository;
 using Optional;
 using System;
 
@@ -19,8 +18,10 @@ namespace MinMq.Service.Models
 			this.configuration = configuration;
 		}
 
-		public DbSet<tQueue> Queues { get; set; }
-		public DbSet<tMessage> Messages { get; set; }
+		public DbSet<tQueue> tQueues { get; set; }
+		public DbSet<tMessage> tMessages { get; set; }
+		public DbSet<tMessage> tMimeTypes { get; set; }
+		public DbSet<tMessage> tCursors { get; set; }
 
 		protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 		{
@@ -55,7 +56,7 @@ namespace MinMq.Service.Models
 
 			modelBuilder.Entity<tMessage>()
 				.HasOne(p => p.MimeType)
-				.WithMany(b => b.Messages)
+				.WithMany(b => b.tMessages)
 				.HasForeignKey(p => p.MimeTypeId)
 				.HasConstraintName("FK_Message_MimeType");
 		}
@@ -73,7 +74,7 @@ namespace MinMq.Service.Models
 		public DateTime Changed { get; set; }
 	}
 
-	public class tMessage : IMessage
+	public class tMessage
 	{
 		[Key]
 		public int MessageId { get; set; }
@@ -94,7 +95,7 @@ namespace MinMq.Service.Models
 		[Key]
 		public int MimeTypeId { get; set; }
 		public byte ByteKey { get; set; }
-		public List<tMessage> Messages { get; set; }
+		public List<tMessage> tMessages { get; set; }
 		public DateTime Added { get; set; }
 		public DateTime Changed { get; set; }
 	}
@@ -102,7 +103,7 @@ namespace MinMq.Service.Models
 	public class tCursor
 	{
 		[Key]
-		public int MimeTypeId { get; set; }
+		public int CursorId { get; set; }
 		public DateTime Added { get; set; }
 		public DateTime Changed { get; set; }
 		public long NextReferenceId { get; set; }

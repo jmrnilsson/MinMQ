@@ -28,7 +28,7 @@ namespace MinMq.Service.Repository
 
 			foreach (var message in newMessages)
 			{
-				var queue = await messageQueueContext.Queues.SingleOrDefaultAsync(q => q.ByteKey == message.QueueByteKey);
+				var queue = await messageQueueContext.tQueues.SingleOrDefaultAsync(q => q.ByteKey == message.QueueByteKey);
 
 				if (queue == null)
 				{
@@ -42,7 +42,7 @@ namespace MinMq.Service.Repository
 					await messageQueueContext.SaveChangesAsync();
 				}
 
-				var messageDo = new Models.tMessage
+				var messageDo = new tMessage
 				{
 					ReferenceId = message.ReferenceId,
 					NextReferenceId = message.NextReferenceId,
@@ -51,7 +51,7 @@ namespace MinMq.Service.Repository
 					HashCode = message.HashCode
 				};
 
-				messageQueueContext.Messages.Add(messageDo);
+				messageQueueContext.tMessages.Add(messageDo);
 
 #if TROUBLESHOOT
 				try
@@ -78,7 +78,7 @@ namespace MinMq.Service.Repository
 
 		private async Task<IEnumerable<Entities.Message>> Find(FindMessagesQuery findMessageQuery)
 		{
-			IAsyncEnumerable<tMessage> messages = messageQueueContext.Messages;
+			IAsyncEnumerable<tMessage> messages = messageQueueContext.tMessages;
 
 			var query =
 				from m in messages

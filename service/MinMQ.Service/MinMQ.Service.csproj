@@ -11,6 +11,24 @@
   <PropertyGroup>
     <CodeAnalysisRuleSet>..\StyleCop.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="Migrations\20191204070427_Change queue name temporarily.cs" />
+    <Compile Remove="Migrations\20191204070427_Change queue name temporarily.Designer.cs" />
+    <Compile Remove="Migrations\20191204070632_Change queue name temporarily.cs" />
+    <Compile Remove="Migrations\20191204070632_Change queue name temporarily.Designer.cs" />
+    <Compile Remove="Migrations\20191204070940_Change queue name temporarily.cs" />
+    <Compile Remove="Migrations\20191204070940_Change queue name temporarily.Designer.cs" />
+    <Compile Remove="Migrations\20191204072027_Add cursor part 1.cs" />
+    <Compile Remove="Migrations\20191204072027_Add cursor part 1.Designer.cs" />
+    <Compile Remove="Migrations\20191204072055_Add cursor...cs" />
+    <Compile Remove="Migrations\20191204072055_Add cursor...Designer.cs" />
+    <Compile Remove="Migrations\20191204072147_Add cursor...cs" />
+    <Compile Remove="Migrations\20191204072147_Add cursor...Designer.cs" />
+    <Compile Remove="Migrations\20191204073650_Add cursor...cs" />
+    <Compile Remove="Migrations\20191204073650_Add cursor...Designer.cs" />
+    <Compile Remove="Migrations\20191204073751_Add cursor.cs" />
+    <Compile Remove="Migrations\20191204073751_Add cursor.Designer.cs" />
+  </ItemGroup>
 
 
   <ItemGroup>
