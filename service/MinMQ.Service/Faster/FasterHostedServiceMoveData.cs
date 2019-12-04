@@ -15,6 +15,7 @@ using NodaTime;
 namespace MinMQ.Service.Faster
 {
 	internal delegate void EndOfFileCallback(long address);
+	internal delegate short MimeTypeDecider(string content);
 
 	/// <summary>
 	/// A hosted service that moves stuff from the FASTER log to some EF-providers data context.
@@ -40,6 +41,8 @@ namespace MinMQ.Service.Faster
 
 			using (var scope = scopeFactory.CreateScope())
 			{
+				using (var queueRepository = scope.ServiceProvider.GetRequiredService<IQueueRepository>())
+				using (var mimeTypeRepository = scope.ServiceProvider.GetRequiredService<IMimeTypeRepository>())
 				using (var messageRepository = scope.ServiceProvider.GetRequiredService<IMessageRepository>())
 				{
 					while (true)
@@ -51,13 +54,21 @@ namespace MinMQ.Service.Faster
 						Instant start = SystemClock.Instance.GetCurrentInstant();
 						var scanner = FasterOps.Instance.Value.Listen(optionsMonitor.CurrentValue.ScanFlushSize);
 						// var messages = await ToListAsync(scanner, FasterOps.Instance.Value.TruncateUntil);
-						var messages = ToList(scanner, FasterOps.Instance.Value.TruncateUntil);
+
+						// Sloppy write (queue name and mime type should probably be known before)
+						var queueId = await queueRepository.Add(new Queue("default"));
+						MimeType mimeTypeXml = (await mimeTypeRepository.Find("text/xml")).ValueOr(() => throw new ApplicationException("xml"));
+						MimeType mimeTypeJson = (await mimeTypeRepository.Find("application/json")).ValueOr(() => throw new ApplicationException("json"));
+						MimeTypeDecider decider = c => c.StartsWith("<") ? mimeTypeXml.MimeTypeId : mimeTypeJson.MimeTypeId;
+						var messages = ToList(scanner, FasterOps.Instance.Value.TruncateUntil, decider, queueId);
+
 						if (!messages.Any())
 						{
 							delayCoefficient = 5;
 							logger.LogInformation("Nothing to flush");
 							continue;
 						}
+
 						var lastReferenceId = await messageRepository.AddRange(messages);
 						lastReferenceId.MatchSome(referenceId => FasterOps.Instance.Value.TruncateUntil(referenceId));
 						Duration elapsed = SystemClock.Instance.GetCurrentInstant() - start;
@@ -68,27 +79,27 @@ namespace MinMQ.Service.Faster
 		}
 
 		// Maybe this also should be IAsyncEnumerable. Or, maybe not yet..
-		private async Task<List<Message>> ToListAsync(IAsyncEnumerable<(string, long, long)> scan, EndOfFileCallback endOfFileCallback)
-		{
-			var messages = new List<Message>();
+		// private async Task<List<Message>> ToListAsync(IAsyncEnumerable<(string, long, long)> scan, EndOfFileCallback endOfFileCallback)
+		// {
+		//	var messages = new List<Message>();
 
-			await foreach ((string content, long referenceId, long nextReferenceId) in scan)
-			{
-				// I'm guessing this is out of bounds for the current storage config
-				if (nextReferenceId > 1_000_000_000)
-				{
-					logger.LogError("Reached end of IDevice");
-					// Debugger.Break();
-					endOfFileCallback(nextReferenceId);
-					continue;
-				}
-				messages.Add(new Message(content, referenceId, nextReferenceId));
-			}
+		//	await foreach ((string content, long referenceId, long nextReferenceId) in scan)
+		//	{
+		//		// I'm guessing this is out of bounds for the current storage config
+		//		if (nextReferenceId > 1_000_000_000)
+		//		{
+		//			logger.LogError("Reached end of IDevice");
+		//			// Debugger.Break();
+		//			endOfFileCallback(nextReferenceId);
+		//			continue;
+		//		}
+		//		messages.Add(new Message(content, referenceId, nextReferenceId));
+		//	}
 
-			return messages;
-		}
+		//	return messages;
+		// }
 
-		private List<Message> ToList(List<(string, long, long)> scan, EndOfFileCallback endOfFileCallback)
+		private List<Message> ToList(List<(string, long, long)> scan, EndOfFileCallback endOfFileCallback, MimeTypeDecider mimeTypeDecider, short queueId)
 		{
 			var messages = new List<Message>();
 
@@ -102,7 +113,7 @@ namespace MinMQ.Service.Faster
 					endOfFileCallback(nextReferenceId);
 					continue;
 				}
-				messages.Add(new Message(content, referenceId, nextReferenceId));
+				messages.Add(new Message(content, referenceId, nextReferenceId, mimeTypeDecider(content), queueId));
 			}
 
 			return messages;

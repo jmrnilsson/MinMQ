@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 using MinMq.Service.Models;
+using NodaTime;
 using Optional;
 
 namespace MinMq.Service.Repository
@@ -12,12 +12,10 @@ namespace MinMq.Service.Repository
 	public class MessageRepository : IMessageRepository
 	{
 		private readonly MessageQueueContext messageQueueContext;
-		private readonly ILogger<MessageRepository> logger;
 
-		public MessageRepository(MessageQueueContext messageQueueContext, ILogger<MessageRepository> logger)
+		public MessageRepository(MessageQueueContext messageQueueContext)
 		{
 			this.messageQueueContext = messageQueueContext;
-			this.logger = logger;
 		}
 
 		public async Task<Option<long>> AddRange(List<Entities.Message> messages)
@@ -28,30 +26,22 @@ namespace MinMq.Service.Repository
 
 			foreach (var message in newMessages)
 			{
-				var queue = await messageQueueContext.Queues.SingleOrDefaultAsync(q => q.ByteKey == message.QueueByteKey);
+				var queue = await messageQueueContext.tQueues.SingleOrDefaultAsync(q => q.QueueId == message.QueueId);
+				var now = SystemClock.Instance.GetCurrentInstant().InUtc().ToDateTimeUtc();
 
-				if (queue == null)
-				{
-					queue = new Queue
-					{
-						ByteKey = message.QueueByteKey,
-						Name = "default"
-					};
-
-					await messageQueueContext.AddAsync(queue);
-					await messageQueueContext.SaveChangesAsync();
-				}
-
-				var messageDo = new Models.Message
+				var messageDo = new tMessage
 				{
 					ReferenceId = message.ReferenceId,
 					NextReferenceId = message.NextReferenceId,
 					Content = message.Content,
 					Queue = queue,
-					HashCode = message.HashCode
+					HashCode = message.HashCode,
+					Added = now,
+					Changed = now,
+					MimeTypeId = message.MimeTypeId
 				};
 
-				messageQueueContext.Messages.Add(messageDo);
+				messageQueueContext.tMessages.Add(messageDo);
 
 #if TROUBLESHOOT
 				try
@@ -78,7 +68,7 @@ namespace MinMq.Service.Repository
 
 		private async Task<IEnumerable<Entities.Message>> Find(FindMessagesQuery findMessageQuery)
 		{
-			IAsyncEnumerable<Message> messages = messageQueueContext.Messages;
+			IAsyncEnumerable<tMessage> messages = messageQueueContext.tMessages;
 
 			var query =
 				from m in messages
@@ -89,8 +79,8 @@ namespace MinMq.Service.Repository
 					m.ReferenceId,
 					m.NextReferenceId,
 					m.HashCode,
-					0x02,
-					m.Queue.ByteKey
+					m.MimeTypeId,
+					m.Queue.QueueId
 				);
 
 			return await query.ToListAsync();

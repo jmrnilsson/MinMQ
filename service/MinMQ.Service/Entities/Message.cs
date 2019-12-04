@@ -1,37 +1,33 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace MinMq.Service.Entities
+﻿namespace MinMq.Service.Entities
 {
 	public class Message
 	{
-		public Message(string content, long referenceId, long nextReferenceId)
+		public Message(string content, long referenceId, long nextReferenceId, short mimeTypeId, short queueId)
 		{
 			Content = content;
 			ReferenceId = referenceId;
 			NextReferenceId = nextReferenceId;
-			MimeTypeByteKey = 0x01;
-			QueueByteKey = 0x00;
+			MimeTypeId = mimeTypeId;
+			QueueId = queueId;
 			HashCode = content.ToFnv1aHashInt64();
 		}
 
-		public Message(string content, long referenceId, long nextReferenceId, string hashCode, byte mimeTypeByteKey, byte queueByteKey)
+		public Message(string content, long referenceId, long nextReferenceId, string hashCode, short mimeTypeId, short queueId)
 		{
 			Content = content;
 			ReferenceId = referenceId;
 			NextReferenceId = nextReferenceId;
-			MimeTypeByteKey = mimeTypeByteKey;
-			QueueByteKey = queueByteKey;
+			MimeTypeId = mimeTypeId;
+			QueueId = queueId;
 			HashCode = hashCode;
 		}
 
 		public string Content { get; }
 		public long ReferenceId { get; }
 		public long NextReferenceId { get; }
-		public byte MimeTypeByteKey { get; }
-		public byte QueueByteKey { get; }
+		public short MimeTypeId { get; }
+		// Work-around since queue should be probably be created before
+		public short QueueId { get; set; }
 		public string HashCode { get; set; }
 	}
 }
