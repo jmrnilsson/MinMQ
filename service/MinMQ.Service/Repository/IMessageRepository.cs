@@ -8,7 +8,6 @@ namespace MinMq.Service.Repository
 {
 	public interface IMessageRepository : IDisposable
 	{
-		// public Task<Option<long>> AddRange(IAsyncEnumerable<Message> messages);
 		public Task<Option<long>> AddRange(List<Message> messages);
 	}
 }

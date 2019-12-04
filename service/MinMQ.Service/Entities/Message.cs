@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace MinMq.Service.Entities
+﻿namespace MinMq.Service.Entities
 {
 	public class Message
 	{
@@ -13,25 +8,25 @@ namespace MinMq.Service.Entities
 			ReferenceId = referenceId;
 			NextReferenceId = nextReferenceId;
 			MimeTypeByteKey = 0x01;
-			QueueByteKey = 0x00;
+			QueueId = 0x00;
 			HashCode = content.ToFnv1aHashInt64();
 		}
 
-		public Message(string content, long referenceId, long nextReferenceId, string hashCode, byte mimeTypeByteKey, byte queueByteKey)
+		public Message(string content, long referenceId, long nextReferenceId, string hashCode, short mimeTypeByteKey, short queueByteKey)
 		{
 			Content = content;
 			ReferenceId = referenceId;
 			NextReferenceId = nextReferenceId;
 			MimeTypeByteKey = mimeTypeByteKey;
-			QueueByteKey = queueByteKey;
+			QueueId = queueByteKey;
 			HashCode = hashCode;
 		}
 
 		public string Content { get; }
 		public long ReferenceId { get; }
 		public long NextReferenceId { get; }
-		public byte MimeTypeByteKey { get; }
-		public byte QueueByteKey { get; }
+		public short MimeTypeByteKey { get; }
+		public short QueueId { get; }
 		public string HashCode { get; set; }
 	}
 }

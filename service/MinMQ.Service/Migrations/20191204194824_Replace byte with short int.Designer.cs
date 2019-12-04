@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MinMq.Service.Models;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -9,36 +10,16 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MinMq.Service.Migrations
 {
     [DbContext(typeof(MessageQueueContext))]
-    partial class MessageQueueContextModelSnapshot : ModelSnapshot
+    [Migration("20191204194824_Replace byte with short int")]
+    partial class Replacebytewithshortint
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn)
                 .HasAnnotation("ProductVersion", "3.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
-
-            modelBuilder.Entity("MinMq.Service.Models.tCursor", b =>
-                {
-                    b.Property<int>("CursorId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
-
-                    b.Property<DateTime>("Added")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<DateTime>("Changed")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<long>("NextReferenceId")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("CursorId");
-
-                    b.ToTable("tCursors");
-                });
 
             modelBuilder.Entity("MinMq.Service.Models.tMessage", b =>
                 {
@@ -59,14 +40,14 @@ namespace MinMq.Service.Migrations
                     b.Property<string>("HashCode")
                         .HasColumnType("text");
 
-                    b.Property<short>("MimeTypeId")
-                        .HasColumnType("smallint");
+                    b.Property<int>("MimeTypeId")
+                        .HasColumnType("integer");
 
                     b.Property<long>("NextReferenceId")
                         .HasColumnType("bigint");
 
-                    b.Property<short>("QueueId")
-                        .HasColumnType("smallint");
+                    b.Property<int>("QueueId")
+                        .HasColumnType("integer");
 
                     b.Property<long>("ReferenceId")
                         .HasColumnType("bigint");
@@ -77,39 +58,46 @@ namespace MinMq.Service.Migrations
 
                     b.HasIndex("QueueId");
 
-                    b.ToTable("tMessages");
+                    b.ToTable("tMessage");
                 });
 
             modelBuilder.Entity("MinMq.Service.Models.tMimeType", b =>
                 {
-                    b.Property<short>("MimeTypeId")
+                    b.Property<int>("MimeTypeId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("smallint")
+                        .HasColumnType("integer")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
                     b.Property<DateTime>("Added")
                         .HasColumnType("timestamp without time zone");
+
+                    b.Property<short>("ByteKey")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("smallint")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
                     b.Property<DateTime>("Changed")
                         .HasColumnType("timestamp without time zone");
 
-                    b.Property<string>("Expression")
-                        .HasColumnType("text");
-
                     b.HasKey("MimeTypeId");
 
-                    b.ToTable("tMimeTypes");
+                    b.ToTable("tMimeType");
                 });
 
             modelBuilder.Entity("MinMq.Service.Models.tQueue", b =>
                 {
-                    b.Property<short>("QueueId")
+                    b.Property<int>("QueueId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("smallint")
+                        .HasColumnType("integer")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
                     b.Property<DateTime>("Added")
                         .HasColumnType("timestamp without time zone");
+
+                    b.Property<short>("ByteKey")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("smallint")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
                     b.Property<DateTime>("Changed")
                         .HasColumnType("timestamp without time zone");

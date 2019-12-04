@@ -20,8 +20,8 @@ namespace MinMq.Service.Models
 
 		public DbSet<tQueue> tQueues { get; set; }
 		public DbSet<tMessage> tMessages { get; set; }
-		public DbSet<tMessage> tMimeTypes { get; set; }
-		public DbSet<tMessage> tCursors { get; set; }
+		public DbSet<tMimeType> tMimeTypes { get; set; }
+		public DbSet<tCursor> tCursors { get; set; }
 
 		protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 		{
@@ -47,11 +47,7 @@ namespace MinMq.Service.Models
 				.ValueGeneratedOnAdd();
 
 			modelBuilder.Entity<tMimeType>()
-				.Property(f => f.ByteKey)
-				.ValueGeneratedOnAdd();
-
-			modelBuilder.Entity<tQueue>()
-				.Property(f => f.ByteKey)
+				.Property(f => f.MimeTypeId)
 				.ValueGeneratedOnAdd();
 
 			modelBuilder.Entity<tMessage>()
@@ -65,9 +61,8 @@ namespace MinMq.Service.Models
 	public class tQueue
 	{
 		[Key]
-		public int QueueId { get; set; }
+		public short QueueId { get; set; }
 		public string Name { get; set; }
-		public byte ByteKey { get; set; }
 
 		public List<tMessage> Messages { get; set; }
 		public DateTime Added { get; set; }
@@ -81,9 +76,9 @@ namespace MinMq.Service.Models
 		public long ReferenceId { get; set; }
 		public long NextReferenceId { get; set; }
 		public string Content { get; set; }
-		public int QueueId { get; set; }
+		public short QueueId { get; set; }
 		public tQueue Queue { get; set; }
-		public int MimeTypeId { get; set; }
+		public short MimeTypeId { get; set; }
 		public tMimeType MimeType { get; set; }
 		public string HashCode { get; set; }
 		public DateTime Added { get; set; }
@@ -93,8 +88,8 @@ namespace MinMq.Service.Models
 	public class tMimeType
 	{
 		[Key]
-		public int MimeTypeId { get; set; }
-		public byte ByteKey { get; set; }
+		public short MimeTypeId { get; set; }
+		public string Expression { get; set; }
 		public List<tMessage> tMessages { get; set; }
 		public DateTime Added { get; set; }
 		public DateTime Changed { get; set; }
