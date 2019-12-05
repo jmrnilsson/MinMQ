@@ -6,7 +6,6 @@ using Microsoft.Extensions.Logging;
 
 namespace MinMQ.Service.Faster
 {
-
 	internal delegate ValueTask CommitAsyncDelegate(CancellationToken token = default);
 
 	/// <summary>
@@ -15,21 +14,21 @@ namespace MinMQ.Service.Faster
 	/// all threads get stuck at some other step than FasterLog.CommitAsync(). However, this service's Timer is always
 	/// granted some CPU-time.
 	/// </summary>
-	public class FasterCommitHostedService : IHostedService, IDisposable
+	public class FasterHostedServiceCommit : IHostedService, IDisposable
 	{
 		private const int PeriodMs = 5;
 		private const int LogCommitTimerEverySeconds = 3000;
-		private readonly ILogger<FasterCommitHostedService> logger;
+		private readonly ILogger<FasterHostedServiceCommit> logger;
 		private Timer timer;
 
-		public FasterCommitHostedService(ILogger<FasterCommitHostedService> logger)
+		public FasterHostedServiceCommit(ILogger<FasterHostedServiceCommit> logger)
 		{
 			this.logger = logger;
 		}
 
 		private static async void ExecuteAsync(object stateInfo)
 		{
-			FasterCommitState state = stateInfo as FasterCommitState;
+			FasterHostedServiceCommitState state = stateInfo as FasterHostedServiceCommitState;
 
 			await state.CommitAsync();
 
@@ -46,9 +45,9 @@ namespace MinMQ.Service.Faster
 
 		public Task StartAsync(CancellationToken stoppingToken)
 		{
-			logger.LogInformation("Commit Hosted Service running.");
+			logger.LogInformation("{0} service running.", nameof(FasterHostedServiceCommit));
 
-			var state = new FasterCommitState(FasterOps.Instance.Value.CommitAsync, logger, GetLoggingInterval());
+			var state = new FasterHostedServiceCommitState(FasterOps.Instance.Value.CommitAsync, logger, GetLoggingInterval());
 			timer = new Timer(ExecuteAsync, state, TimeSpan.Zero, TimeSpan.FromMilliseconds(PeriodMs));
 
 			return Task.CompletedTask;
@@ -71,22 +70,6 @@ namespace MinMQ.Service.Faster
 			int interval = LogCommitTimerEverySeconds / PeriodMs;
 			interval = Math.Max(1, interval);
 			return Math.Min(2000, interval);
-		}
-
-		private class FasterCommitState
-		{
-			public FasterCommitState(CommitAsyncDelegate commitAsync, ILogger logger, int loggingInterval)
-			{
-				CommitAsync = commitAsync;
-				Logger = logger;
-				LoggingInterval = loggingInterval;
-				InvokationCount = 0;
-			}
-
-			public CommitAsyncDelegate CommitAsync { get; }
-			public ILogger Logger { get; }
-			public int LoggingInterval { get; }
-			public int InvokationCount { get; set; }
 		}
 	}
 }

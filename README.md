@@ -44,6 +44,7 @@ Future aspirations may include:
 ## Setup
 **NOTE:** Linux/OSX may have to add sudo some of the Docker commands.
 
+### Setup volume for microsoft.FASTER
 FASTER allocates disk preemptively. Around 1.1 GB is used per default. Consequently a large docker volume, or path on
 disk that comfortably can allocate more than 1.1GB have to be assigned, preferably an SSD.
 
@@ -53,6 +54,17 @@ shell-script instead.
 
 **For all others**
 If you plan to run the service without a container service the path set as FasterDevice in [appsettings.Development.json](./service-kestrel/Service-Kestrel/Service-Kestrel/appsettings.Development.json) must be assigned.
+
+### Setup database 
+Start the databaste with 
+
+    docker-compose up mmq-db
+
+Start Visual Studio since the dotnet core tools from 2.* doesn't work any more or [documenation](https://docs.microsoft.com/en-us/ef/core/get-started/?tabs=netcore-cli) is not up-to-date.
+
+Tools > Nuget Package Mannager
+
+    Update-Database -Context MessageQueueContext
 
 ## Usage
 With Docker-compose. `Sudo` is system dependant doesn't have to apply.
