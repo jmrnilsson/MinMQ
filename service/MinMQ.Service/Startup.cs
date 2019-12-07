@@ -43,6 +43,7 @@ namespace MinMQ.Service
 			services.AddScoped<IMessageRepository, MessageRepository>();
 			services.AddScoped<IQueueRepository, QueueRepository>();
 			services.AddScoped<IMimeTypeRepository, MimeTypeRepository>();
+			services.AddScoped<ICursorRepository, CursorRepository>();
 		}
 
 		private static void SetOptions(MinMQConfiguration o)

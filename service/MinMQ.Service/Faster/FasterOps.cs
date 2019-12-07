@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using FASTER.core;
+using MinMq.Service.Entities;
 using MinMQ.Service.Configuration;
 using Optional;
 
@@ -152,14 +153,14 @@ namespace MinMQ.Service
 			}
 		}
 
-		public List<(string, long, long)> Listen(int flushSize)
+		public List<(string, long, long)> Listen(int flushSize, Cursor cursor)
 		{
 			List<(string, long, long)> entries = new List<(string, long, long)>();
 			// CancellationTokenSource cts = new CancellationTokenSource();
 			UTF8Encoding encoding = new UTF8Encoding();
 
 			int i = 0;
-			using (FasterLogScanIterator iter = logger.Scan(0, 1_000_000_000))
+			using (FasterLogScanIterator iter = logger.Scan(cursor.NextAddress, 10_000))
 			{
 				while (true)
 				{
@@ -177,6 +178,7 @@ namespace MinMQ.Service
 						// await iter.WaitAsync(cts.Token);
 					}
 
+					cursor.Set(iter.NextAddress);
 					entries.Add((encoding.GetString(bytes), iter.CurrentAddress, iter.NextAddress));
 
 					i++;
