@@ -45,6 +45,8 @@ namespace MinMQ.Service.Faster
 				using (var mimeTypeRepository = scope.ServiceProvider.GetRequiredService<IMimeTypeRepository>())
 				using (var messageRepository = scope.ServiceProvider.GetRequiredService<IMessageRepository>())
 				{
+					short queueId = await queueRepository.FindOr("some", async () => await queueRepository.Add(new Queue("some")));
+
 					while (true)
 					{
 						await Task.Delay(DelayMs * delayCoefficient);
@@ -56,7 +58,6 @@ namespace MinMQ.Service.Faster
 						// var messages = await ToListAsync(scanner, FasterOps.Instance.Value.TruncateUntil);
 
 						// Sloppy write (queue name and mime type should probably be known before)
-						var queueId = await queueRepository.Add(new Queue("default"));
 						MimeType mimeTypeXml = (await mimeTypeRepository.Find("text/xml")).ValueOr(() => throw new ApplicationException("xml"));
 						MimeType mimeTypeJson = (await mimeTypeRepository.Find("application/json")).ValueOr(() => throw new ApplicationException("json"));
 						MimeTypeDecider decider = c => c.StartsWith("<") ? mimeTypeXml.MimeTypeId : mimeTypeJson.MimeTypeId;

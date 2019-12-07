@@ -6,6 +6,9 @@ namespace MinMq.Service.Repository
 {
 	public interface IQueueRepository : IDisposable
 	{
-		Task<short> Add(Queue queues);
+		Task<short?> Find(string queueName);
+		Task<short> FindOr(string queueName, Func<Task<short>> valueFactory);
+		Task<short> Add(Queue queue);
+		Task<short> Update(Queue queue);
 	}
 }

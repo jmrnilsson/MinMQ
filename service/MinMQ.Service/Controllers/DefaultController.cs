@@ -63,11 +63,29 @@ namespace MinMQ.Service.Controllers
 			);
 		}
 
+		[HttpGet("/list/{name:int}")]
+		public async Task<IActionResult> ListFor(int queueId)
+		{
+			var scanner = FasterOps.Instance.Value.GetListAsync();
+			return (await ControllerExtensions.ToListResponse(scanner)).Match<IActionResult>
+			(
+				some: values => Ok(values),
+				none: () => NotFound()
+			);
+		}
+
 		// In contrast, the URI in a PUT request identifies the entity enclosed with the request.
 		[HttpPut("/queue/{name:regex(^\\w+)}")]
-		public async Task<IActionResult> List(string name)
+		public async Task<IActionResult> Add(string name)
 		{
-			return Ok(await queueRepository.Add(new Queue(name)));
+			{
+				short? queueId = await queueRepository.Find(name);
+				if (queueId.HasValue) return Redirect("/list/{queueId}");
+			}
+			{
+				short queueId = await queueRepository.Add(new Queue(name));
+				return Created($"/list/{queueId}", queueId);
+			}
 		}
 	}
 }

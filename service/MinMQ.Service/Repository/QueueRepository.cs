@@ -1,8 +1,11 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using MinMq.Service.Entities;
 using MinMq.Service.Models;
 using NodaTime;
+using Optional;
 
 namespace MinMq.Service.Repository
 {
@@ -15,20 +18,21 @@ namespace MinMq.Service.Repository
 			this.messageQueueContext = messageQueueContext;
 		}
 
-		public async Task<short> Add(Queue queue)
+		public async Task<short> Update(Queue queue)
 		{
-			tQueue queueDo = await messageQueueContext.tQueues.SingleOrDefaultAsync(q => q.Name == queue.Name);
-
 			var now = SystemClock.Instance.GetCurrentInstant().InUtc().ToDateTimeUtc();
 
-			if (queueDo != null)
-			{
-				queueDo.Changed = now;
-				await messageQueueContext.SaveChangesAsync();
-				return queueDo.QueueId;
-			}
+			tQueue queueDo = await messageQueueContext.tQueues.SingleOrDefaultAsync(q => q.Name == queue.Name);
+			queueDo.Changed = now;
+			await messageQueueContext.SaveChangesAsync();
+			return queueDo.QueueId;
+		}
 
-			queueDo = new tQueue
+		public async Task<short> Add(Queue queue)
+		{
+			var now = SystemClock.Instance.GetCurrentInstant().InUtc().ToDateTimeUtc();
+
+			tQueue queueDo = new tQueue
 			{
 				Name = queue.Name,
 				Changed = now,
@@ -44,6 +48,22 @@ namespace MinMq.Service.Repository
 		public void Dispose()
 		{
 			messageQueueContext?.Dispose();
+		}
+
+		public async Task<short?> Find(string queueName)
+		{
+			return await
+			(
+				from q in (IAsyncEnumerable<tQueue>)messageQueueContext.tQueues
+				where q.Name == queueName
+				select (short?)q.QueueId
+			).SingleOrDefaultAsync();
+		}
+
+		public async Task<short> FindOr(string queueName, Func<Task<short>> valueFactory)
+		{
+			var queueId = await Find(queueName);
+			return queueId.HasValue ? queueId.Value : await valueFactory();
 		}
 	}
 }
