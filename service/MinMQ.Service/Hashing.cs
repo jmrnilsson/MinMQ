@@ -1,20 +1,22 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace MinMq.Service
 {
-	public static class FNV1a
+	public static class Hashing
 	{
+		/// <summary>
+		/// Fowler-Noll-Vo 1 a in 64 bit flavor as base 64
+		/// </summary>
+		/// <param name="text">Text to be hashed</param>
+		/// <returns>A base 64 encoded string</returns>
 		public static string ToFnv1aHashInt64(this string text)
 		{
 			string Fnv1a(byte[] bytes_)
 			{
-				const uint offset = 0x811C9DC5;
-				const uint prime = 0x01000193;
-				uint hash = offset;
+				const ulong offset = 14695981039346656037;
+				const ulong prime = 1099511628211;
+				ulong hash = offset;
 
 				for (var i = 0; i < bytes_.Length; i++)
 				{
@@ -25,7 +27,6 @@ namespace MinMq.Service
 					}
 				}
 
-				// return BitConverter.ToInt64(bytes_, 0);
 				return Convert.ToBase64String(BitConverter.GetBytes(hash));
 			}
 
