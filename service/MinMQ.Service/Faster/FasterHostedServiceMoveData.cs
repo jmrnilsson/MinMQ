@@ -62,7 +62,7 @@ namespace MinMQ.Service.Faster
 						// Have a sneaking suspicions we should keep the nextAddress from the last iteration. If we remove truncate
 						// then the cursor doesn't progress and flush next batch.
 						Instant start = SystemClock.Instance.GetCurrentInstant();
-						var scanner = FasterOps.Instance.Value.Listen(optionsMonitor.CurrentValue.ScanFlushSize, currentCursor.NextAddress);
+						var scanner = FasterOps.Instance.Value.Listen(optionsMonitor.CurrentValue.ScanFlushSize, currentCursor);
 						// var messages = await ToListAsync(scanner, FasterOps.Instance.Value.TruncateUntil);
 
 						// Sloppy write (queue name and mime type should probably be known before)

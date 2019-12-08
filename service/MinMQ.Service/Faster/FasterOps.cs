@@ -153,14 +153,16 @@ namespace MinMQ.Service
 			}
 		}
 
-		public List<(string, long, long)> Listen(int flushSize, long nextAddress_)
+		public List<(string, long, long)> Listen(int flushSize, Cursor cursor)
 		{
+			var nextAddress_ = cursor.NextAddress;
+
 			List<(string, long, long)> entries = new List<(string, long, long)>();
 			// CancellationTokenSource cts = new CancellationTokenSource();
 			UTF8Encoding encoding = new UTF8Encoding();
 
 			int i = 0;
-			using (FasterLogScanIterator iter = logger.Scan(logger.BeginAddress, logger.FlushedUntilAddress))
+			using (FasterLogScanIterator iter = logger.Scan(0, 1_000_000_000))
 			{
 				while (true)
 				{
@@ -179,6 +181,16 @@ namespace MinMQ.Service
 					}
 
 					entries.Add((encoding.GetString(bytes), iter.CurrentAddress, iter.NextAddress));
+
+					if (cursor is DebugCursor debugCursor)
+					{
+						debugCursor.Increment();
+
+						if (debugCursor.Iteration > 1841)
+						{
+							int j = 0;
+						}
+					}
 
 					i++;
 

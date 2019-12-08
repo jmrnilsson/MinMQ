@@ -56,7 +56,7 @@ namespace MinMq.Service.Repository
 			(
 				from q in (IAsyncEnumerable<tCursor>)messageQueueContext.tCursors
 				where q.CursorId == cursorId
-				select new Cursor(q.CursorId, q.NextReferenceId)
+				select new DebugCursor(q.CursorId, q.NextReferenceId)
 			).SingleOrDefaultAsync();
 		}
 
