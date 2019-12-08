@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using MinMq.Service.Entities;
 using MinMq.Service.Models;
 using NodaTime;
-using Optional;
 
 namespace MinMq.Service.Repository
 {
@@ -32,17 +31,16 @@ namespace MinMq.Service.Repository
 		{
 			var now = SystemClock.Instance.GetCurrentInstant().InUtc().ToDateTimeUtc();
 
-			tQueue queueDo = new tQueue
+			tQueue queue_ = new tQueue
 			{
 				Name = queue.Name,
 				Changed = now,
 				Added = now
 			};
 
-			await messageQueueContext.AddAsync(queueDo);
+			await messageQueueContext.AddAsync(queue_);
 			await messageQueueContext.SaveChangesAsync();
-			queueDo = await messageQueueContext.tQueues.SingleOrDefaultAsync(q => q.Name == queue.Name);
-			return queueDo.QueueId;
+			return queue_.QueueId;
 		}
 
 		public void Dispose()
