@@ -160,7 +160,7 @@ namespace MinMQ.Service
 			UTF8Encoding encoding = new UTF8Encoding();
 
 			int i = 0;
-			using (FasterLogScanIterator iter = logger.Scan(nextAddress_, nextAddress_ + 1_000_000_000))
+			using (FasterLogScanIterator iter = logger.Scan(logger.BeginAddress, logger.FlushedUntilAddress))
 			{
 				while (true)
 				{
