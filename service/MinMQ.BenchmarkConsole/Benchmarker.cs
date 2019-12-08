@@ -34,22 +34,20 @@ namespace MinMQ.BenchmarkConsole
 		internal async Task Start()
 		{
 			int jsonCount, xmlCount;
-			List<string> documents;
-			{
-				(List<string> jsons, List<string> xmls) = TimedFunction(() => GenerateObjects(numberOfObjects, out jsons, out xmls));
-				documents = jsons.Union(xmls).ToList();
-				jsonCount = jsons.Count;
-				xmlCount = xmls.Count;
-			}
+			(List<string> jsons, List<string> xmls) = TimedFunction(() => GenerateObjects(numberOfObjects, out jsons, out xmls));
+			jsonCount = jsons.Count;
+			xmlCount = xmls.Count;
 
 			logger.LogInformation("Sending JSON and XML..");
 			Instant start = SystemClock.Instance.GetCurrentInstant();
 
 			// Old-school non-blocking
-			await PostSendAsStringContent(documents);
+			await PostSendAsStringContent(jsons);
+			await PostSendAsStringContent(xmls);
 			Duration duration = SystemClock.Instance.GetCurrentInstant() - start;
 			decimal throughtput = (jsonCount + xmlCount) / (decimal)duration.TotalSeconds;
 			logger.LogInformation("Done! {0:N2} documents/s (Xmls: {1}, Jsons={2}))", throughtput, xmlCount, jsonCount);
+			OnComplete?.Invoke();
 		}
 
 		private (List<string>, List<string>) GenerateObjects(int numberOfObjects, out List<string> jsons, out List<string> xmls)
