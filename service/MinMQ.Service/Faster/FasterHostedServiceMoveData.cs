@@ -62,14 +62,14 @@ namespace MinMQ.Service.Faster
 						// Have a sneaking suspicions we should keep the nextAddress from the last iteration. If we remove truncate
 						// then the cursor doesn't progress and flush next batch.
 						Instant start = SystemClock.Instance.GetCurrentInstant();
-						var scanner = FasterOps.Instance.Value.Listen(optionsMonitor.CurrentValue.ScanFlushSize, currentCursor);
+						var scanner = FasterOps.Instance.Value.Listen(optionsMonitor.CurrentValue.ScanFlushSize, currentCursor.NextAddress);
 						// var messages = await ToListAsync(scanner, FasterOps.Instance.Value.TruncateUntil);
 
 						// Sloppy write (queue name and mime type should probably be known before)
 						MimeType mimeTypeXml = (await mimeTypeRepository.Find("text/xml")).ValueOr(() => throw new ApplicationException("xml"));
 						MimeType mimeTypeJson = (await mimeTypeRepository.Find("application/json")).ValueOr(() => throw new ApplicationException("json"));
 						MimeTypeDecider decider = c => c.StartsWith("<") ? mimeTypeXml.MimeTypeId : mimeTypeJson.MimeTypeId;
-						var messages = ToList(scanner, FasterOps.Instance.Value.TruncateUntil, decider, queueId);
+						var messages = ToList(scanner, decider, queueId);
 
 						if (!messages.Any())
 						{
@@ -79,7 +79,7 @@ namespace MinMQ.Service.Faster
 						}
 
 						var lastReferenceId = await messageRepository.AddRange(messages);
-						// currentCursor.Set(lastReferenceId);
+						currentCursor.Set(lastReferenceId);
 						lastReferenceId.MatchSome(referenceId => FasterOps.Instance.Value.TruncateUntil(referenceId));
 						await cursorRepository.Update(currentCursor);
 						Duration elapsed = SystemClock.Instance.GetCurrentInstant() - start;
@@ -110,20 +110,21 @@ namespace MinMQ.Service.Faster
 		//	return messages;
 		// }
 
-		private List<Message> ToList(List<(string, long, long)> scan, EndOfFileCallback endOfFileCallback, MimeTypeDecider mimeTypeDecider, short queueId)
+		// private List<Message> ToList(List<(string, long, long)> scan, EndOfFileCallback endOfFileCallback, MimeTypeDecider mimeTypeDecider, short queueId)
+		private List<Message> ToList(List<(string, long, long)> scan, MimeTypeDecider mimeTypeDecider, short queueId)
 		{
 			var messages = new List<Message>();
 
 			foreach ((string content, long referenceId, long nextReferenceId) in scan)
 			{
 				// I'm guessing this is out of bounds for the current storage config
-				if (nextReferenceId > 1_000_000_000)
-				{
-					logger.LogError("Reached end of IDevice");
-					// Debugger.Break();
-					endOfFileCallback(nextReferenceId);
-					continue;
-				}
+				//if (nextReferenceId > 1_000_000_000)
+				//{
+				//	logger.LogError("Reached end of IDevice");
+				//	// Debugger.Break();
+				//	endOfFileCallback(nextReferenceId);
+				//	continue;
+				//}
 				messages.Add(new Message(content, referenceId, nextReferenceId, mimeTypeDecider(content), queueId));
 			}
 

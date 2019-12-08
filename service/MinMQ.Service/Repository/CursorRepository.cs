@@ -24,6 +24,7 @@ namespace MinMq.Service.Repository
 
 			tCursor cursorDo = await messageQueueContext.tCursors.SingleOrDefaultAsync(q => q.CursorId == cursor.Id);
 			cursorDo.Changed = now;
+			cursorDo.NextReferenceId = cursor.NextAddress;
 			await messageQueueContext.SaveChangesAsync();
 			return cursorDo.CursorId;
 		}
