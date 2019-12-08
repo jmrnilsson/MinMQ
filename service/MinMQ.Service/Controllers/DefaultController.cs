@@ -1,8 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using MinMQ.Service.Controllers.Dto;
+using MinMq.Service.Entities;
 using MinMQ.Service.Models;
+using MinMq.Service.Repository;
 
 namespace MinMQ.Service.Controllers
 {
@@ -11,10 +12,12 @@ namespace MinMQ.Service.Controllers
 	public class DefaultController : ControllerBase
 	{
 		private readonly MessagesContext messagesContext;
+		private readonly IQueueRepository queueRepository;
 
-		public DefaultController(MessagesContext messagesContext)
+		public DefaultController(MessagesContext messagesContext, IQueueRepository queueRepository)
 		{
 			this.messagesContext = messagesContext;
+			this.queueRepository = queueRepository;
 		}
 
 		[HttpGet("/status")]
@@ -26,14 +29,14 @@ namespace MinMQ.Service.Controllers
 		[HttpPost("/efcore-in-mem-dto")]
 		public async Task PostAsync(MessageRequestDto message)
 		{
-			await messagesContext.Messages.AddAsync(new Message { Content = message.Content });
+			await messagesContext.Messages.AddAsync(new Models.Message { Content = message.Content });
 			await messagesContext.SaveChangesAsync();
 		}
 
 		[HttpPost("/efcore-in-mem-text")]
 		public async Task PostAsync(string message)
 		{
-			await messagesContext.Messages.AddAsync(new Message { Content = message });
+			await messagesContext.Messages.AddAsync(new Models.Message { Content = message });
 			await messagesContext.SaveChangesAsync();
 		}
 
@@ -58,6 +61,31 @@ namespace MinMQ.Service.Controllers
 				some: values => Ok(values),
 				none: () => NotFound()
 			);
+		}
+
+		[HttpGet("/list/{name:int}")]
+		public async Task<IActionResult> ListFor(int queueId)
+		{
+			var scanner = FasterOps.Instance.Value.GetListAsync();
+			return (await ControllerExtensions.ToListResponse(scanner)).Match<IActionResult>
+			(
+				some: values => Ok(values),
+				none: () => NotFound()
+			);
+		}
+
+		// In contrast, the URI in a PUT request identifies the entity enclosed with the request.
+		[HttpPut("/queue/{name:regex(^\\w+)}")]
+		public async Task<IActionResult> Add(string name)
+		{
+			{
+				short? queueId = await queueRepository.Find(name);
+				if (queueId.HasValue) return Redirect("/list/{queueId}");
+			}
+			{
+				short queueId = await queueRepository.Add(new Queue(name));
+				return Created($"/list/{queueId}", queueId);
+			}
 		}
 	}
 }
