@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using FASTER.core;
 using MinMQ.Service.Configuration;
+using MinMq.Service.Entities;
 using Optional;
 
 namespace MinMQ.Service
@@ -152,8 +153,10 @@ namespace MinMQ.Service
 			}
 		}
 
-		public List<(string, long, long)> Listen(int flushSize)
+		public List<(string, long, long)> Listen(int flushSize, Cursor cursor)
 		{
+			var nextAddress_ = cursor.NextAddress;
+
 			List<(string, long, long)> entries = new List<(string, long, long)>();
 			// CancellationTokenSource cts = new CancellationTokenSource();
 			UTF8Encoding encoding = new UTF8Encoding();
@@ -178,6 +181,16 @@ namespace MinMQ.Service
 					}
 
 					entries.Add((encoding.GetString(bytes), iter.CurrentAddress, iter.NextAddress));
+
+					if (cursor is DebugCursor debugCursor)
+					{
+						debugCursor.Increment();
+
+						if (debugCursor.Iteration > 1841)
+						{
+							int j = 0;
+						}
+					}
 
 					i++;
 

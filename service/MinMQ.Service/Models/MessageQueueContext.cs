@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using MinMQ.Service.Configuration;
@@ -20,8 +18,10 @@ namespace MinMq.Service.Models
 			this.configuration = configuration;
 		}
 
-		public DbSet<Queue> Queues { get; set; }
-		public DbSet<Message> Messages { get; set; }
+		public DbSet<tQueue> tQueues { get; set; }
+		public DbSet<tMessage> tMessages { get; set; }
+		public DbSet<tMimeType> tMimeTypes { get; set; }
+		public DbSet<tCursor> tCursors { get; set; }
 
 		protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 		{
@@ -32,58 +32,75 @@ namespace MinMq.Service.Models
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
-			modelBuilder.Entity<Message>()
+			modelBuilder.Entity<tMessage>()
 				.HasOne(p => p.Queue)
 				.WithMany(b => b.Messages)
 				.HasForeignKey(p => p.QueueId)
 				.HasConstraintName("FK_Message_Queue");
 
-			modelBuilder.Entity<Message>()
+			modelBuilder.Entity<tMessage>()
 				.Property(f => f.MessageId)
 				.ValueGeneratedOnAdd();
 
-			modelBuilder.Entity<Queue>()
+			modelBuilder.Entity<tQueue>()
 				.Property(f => f.QueueId)
 				.ValueGeneratedOnAdd();
 
-			modelBuilder.Entity<MimeType>()
-				.Property(f => f.ByteKey)
+			modelBuilder.Entity<tMimeType>()
+				.Property(f => f.MimeTypeId)
 				.ValueGeneratedOnAdd();
 
-			modelBuilder.Entity<Queue>()
-				.Property(f => f.ByteKey)
-				.ValueGeneratedOnAdd();
-
-			// No FK for mime-type yet
+			modelBuilder.Entity<tMessage>()
+				.HasOne(p => p.MimeType)
+				.WithMany(b => b.tMessages)
+				.HasForeignKey(p => p.MimeTypeId)
+				.HasConstraintName("FK_Message_MimeType");
 		}
 	}
 
-	public class Queue
+	public class tQueue
 	{
-		public int QueueId { get; set; }
+		[Key]
+		public short QueueId { get; set; }
 		public string Name { get; set; }
-		public byte ByteKey { get; set; }
 
-		public List<Message> Messages { get; set; }
+		public List<tMessage> Messages { get; set; }
+		public DateTime Added { get; set; }
+		public DateTime Changed { get; set; }
 	}
 
-	public class Message
+	public class tMessage
 	{
 		[Key]
 		public int MessageId { get; set; }
 		public long ReferenceId { get; set; }
 		public long NextReferenceId { get; set; }
-		public string MimeType { get; set; }
 		public string Content { get; set; }
-		public int QueueId { get; set; }
-		public Queue Queue { get; set; }
+		public short QueueId { get; set; }
+		public tQueue Queue { get; set; }
+		public short MimeTypeId { get; set; }
+		public tMimeType MimeType { get; set; }
 		public string HashCode { get; set; }
+		public DateTime Added { get; set; }
+		public DateTime Changed { get; set; }
 	}
 
-	public class MimeType
+	public class tMimeType
 	{
 		[Key]
-		public string MimeTypeId { get; set; }
-		public byte ByteKey { get; set; }
+		public short MimeTypeId { get; set; }
+		public string Expression { get; set; }
+		public List<tMessage> tMessages { get; set; }
+		public DateTime Added { get; set; }
+		public DateTime Changed { get; set; }
+	}
+
+	public class tCursor
+	{
+		[Key]
+		public int CursorId { get; set; }
+		public DateTime Added { get; set; }
+		public DateTime Changed { get; set; }
+		public long NextReferenceId { get; set; }
 	}
 }

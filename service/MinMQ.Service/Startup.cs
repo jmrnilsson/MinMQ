@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -11,7 +12,6 @@ using MinMQ.Service.HttpRequestHandlers;
 using MinMq.Service.Models;
 using MinMQ.Service.Models;
 using MinMq.Service.Repository;
-using System;
 
 namespace MinMQ.Service
 {
@@ -41,6 +41,9 @@ namespace MinMQ.Service
 			// services.AddDbContext<MessageQueueContext>(options => options.UseNpgsql(Configuration.GetConnectionString("MessageQueueContext")));
 			services.AddDbContext<MessageQueueContext>(options => options.UseNpgsql(Configuration.GetConnectionString("MessageQueueContext")));
 			services.AddScoped<IMessageRepository, MessageRepository>();
+			services.AddScoped<IQueueRepository, QueueRepository>();
+			services.AddScoped<IMimeTypeRepository, MimeTypeRepository>();
+			services.AddScoped<ICursorRepository, CursorRepository>();
 		}
 
 		private static void SetOptions(MinMQConfiguration o)
