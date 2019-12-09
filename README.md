@@ -2,12 +2,13 @@
 
 # MinMQ
 
-**Note:** _This is a work-in-progress. So far only prototype API is in place for write queries. Nothing exists in terms of a
-managed or defined API for sending or retrieving messages._ 
+**Note:** _This is work-in-progress. So far only prototype API is in place for write queries. Nothing exists in terms of
+a managed or defined API for sending or retrieving messages. At the moment messages are being flushed to Postgres 
+for review and follow-up purposes; Making sure sent messages eventually show up._  
 
-MinMQ is a minimal message queue for private networks, on-premise, or atleast non-public networks. It targets virtual
-machines, Docker and physical hosts. It's designed for low ceremony, high throughput, medium-to-low latency, and has a 
-HTTP-transport for comfortable transmission of messages.
+MinMQ is a minimal message queue for private networks, on-premise, or non-public networks. Atleast not for the time
+being. It targets virtual machines, Docker and physical hosts. It's designed for low ceremony, high throughput,
+medium-to-low latency, and has a HTTP-transport for comfortable transmission of messages.
 
 ## This effort focuses on:
 - Low latency
@@ -31,19 +32,22 @@ flushing to a durable disk later on.
 - A Docker image and/or [Helm charts](https://helm.sh/).
 - Error-queues.
 - Named queues.
-- Message content limit (<1 MB).
 - Mime-Types.
+- Message content limit (<1 MB).
 - Flushing to multiple IDevices. Currently, all records are flushing to Postgres. 
 
 ## In a more distant future the following things may also be explored:
-- Faster Materialized views, cached responses or read models.
+- Read models: Faster KV, SQL Materalized views or cached responses.
+- Some kind of tiered solution:
+  - Log splicing, it's most likely that dealing with errors or unread message will require logs to be entirely rewritten
+  possibly even [compacted](http://cloudurable.com/blog/kafka-architecture-log-compaction/index.html). 
+  - [N-tiered service provisioning](docs/ntiered.md)
+  - Multiple IDevices and a commit-schedular with knowledge of logical devices (however, how to saturate a SSD over HTTP
+  is beyond me).
+  - Inbound FlatBuffers or Protobuf from a single or multiple HTTP-hosts.
 - Swagger/Swashbuckle
 - More [advanced benchmarks suites](https://github.com/aspnet/Benchmarks).
 - Possibly a client, or and example implementation of set of atomic yet composite messages.
-- Some kind of tiered solution:
-  - [N-tiered service provisioning](docs/ntiered.md)
-  - Multiple IDevices (however, how to saturate a SSD over HTTP is beyond me).
-  - Inbound FlatBuffers or Protobuf from a single or multiple HTTP-hosts.
 - Authentication
 - Dynamic latency-scaling.
 

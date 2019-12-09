@@ -20,7 +20,7 @@ namespace MinMQ.BenchmarkConsole
 		/// <returns>JSON with random objects and values</returns>
 		public override string GenerateObject()
 		{
-			JObject child = new JObject(new JProperty(words.Pick(), new JValue(words.Pick())));
+			JObject child = new JObject(new JProperty(words.Pick(), new JValue(Guid.NewGuid().ToString())));
 			int depth = 0;
 			IEnumerable<JObject> children = GenerateChildren(++depth);
 			AddChildren(children, child);

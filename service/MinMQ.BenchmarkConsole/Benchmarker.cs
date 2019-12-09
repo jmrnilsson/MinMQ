@@ -19,7 +19,7 @@ namespace MinMQ.BenchmarkConsole
 		private readonly int numberOfObjects;
 		private readonly CancellationToken cancellationToken;
 
-		internal Benchmarker(IHttpClientFactory httpClientFactory, int ntree, int numberOfObjects, CancellationToken cancellationToken)
+		public Benchmarker(IHttpClientFactory httpClientFactory, int ntree, int numberOfObjects, CancellationToken cancellationToken)
 		{
 			this.httpClientFactory = httpClientFactory;
 			this.ntree = ntree;
@@ -29,7 +29,7 @@ namespace MinMQ.BenchmarkConsole
 
 		public event OnCompleteDelegate OnComplete;
 
-		internal async Task Start()
+		public async Task Start()
 		{
 			int jsonCount, xmlCount;
 			(List<string> jsons, List<string> xmls) = TimedFunction(() => GenerateObjects(numberOfObjects, out jsons, out xmls));
