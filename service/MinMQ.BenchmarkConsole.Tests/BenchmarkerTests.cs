@@ -53,6 +53,7 @@ namespace MinMQ.BenchmarkConsole.Tests
 			{
 				_handlerFunc = handlerFunc;
 			}
+			
 			protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
 			{
 				invocationCount++;
