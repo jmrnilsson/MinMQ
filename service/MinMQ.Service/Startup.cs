@@ -68,6 +68,8 @@ namespace MinMQ.Service
 				app.UseDeveloperExceptionPage();
 			}
 
+			UpdateDatabase(app);
+
 			app.UseRouting();
 
 			// app.UseAuthorization();
@@ -78,6 +80,17 @@ namespace MinMQ.Service
 				endpoints.MapPost("/send", FasterHttpHandler.HandleRequest);
 				endpoints.MapHealthChecks("/healthcheck");
 			});
+		}
+
+		private static void UpdateDatabase(IApplicationBuilder app)
+		{
+			using (var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
+			{
+				using (var context = serviceScope.ServiceProvider.GetService<MessageQueueContext>())
+				{
+					context.Database.Migrate();
+				}
+			}
 		}
 	}
 }

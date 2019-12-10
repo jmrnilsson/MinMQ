@@ -66,6 +66,23 @@ local IDevices can be configured.
 > [appsettings.Development.json](./service/MinMQ.Service/appsettings.Development.json). It
 > must be assigned before starting.
 
+### How to debug with Visual Studio
+
+1. Open a terminal and navigate to repository root `git rev-parse --show-toplevel` or so.
+2. Type `docker-compose up mmq-db` which starts the reporting Postgres-database meant for analysis of the results
+3. Open Visual studio and set _MinMQ.Service_ as the start-up project
+4. Run the solution
+5. Open a second terminal and navigate to service/MinMQ.BenchmarkConsole
+6. Type `dotnet run 5000` to send 5000 XMLs and 5000 JSONs to the service
+
+### How to run on Debian Buster - armhf
+
+1. Open a terminal and type `sudo docker-compose build`
+2. And then `sudo docker-compose run`
+3. TBD on how to run service/MinMQ.BenchmarkConsole
+4. A the moment, you can run `sudo docker-compose run mmq-benchmarks -- post_message.sh` in a separate terminal which
+    launches a armhf-patched version wg/wrk built in step 1.
+
 ## Performance
 This is continiously measured and some sparse unstructed working documenets are available in [docs/perf.md](docs/perf.md).
 
