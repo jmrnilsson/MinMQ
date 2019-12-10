@@ -96,7 +96,7 @@ But overall the with the custom made benchmarker about 30-50% saturation of a SA
 
 ## Links
 
-- [FASTER: An Embedded Key-Value Store for State Managemen (video)](https://www.microsoft.com/en-us/research/video/faster-an-embedded-key-value-store-for-state-management/)
+- [FASTER: An Embedded Key-Value Store for State Management (video)](https://www.microsoft.com/en-us/research/video/faster-an-embedded-key-value-store-for-state-management/)
 
 ## TL;DR
 Here are some useful commands. _Create a new queue._
