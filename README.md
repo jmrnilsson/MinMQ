@@ -19,9 +19,10 @@ medium-to-low latency, and has a HTTP-transport for comfortable transmission of 
 
 This implementation merely combines the efforts of [microsoft.FASTER](https://github.com/microsoft/FASTER) and 
 [AspNet Core 3.0](https://docs.microsoft.com/en-us/aspnet/core/?view=aspnetcore-3.0). A HTTP-transports on top of a *very*
-fast log. FASTER provides "group commits" with [Concurrent Prefix Recovery](https://www.microsoft.com/en-us/research/uploads/prod/2019/01/cpr-sigmod19.pdf) rather than a [Work Ahead Log](https://wiki.postgresql.org/wiki/Improve_the_performance_of_ALTER_TABLE_SET_LOGGED_UNLOGGED_statement). This approach is reminiscent to that of [Microsoft Message Queue](https://support.microsoft.com/ms-my/help/256096/how-to-install-msmq-2-0-to-enable-queued-components) for
-messages transacted in bulk using Microsoft Distributed Transaction Coordinator. Albeit, this is quite diffent from "unlogged" tables or in-memory database 
-flushing to a durable disk later on. 
+fast recoverable log. FASTER provides "group commits" with [Concurrent Prefix Recovery](https://www.microsoft.com/en-us/research/uploads/prod/2019/01/cpr-sigmod19.pdf) rather than a [Work Ahead Log](https://wiki.postgresql.org/wiki/Improve_the_performance_of_ALTER_TABLE_SET_LOGGED_UNLOGGED_statement). This approach is reminiscent to that of [Microsoft Message Queue](https://support.microsoft.com/ms-my/help/256096/how-to-install-msmq-2-0-to-enable-queued-components) for
+messages transacted in bulk using Microsoft Distributed Transaction Coordinator. Albeit, this a quite different approach
+from "unlogged" tables or in-memory databases flushing to a durable disk later on which doesn't provide the same level
+of durability.
 
 ## Soon, the following things will be explored
 - A formal API (perhaps something reminiscent to MSMQ or IronMQ)
@@ -40,7 +41,8 @@ flushing to a durable disk later on.
 - Read models: Faster KV, SQL Materalized views or cached responses.
 - Some kind of tiered solution:
   - Log splicing, it's most likely that dealing with errors or unread message will require logs to be entirely rewritten
-  possibly even [compacted](http://cloudurable.com/blog/kafka-architecture-log-compaction/index.html). 
+  possibly even [compacted](http://cloudurable.com/blog/kafka-architecture-log-compaction/index.html). Log compaction
+  may already have been added by the [FASTER-team](https://microsoft.github.io/FASTER/roadmap). _Investigate this._
   - [N-tiered service provisioning](docs/ntiered.md)
   - Multiple IDevices and a commit-schedular with knowledge of logical devices (however, how to saturate a SSD over HTTP
   is beyond me).
@@ -91,6 +93,10 @@ More information on how to continue the development work can be found [here](doc
 But overall the with the custom made benchmarker about 30-50% saturation of a SATA SSD seems to be plausible. 
 
 <img src="./ssd-saturation.png" />
+
+## Links
+
+- [FASTER: An Embedded Key-Value Store for State Management (video)](https://www.microsoft.com/en-us/research/video/faster-an-embedded-key-value-store-for-state-management/)
 
 ## TL;DR
 Here are some useful commands. _Create a new queue._
