@@ -9,11 +9,18 @@ namespace MinMQ.BenchmarkConsole
 	{
 		private readonly IHttpClientFactory httpClientFactory;
 		private readonly IHostApplicationLifetime hostApplicationLifetime;
+		private readonly MinMQEnvironmentVariables minMQEnvironmentVariables;
 
-		public BenchmarkHostedService(IHttpClientFactory httpClientFactory, IHostApplicationLifetime hostApplicationLifetime)
+		public BenchmarkHostedService
+		(
+			IHttpClientFactory httpClientFactory,
+			IHostApplicationLifetime hostApplicationLifetime,
+			MinMQEnvironmentVariables minMQEnvironmentVariables
+		)
 		{
 			this.httpClientFactory = httpClientFactory;
 			this.hostApplicationLifetime = hostApplicationLifetime;
+			this.minMQEnvironmentVariables = minMQEnvironmentVariables;
 		}
 
 		public async Task StartAsync(CancellationToken cancellationToken)
@@ -22,7 +29,8 @@ namespace MinMQ.BenchmarkConsole
 			hostApplicationLifetime.ApplicationStopping.Register(OnStopping);
 			// hostApplicationLifetime.ApplicationStopped.Register(OnStopped);
 
-			var benchmarker = new Benchmarker(httpClientFactory, Program.NTree, Program.NumberOfObjects, cancellationToken);
+			string requestPath = minMQEnvironmentVariables.RequestPath;
+			var benchmarker = new Benchmarker(httpClientFactory, Program.NTree, Program.NumberOfObjects, requestPath, cancellationToken);
 			benchmarker.OnComplete += Program.OnCompletedEvent;
 			await benchmarker.Start();
 			await StopAsync(cancellationToken);
