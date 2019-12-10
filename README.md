@@ -80,7 +80,7 @@ local IDevices can be configured.
 ### How to run on Debian Buster - armhf
 
 1. Open a terminal and type `sudo docker-compose build`
-2. And then `sudo docker-compose run`
+2. And then `sudo docker-compose up mmq-db mmq-service-express mmq-service mmq-service-hapi mmq-service-nodejs`
 3. TBD on how to run service/MinMQ.BenchmarkConsole
 4. A the moment, you can run `sudo docker-compose run mmq-benchmarks -- post_message.sh` in a separate terminal which
     launches a armhf-patched version wg/wrk built in step 1.

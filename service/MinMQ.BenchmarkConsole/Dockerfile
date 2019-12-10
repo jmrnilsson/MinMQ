@@ -16,4 +16,4 @@ ENV REQUEST_PATH "http://mmq-service:9000/send"
 
 WORKDIR /app
 COPY --from=build /app .
-ENTRYPOINT ["dotnet", "MinMQ.BenchmarkConsole.dll", "10000"]
+ENTRYPOINT ["dotnet", "MinMQ.BenchmarkConsole.dll", "3000"]
