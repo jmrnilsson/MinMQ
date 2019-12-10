@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -11,8 +12,9 @@ namespace MinMQ.BenchmarkConsole
 
 	public class Program
 	{
-		public static readonly int NTree = 5;  // NTree = 2 == binary tree
 		private static readonly CancellationTokenSource CancellationTokenSource = new CancellationTokenSource();
+		private static readonly string RequestPath = Environment.GetEnvironmentVariable("RequestPath");
+		public static readonly int NTree = 5;  // NTree = 2 == binary tree
 		public static int NumberOfObjects { get; set; } = 1000;
 
 		public static async Task Main(string[] args)
@@ -27,6 +29,7 @@ namespace MinMQ.BenchmarkConsole
 			var builder = new HostBuilder()
 				.ConfigureServices((hostContext, services) =>
 				{
+					services.AddSingleton<MinMQEnvironmentVariables>();
 					services.AddHttpClient();
 					services.AddHostedService<BenchmarkHostedService>();
 				});

@@ -17,13 +17,22 @@ namespace MinMQ.BenchmarkConsole
 		private readonly int ntree;
 		private readonly Duration showProgressEvery = Duration.FromMilliseconds(400);
 		private readonly int numberOfObjects;
+		private readonly string requestPath;
 		private readonly CancellationToken cancellationToken;
 
-		public Benchmarker(IHttpClientFactory httpClientFactory, int ntree, int numberOfObjects, CancellationToken cancellationToken)
+		public Benchmarker
+		(
+			IHttpClientFactory httpClientFactory,
+			int ntree,
+			int numberOfObjects,
+			string requestPath,
+			CancellationToken cancellationToken
+		)
 		{
 			this.httpClientFactory = httpClientFactory;
 			this.ntree = ntree;
 			this.numberOfObjects = numberOfObjects;
+			this.requestPath = requestPath;
 			this.cancellationToken = cancellationToken;
 		}
 
@@ -104,7 +113,7 @@ namespace MinMQ.BenchmarkConsole
 
 				HttpClient httpClient = httpClientFactory.CreateClient();
 				StringContent content = new StringContent(documents[j]);
-				tasks.Add(httpClient.PostAsync("http://localhost:9000/send", content)); // It seems a CancellationToken here will fail the service.
+				tasks.Add(httpClient.PostAsync(requestPath, content)); // It seems a CancellationToken here will fail the service.
 
 				if (j % ConcurrentHttpRequests == 0 && j > 0)
 				{

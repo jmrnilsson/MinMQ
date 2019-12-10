@@ -11,13 +11,19 @@ services:
     ports:
     - "9000:9000"
     environment:
-    - ASPNETCORE_ENVIRONMENT=Docker
-    - ASPNETCORE_URLS=http://0.0.0.0:9000
+    - ASPNETCORE_ENVIRONMENT=Docker  # probably not needed
+    - ASPNETCORE_URLS=http://0.0.0.0:9000  # probably not needed
     volumes:
     - fasterdbo:/opt/faster
     # shm_size: "2gb"
     links:
     - "mmq-db"
+  mmq-benchmark-console:
+    build:
+      context: ./service/
+      dockerfile: ./MinMQ.BenchmarkConsole/Dockerfile
+    links:
+    - "mmq-service"
   mmq-service-express:
     build: ./benchmark/service-express
     ports:

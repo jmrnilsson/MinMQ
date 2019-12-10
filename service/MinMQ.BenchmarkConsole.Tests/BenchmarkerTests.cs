@@ -19,7 +19,8 @@ namespace MinMQ.BenchmarkConsole.Tests
 		public BenchmarkerTests()
 		{
 			httpClientFactoryMock = new Mock<IHttpClientFactory>();
-			benchmarker = new Benchmarker(httpClientFactoryMock.Object, 5, 250, cts.Token);
+			string requestPath = "https://localhost:666/send";
+			benchmarker = new Benchmarker(httpClientFactoryMock.Object, 5, 250, requestPath, cts.Token);
 			httpHandler = new DelegatingHandlerStub();
 			var client = new HttpClient(httpHandler);
 			httpClientFactoryMock.Setup(_ => _.CreateClient(It.IsAny<string>())).Returns(client);
