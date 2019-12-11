@@ -92,7 +92,7 @@ More information on how to continue the development work can be found [here](doc
 
 But overall the with the custom made benchmarker about 30-50% saturation of a SATA SSD seems to be plausible. 
 
-<img src="./ssd-saturation.png" />
+<img src="./desktop.gif" />
 
 ## Links
 
