@@ -14,34 +14,27 @@ namespace MinMQ.BenchmarkConsole
 	{
 		private const int ConcurrentHttpRequests = 400;
 		private readonly IHttpClientFactory httpClientFactory;
-		private readonly int ntree;
+		private readonly IMinMQEnvironmentVariables minMQEnvironmentVariables;
 		private readonly Duration showProgressEvery = Duration.FromMilliseconds(400);
-		private readonly int numberOfObjects;
-		private readonly string requestPath;
-		private readonly CancellationToken cancellationToken;
+		private CancellationToken cancellationToken;
 
 		public Benchmarker
 		(
 			IHttpClientFactory httpClientFactory,
-			int ntree,
-			int numberOfObjects,
-			string requestPath,
-			CancellationToken cancellationToken
+			IMinMQEnvironmentVariables minMQEnvironmentVariables
 		)
 		{
 			this.httpClientFactory = httpClientFactory;
-			this.ntree = ntree;
-			this.numberOfObjects = numberOfObjects;
-			this.requestPath = requestPath;
-			this.cancellationToken = cancellationToken;
+			this.minMQEnvironmentVariables = minMQEnvironmentVariables;
 		}
 
 		public event OnCompleteDelegate OnComplete;
 
-		public async Task Start()
+		public async Task Start(CancellationToken cancellationToken)
 		{
+			this.cancellationToken = cancellationToken;
 			int jsonCount, xmlCount;
-			(List<string> jsons, List<string> xmls) = TimedFunction(() => GenerateObjects(numberOfObjects, out jsons, out xmls));
+			(List<string> jsons, List<string> xmls) = TimedFunction(() => GenerateObjects(minMQEnvironmentVariables.NumberOfObjects, out jsons, out xmls));
 			jsonCount = jsons.Count;
 			xmlCount = xmls.Count;
 
@@ -62,8 +55,8 @@ namespace MinMQ.BenchmarkConsole
 			Instant lastShowProgress = SystemClock.Instance.GetCurrentInstant();
 			jsons = new List<string>();
 			xmls = new List<string>();
-			var jsonGenerator = new JsonGenerator(ntree);
-			var xmlGenerator = new XmlGenerator(ntree);
+			var jsonGenerator = new JsonGenerator(minMQEnvironmentVariables.NTree);
+			var xmlGenerator = new XmlGenerator(minMQEnvironmentVariables.NTree);
 
 			Log.Information("Preparing payload");
 			for (int i = 0; i < numberOfObjects; i++)
@@ -113,7 +106,7 @@ namespace MinMQ.BenchmarkConsole
 
 				HttpClient httpClient = httpClientFactory.CreateClient();
 				StringContent content = new StringContent(documents[j]);
-				tasks.Add(httpClient.PostAsync(requestPath, content)); // It seems a CancellationToken here will fail the service.
+				tasks.Add(httpClient.PostAsync(minMQEnvironmentVariables.RequestPath, content)); // It seems a CancellationToken here will fail the service.
 
 				if (j % ConcurrentHttpRequests == 0 && j > 0)
 				{

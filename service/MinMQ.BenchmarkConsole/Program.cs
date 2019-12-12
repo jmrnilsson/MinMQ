@@ -13,13 +13,11 @@ namespace MinMQ.BenchmarkConsole
 	public class Program
 	{
 		private static readonly CancellationTokenSource CancellationTokenSource = new CancellationTokenSource();
-		private static readonly string RequestPath = Environment.GetEnvironmentVariable("RequestPath");
-		public static readonly int NTree = 5;  // NTree = 2 == binary tree
-		public static int NumberOfObjects { get; set; } = 1000;
+
 
 		public static async Task Main(string[] args)
 		{
-			ParseArguments(args).MatchSome(value => NumberOfObjects = value);
+			var numberOfObjects = ParseArguments(args);
 
 			Log.Logger = new LoggerConfiguration()
 				.MinimumLevel.Information()
@@ -29,7 +27,8 @@ namespace MinMQ.BenchmarkConsole
 			var builder = new HostBuilder()
 				.ConfigureServices((hostContext, services) =>
 				{
-					services.AddSingleton<MinMQEnvironmentVariables>();
+					services.AddSingleton<IMinMQEnvironmentVariables>(numberOfObjects.Match(noo => new MinMQEnvironmentVariables(noo), () => new MinMQEnvironmentVariables()));
+					services.AddSingleton<Benchmarker>();
 					services.AddHttpClient();
 					services.AddHostedService<BenchmarkHostedService>();
 				});

@@ -38,7 +38,6 @@ namespace MinMQ.Service
 			services.AddOptions<MinMQConfiguration>().Configure(SetOptions).ValidateDataAnnotations();
 			services.AddHealthChecks();
 			services.AddScoped<CancellationTokenSourceFactory>(_ => () => new CancellationTokenSource());
-			// services.AddDbContext<MessageQueueContext>(options => options.UseNpgsql(Configuration.GetConnectionString("MessageQueueContext")));
 			services.AddDbContext<MessageQueueContext>(options => options.UseNpgsql(Configuration.GetConnectionString("MessageQueueContext")));
 			services.AddScoped<IMessageRepository, MessageRepository>();
 			services.AddScoped<IQueueRepository, QueueRepository>();

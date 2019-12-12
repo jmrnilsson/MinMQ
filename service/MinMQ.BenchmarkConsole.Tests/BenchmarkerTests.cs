@@ -19,8 +19,7 @@ namespace MinMQ.BenchmarkConsole.Tests
 		public BenchmarkerTests()
 		{
 			httpClientFactoryMock = new Mock<IHttpClientFactory>();
-			string requestPath = "https://localhost:666/send";
-			benchmarker = new Benchmarker(httpClientFactoryMock.Object, 5, 250, requestPath, cts.Token);
+			benchmarker = new Benchmarker(httpClientFactoryMock.Object, new MinMQTestEnvVar());
 			httpHandler = new DelegatingHandlerStub();
 			var client = new HttpClient(httpHandler);
 			httpClientFactoryMock.Setup(_ => _.CreateClient(It.IsAny<string>())).Returns(client);
@@ -29,7 +28,7 @@ namespace MinMQ.BenchmarkConsole.Tests
 		[Fact]
         public async Task Benchmarker_should_send_http_requests_for_every_document()
         {	
-			await benchmarker.Start();
+			await benchmarker.Start(cts.Token);
 			httpHandler.InvocationCount.ShouldBe(500);
         }
 
@@ -43,7 +42,7 @@ namespace MinMQ.BenchmarkConsole.Tests
 
 		public class DelegatingHandlerStub : DelegatingHandler
 		{
-			private int invocationCount = 0;
+			private int invocationCount;
 			private readonly Func<HttpRequestMessage, CancellationToken, Task<HttpResponseMessage>> _handlerFunc;
 			public DelegatingHandlerStub()
 			{
@@ -62,6 +61,15 @@ namespace MinMQ.BenchmarkConsole.Tests
 			}
 
 			public int InvocationCount => invocationCount;
+		}
+
+		public class MinMQTestEnvVar : IMinMQEnvironmentVariables
+		{
+			public int NTree => 5;
+
+			public int NumberOfObjects => 250;
+
+			public string RequestPath => "https://localhost:666/send";
 		}
 	}
 }
