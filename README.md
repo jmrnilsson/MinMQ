@@ -6,7 +6,7 @@
 a managed or defined API for sending or retrieving messages. At the moment messages are being flushed to Postgres 
 for review and follow-up purposes; Making sure sent messages eventually show up._  
 
-MinMQ is a minimal message queue for private networks, on-premise, or non-public networks. Atleast not for the time
+MinMQ is a minimal message queue for private networks, on-premise, or non-public networks for the time
 being. It targets virtual machines, Docker and physical hosts. It's designed for low ceremony, high throughput,
 medium-to-low latency, and has a HTTP-transport for comfortable transmission of messages.
 
