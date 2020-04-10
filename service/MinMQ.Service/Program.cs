@@ -49,7 +49,7 @@ namespace MinMQ.Service
 				}).ConfigureServices(services =>
 				{
 					services.AddHostedService<FasterHostedServiceCommit>();
-					services.AddHostedService<FasterHostedServiceMoveData>();
+					// services.AddHostedService<FasterHostedServiceMoveData>();
 				});
 	}
 }

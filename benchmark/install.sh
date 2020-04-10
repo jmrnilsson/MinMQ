@@ -37,7 +37,18 @@ done
 
 EOF
 
-chmod +x /app/wrk/http-ready.sh
+# https://stackoverflow.com/questions/9869902/prevent-bash-from-interpreting-without-quoting-everything
+cat >> /app/wrk/http-ready-mmq.sh << 'EOF'
+#!/bin/bash
+while [ $(curl -o -I -L -s -w "%{http_code}" http://mmq-service:9000/healthcheck) -ne 200 ]
+do
+    echo -n "kerstel"
+    sleep 1
+done
+
+EOF
+
+chmod +x /app/wrk/http-ready-mmq.sh
 
 echo 'Creating status.sh'
 cat >> /app/wrk/status.sh << EOF
@@ -87,7 +98,7 @@ set -e
 echo ''
 echo '- Make sure to check CPU and RAM saturation.'
 echo ''
-./http-ready.sh
+./http-ready-mmq.sh
 echo ''
 echo '** EF CORE IN-MEMORY DB **'
 ./wrk -t1 -c5 -d5s -s ./scripts/mmq-post.lua http://mmq-service:9000/efcore-in-mem-text
