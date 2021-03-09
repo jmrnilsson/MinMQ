@@ -19,11 +19,7 @@ app.get('/status', (req, res) => {
 });
 
 // server maybe used closing down later
-const server = app.listen(config.port, config.host, async (e) => {
-  if (e) {
-    throw new Error('Internal Server Error');
-  }
-
+const server = app.listen(config.port, config.host, async () => {
   const { name, host, port} = config;
   logger.info('Starting service. Name=%s Host=%s Port=%s', name, host, port);
 });

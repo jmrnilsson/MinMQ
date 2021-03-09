@@ -296,3 +296,37 @@ Same as above (see run 2)
       145507 requests in 7.05s, 17.07MB read
     Requests/sec:  20631.01
     Transfer/sec:      2.42MB
+
+# Run 20210309 - macOS Big Sur
+
+docker-compose run mmq-benchmarks -- post_message.sh 
+Creating minmq_mmq-benchmarks_run ... done
+
+- Make sure to check CPU and RAM saturation.
+
+Warning: The file name argument '-I' looks like a flag.
+Warning: The file name argument '-I' looks like a flag.
+Warning: The file name argument '-I' looks like a flag.
+Warning: The file name argument '-I' looks like a flag.
+
+** EF CORE IN-MEMORY DB **
+Running 5s test @ http://mmq-service:9000/efcore-in-mem-text
+  1 threads and 5 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency     1.80ms    8.61ms 105.15ms   96.93%
+    Req/Sec    10.91k     2.56k   13.52k    81.63%
+  53287 requests in 5.00s, 4.68MB read
+Requests/sec:  10656.34
+Transfer/sec:      0.93MB
+
+** JSON 400C **
+Running 12s test @ http://mmq-service:9000/send
+  12 threads and 400 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency     9.74ms    3.25ms  45.69ms   72.31%
+    Req/Sec     3.37k   360.26     4.65k    76.53%
+  482874 requests in 12.02s, 56.64MB read
+Requests/sec:  40158.08
+Transfer/sec:      4.71MB
+
+    Postgres reporting averages: 160 - 250 documents per second. 
