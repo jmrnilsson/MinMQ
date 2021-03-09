@@ -2,20 +2,21 @@
 
 # MinMQ
 
-**Note:** _This is work-in-progress. So far only prototype API is in place for write queries. Nothing exists in terms of
-a managed or defined API for sending or retrieving messages. At the moment messages are being flushed to Postgres 
-for review and follow-up purposes; Making sure sent messages eventually show up._  
+**Note:** _This is work-in-progress. A prototype API is in place to write queries. Nothing exists
+in terms of formal API for sending or retrieving messages. At the moment messages are being flushed
+to Postgres for review and follow-up purposes; Making sure sent messages eventually show up._  
 
-MinMQ is a minimal message queue for private networks, on-premise, or non-public networks for the time
-being. It targets virtual machines, Docker and physical hosts. It's designed for low ceremony, high throughput,
-medium-to-low latency, and has a HTTP-transport for comfortable transmission of messages.
+MinMQ is a minimal message queue for private networks, on-premise, or non-public networks for the
+time being. It targets virtual machines, Docker and physical hosts. It's designed for low ceremony,
+high throughput, medium-to-low latency, and has a HTTP-transport for comfortable transmission of
+messages.
 
 ## This effort focuses on:
 - Low latency
 - High throughput (storage dependant)
 - Durable, transactional commits
-- Continuous benchmarking
 - In-order processing
+- Continuous benchmarking
 
 This implementation merely combines the efforts of [microsoft.FASTER](https://github.com/microsoft/FASTER) and 
 [AspNet Core 3.0](https://docs.microsoft.com/en-us/aspnet/core/?view=aspnetcore-3.0). A HTTP-transports on top of a *very*
@@ -23,33 +24,41 @@ fast log. FASTER provides "group commits" with [Concurrent Prefix Recovery](http
 messages transacted in bulk using Microsoft Distributed Transaction Coordinator. Albeit, this is quite diffent from "unlogged" tables or in-memory database 
 flushing to a durable disk later on. 
 
-## Soon, the following things will be explored
+## Eventually the following things will be explored
 - A formal API (perhaps something reminiscent to MSMQ or IronMQ)
   - `Send` (or Post)
-  - Explicit two-phase commits for retrieving messages:
-    - `Peek` (or Reserve)
-    - `Delete` (or Recieve or Get)  
-- A Docker image and/or [Helm charts](https://helm.sh/).
-- Error-queues.
-- Named queues.
-- Mime-Types.
-- Message content limit (<1 MB).
-- Flushing to multiple IDevices. Currently, all records are flushing to Postgres. 
+  - `Peek` (or Reserve)
+  - `Delete` (or Recieve or Get)
+- Implementation per specification pattern for bootstrapping onto Kestrel.
+  - Named queues.
+  - Mime-Types (probably pre-defined).
+  - Deleting queues.
+  - Message content limit (<1 MB).
+  - Should there be Error-queues?
+- Make a C# client:
+  - Separate project (or solution and/or repository).
+  - Wraps https requests effectively. 
+  - Extend with Reactive Extensions
+  - What to do about bulk operations e.g. on-the-fly log compaction via delegate or interface and the specification pattern.
 
 ## In a more distant future the following things may also be explored:
+- A queue management tools, that supports mime types and named queues and a formal token based security API for admin provisioning.
+_Only allow for empty queues to be deleted?_
 - Read models: Faster KV, SQL Materalized views or cached responses.
 - Some kind of tiered solution:
-  - Log splicing, it's most likely that dealing with errors or unread message will require logs to be entirely rewritten
+  - Log splicing (it's likely that dealing with errors or unread message will require logs to be entirely rewritten
   possibly even [compacted](http://cloudurable.com/blog/kafka-architecture-log-compaction/index.html). 
-  - [N-tiered service provisioning](docs/ntiered.md)
-  - Multiple IDevices and a commit-schedular with knowledge of logical devices (however, how to saturate a SSD over HTTP
-  is beyond me).
-  - Inbound FlatBuffers or Protobuf from a single or multiple HTTP-hosts.
-- Swagger/Swashbuckle
-- More [advanced benchmarks suites](https://github.com/aspnet/Benchmarks).
-- Possibly a client, or and example implementation of set of atomic yet composite messages.
-- Authentication
-- Dynamic latency-scaling.
+  - Internal relaying [N-tiered service provisioning](docs/ntiered.md).
+  - Multiple IDevices and a commit-schedular settings.
+- Admin tool authentication and queue privilages (w/r/d)
+
+## Unresolved talking points
+- Should the constant commit interval cater for high contension scenario only or dynamically change depending on the load.
+- How to manage storage or IDevice overflow?
+- Is there a point to adding an API for inbound FlatBuffers or Protobuf since this project is closely related to Kestrel.
+- Is there point to creating a Docker image and/or [Helm charts](https://helm.sh/) as a stand-alone Kestrel+MinMQ-host?
+- Should [advanced benchmarks suites](https://github.com/aspnet/Benchmarks) per AspNetCore's recommendation be used?
+- Should non-empty queues allow for deletion? 
 
 ## Setup
 ### Setup a volume or disk area for FASTER IDevice
