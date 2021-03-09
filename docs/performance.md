@@ -328,6 +328,5 @@ Running 12s test @ http://mmq-service:9000/send
   482874 requests in 12.02s, 56.64MB read
 Requests/sec:  40158.08
 Transfer/sec:      4.71MB
-martinnilsson@Martins-MacBook-Pro MinMQ % 
 
     Postgres reporting averages: 160 - 250 documents per second. 
