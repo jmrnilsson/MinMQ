@@ -35,11 +35,11 @@ flushing to a durable disk later on.
   - Deleting queues.
   - Message content limit (<1 MB).
   - Should there be Error-queues?
-- Make a C# client:
-  - Separate project (or solution and/or repository).
+- Create a C# client:
+  - Should be a separate project and possibly another solution and/or repository.
   - Wraps https requests effectively. 
-  - Extend with Reactive Extensions
-  - What to do about bulk operations e.g. on-the-fly log compaction via delegate or interface and the specification pattern.
+  - Add Reactive Extensions.
+  - What to do about bulk operations e.g. on-the-fly log compaction via delegate or interface and the specification pattern?
 
 ## In a more distant future the following things may also be explored:
 - A queue management tools, that supports mime types and named queues and a formal token based security API for admin provisioning.
@@ -70,10 +70,55 @@ local IDevices can be configured.
 > Inspect the `setup.ps1` and change path so corresponds some disk space. For comfort i may be simpler change it to
 > shell-script instead. Docker-compose volume is defined with `external: true` so a disk _won't be_ created automatically.
 
+*Docker on macOS*
+Possibly?
+
+    docker volume create --name=fasterdbo --driver local --opt o=size=1200m --opt device=tmpfs --opt type=tmpfs
+
 *Everyone else*
 > If you plan to run the service without a container service a FasterDevice-path must be set as in
 > [appsettings.Development.json](./service/MinMQ.Service/appsettings.Development.json). It
 > must be assigned before starting.
+
+
+## Running on macOS
+This is on Docker.
+
+    docker-compose up
+
+The benchmarker will fail as it requires a specific script to be selected. There is no default benchmark script that will be used at this point. More information on
+running and benchmarking are pending a branch merger. 
+
+Benchmarking can be done with the following (verified on macOS).
+
+    docker-compose run mmq-benchmarks -- post_message.sh 
+
+The benchmark scripts to choose from are available by typing (from the repository root).
+
+    cat benchmark/install.sh | grep cat | cut -d" " -f3
+
+> This will output something like this:
+>
+>    ```/app/wrk/http-ready.sh
+>    /app/wrk/status.sh
+>    /app/wrk/misc.sh
+>    /app/wrk/post_message.sh
+>    /app/wrk/arm.sh
+>    /app/wrk/arm1.sh```
+
+The performance of the web stack can be compared to a few javascript variants. 
+
+    docker-compose run mmq-benchmarks -- status.sh 
+
+On a recent (202103) run the figures were the following. 
+
+| Web stack | Requests/sec | Transfer/sec |
+|-------|--------------|--------|
+|NodeJS (httpd)|20439.95|2.53MB|
+|Express|10180.03|2.17MB|
+|Hapi|7815.26|1.40MB|
+|Kestrel|36354.56|5.93MB|
+|Kestrel (healthcheck) |80230.80|18.13MB|
 
 ## Performance
 This is continiously measured and some sparse unstructed working documenets are available in [docs/perf.md](docs/perf.md).
@@ -83,6 +128,7 @@ More information on how to continue the development work can be found [here](doc
 But overall the with the custom made benchmarker about 30-50% saturation of a SATA SSD seems to be plausible. 
 
 <img src="./ssd-saturation.png" />
+
 
 ## TL;DR
 Here are some useful commands. _Create a new queue._

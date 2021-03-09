@@ -1,4 +1,4 @@
-FROM ubuntu:eoan-20191017 AS build
+FROM ubuntu:focal-20210217 AS build
 
 ENV DEBIAN_FRONTEND noninteractive
 
@@ -19,7 +19,7 @@ RUN unzip master.zip
 COPY ARM64v8-atomic-op-fix.diff /source/wrk-master/
 RUN (cd wrk-master; patch -p1 < ./ARM64v8-atomic-op-fix.diff; make)
 
-FROM ubuntu:eoan-20191017 AS mmq-benchmark
+FROM ubuntu:focal-20210217 AS mmq-benchmark
 
 RUN apt-get update
 
