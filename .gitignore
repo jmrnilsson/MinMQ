@@ -2,6 +2,7 @@ node_modules
 dist
 obj
 bin
+.DS_Store
 .ionide
 .vs
 **/*.xcf

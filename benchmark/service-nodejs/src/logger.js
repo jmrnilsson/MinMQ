@@ -14,7 +14,7 @@ let _logger = null;
         level: process.env.LOGLEVEL || 'info',
         format: combine(
             splat(),
-            label({ label: 'Seo.Crawler' }),
+            label({ label: 'Service.Nodejs' }),
             timestamp(),
             customFormat,
         ),
