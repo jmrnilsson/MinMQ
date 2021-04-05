@@ -60,7 +60,7 @@ namespace MinMQ.Service.Faster
 
 		public Task StopAsync(CancellationToken stoppingToken)
 		{
-			logger.LogInformation("Timed Hosted' Service is stopping.");
+			logger.LogInformation("{0} service is stopping.", nameof(FasterHostedServiceCommit));
 			timer?.Change(Timeout.Infinite, 0);
 			return Task.CompletedTask;
 		}

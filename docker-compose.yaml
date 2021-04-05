@@ -50,7 +50,7 @@ services:
     image: postgres:12.1
     restart: always
     ports:
-    - "5432:5432"
+    - "50001:5432"
     volumes:
     - postgresdata:/var/lib/postgresql/data
     env_file:

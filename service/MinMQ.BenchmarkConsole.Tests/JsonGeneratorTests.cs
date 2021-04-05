@@ -21,7 +21,7 @@ namespace MinMQ.BenchmarkConsole.Tests
 		}
 
 		[Fact]
-		public void JsonGenerator_should_not_merge_if_unioned()
+		public void Generated_objects_should_be_unique()
 		{
 			var jsons = new List<string>();
 

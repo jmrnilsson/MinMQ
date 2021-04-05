@@ -21,7 +21,7 @@ namespace MinMQ.BenchmarkConsole.Tests
 		}
 
 		[Fact]
-		public void XmlGenerator_should_not_merge_if_unioned()
+		public void Generated_objects_should_be_unique()
 		{
 			var xmls = new List<string>();
 

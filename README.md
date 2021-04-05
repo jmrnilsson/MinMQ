@@ -86,17 +86,15 @@ local IDevices can be configured.
     launches a armhf-patched version wg/wrk built in step 1.
 
 ## Performance
-This is continiously measured and some sparse unstructed working documenets are available in [docs/perf.md](docs/perf.md).
-
-More information on how to continue the development work can be found [here](docs/development_work.md). 
-
-But overall the with the custom made benchmarker about 30-50% saturation of a SATA SSD seems to be plausible. 
+This is continiously measured and some sparse unstructed working documenets are available in [docs/perf.md](docs/perf.md). More information on how to continue the development work can be found [here](docs/development_work.md). But overall the with the custom made benchmarker about 30-50% saturation of a SATA SSD seems to be plausible. 
 
 <img src="./desktop.gif" />
 
-## Links
+## Further reading
 
 - [FASTER: An Embedded Key-Value Store for State Management (video)](https://www.microsoft.com/en-us/research/video/faster-an-embedded-key-value-store-for-state-management/)
+- [FASTERs Github repository](https://github.com/microsoft/FASTER)
+- [https://aka.ms/FASTER](https://aka.ms/FASTER)
 
 ## TL;DR
 Here are some useful commands. _Create a new queue._
