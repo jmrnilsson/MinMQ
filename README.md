@@ -20,9 +20,10 @@ messages.
 
 This implementation merely combines the efforts of [microsoft.FASTER](https://github.com/microsoft/FASTER) and 
 [AspNet Core 3.0](https://docs.microsoft.com/en-us/aspnet/core/?view=aspnetcore-3.0). A HTTP-transports on top of a *very*
-fast log. FASTER provides "group commits" with [Concurrent Prefix Recovery](https://www.microsoft.com/en-us/research/uploads/prod/2019/01/cpr-sigmod19.pdf) rather than a [Work Ahead Log](https://wiki.postgresql.org/wiki/Improve_the_performance_of_ALTER_TABLE_SET_LOGGED_UNLOGGED_statement). This approach is reminiscent to that of [Microsoft Message Queue](https://support.microsoft.com/ms-my/help/256096/how-to-install-msmq-2-0-to-enable-queued-components) for
-messages transacted in bulk using Microsoft Distributed Transaction Coordinator. Albeit, this is quite diffent from "unlogged" tables or in-memory database 
-flushing to a durable disk later on. 
+fast recoverable log. FASTER provides "group commits" with [Concurrent Prefix Recovery](https://www.microsoft.com/en-us/research/uploads/prod/2019/01/cpr-sigmod19.pdf) rather than a [Work Ahead Log](https://wiki.postgresql.org/wiki/Improve_the_performance_of_ALTER_TABLE_SET_LOGGED_UNLOGGED_statement). This approach is reminiscent to that of [Microsoft Message Queue](https://support.microsoft.com/ms-my/help/256096/how-to-install-msmq-2-0-to-enable-queued-components) for
+messages transacted in bulk using Microsoft Distributed Transaction Coordinator. Albeit, this a quite different approach
+from "unlogged" tables or in-memory databases flushing to a durable disk later on which doesn't provide the same level
+of durability.
 
 ## Eventually the following things will be explored
 - A formal API (perhaps something reminiscent to MSMQ or IronMQ)
@@ -46,10 +47,16 @@ flushing to a durable disk later on.
 _Only allow for empty queues to be deleted?_
 - Read models: Faster KV, SQL Materalized views or cached responses.
 - Some kind of tiered solution:
-  - Log splicing (it's likely that dealing with errors or unread message will require logs to be entirely rewritten
-  possibly even [compacted](http://cloudurable.com/blog/kafka-architecture-log-compaction/index.html). 
-  - Internal relaying [N-tiered service provisioning](docs/ntiered.md).
+  - Log splicing, it's most likely that dealing with errors or unread message will require logs to be entirely rewritten
+  possibly even [compacted](http://cloudurable.com/blog/kafka-architecture-log-compaction/index.html). Log compaction
+  may already have been added by the [FASTER-team](https://microsoft.github.io/FASTER/roadmap). _Investigate this._
+  - Relaying or blue-green deploy possibility [N-tiered service provisioning](docs/ntiered.md).
   - Multiple IDevices and a commit-schedular settings.
+  - Inbound FlatBuffers or Protobuf from a single or multiple HTTP-hosts (First make sure in-process logging is fast)
+- More [advanced benchmarks suites](https://github.com/aspnet/Benchmarks).
+- Possibly a client, or and example implementation of set of atomic yet composite messages.
+- Authentication
+- Dynamic latency-scaling.
 - Admin tool authentication and queue privilages (w/r/d)
 
 ## Unresolved talking points
@@ -80,8 +87,25 @@ Possibly?
 > [appsettings.Development.json](./service/MinMQ.Service/appsettings.Development.json). It
 > must be assigned before starting.
 
+### How to debug with Visual Studio
+
+1. Open a terminal and navigate to repository root `git rev-parse --show-toplevel` or so.
+2. Type `docker-compose up mmq-db` which starts the reporting Postgres-database meant for analysis of the results
+3. Open Visual studio and set _MinMQ.Service_ as the start-up project
+4. Run the solution
+5. Open a second terminal and navigate to service/MinMQ.BenchmarkConsole
+6. Type `dotnet run 5000` to send 5000 XMLs and 5000 JSONs to the service
+
+### How to run on Debian Buster - armhf
+
+1. Open a terminal and type `sudo docker-compose build`
+2. And then `sudo docker-compose up mmq-db mmq-service-express mmq-service mmq-service-hapi mmq-service-nodejs`
+3. TBD on how to run service/MinMQ.BenchmarkConsole
+4. A the moment, you can run `sudo docker-compose run mmq-benchmarks -- post_message.sh` in a separate terminal which
+    launches a armhf-patched version wg/wrk built in step 1.
 
 ## Running on macOS
+
 This is on Docker.
 
     docker-compose up
@@ -121,13 +145,16 @@ On a recent (202103) run the figures were the following.
 |Kestrel (healthcheck) |80230.80|18.13MB|
 
 ## Performance
-This is continiously measured and some sparse unstructed working documenets are available in [docs/perf.md](docs/perf.md).
 
-More information on how to continue the development work can be found [here](docs/development_work.md). 
+This is continiously measured and some sparse unstructed working documenets are available in [docs/perf.md](docs/perf.md). More information on how to continue the development work can be found [here](docs/development_work.md). But overall the with the custom made benchmarker about 30-50% saturation of a SATA SSD seems to be plausible. 
 
-But overall the with the custom made benchmarker about 30-50% saturation of a SATA SSD seems to be plausible. 
+<img src="./desktop.gif" />
 
-<img src="./ssd-saturation.png" />
+## Further reading
+
+- [FASTER: An Embedded Key-Value Store for State Management (video)](https://www.microsoft.com/en-us/research/video/faster-an-embedded-key-value-store-for-state-management/)
+- [FASTERs Github repository](https://github.com/microsoft/FASTER)
+- [https://aka.ms/FASTER](https://aka.ms/FASTER)
 
 
 ## TL;DR

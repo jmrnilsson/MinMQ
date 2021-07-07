@@ -9,3 +9,5 @@ bin
 logo-worker-2.png
 #.env
 artworks
+**/*.mov
+docs/gif/**.gif

@@ -23,7 +23,9 @@ namespace MinMQ.BenchmarkConsole
 		public override string GenerateObject()
 		{
 			doc = new XmlDocument();
-			doc.AppendChild(doc.CreateElement(words.Pick()));
+			var element = doc.CreateElement(words.Pick());
+			element.SetAttribute("id", Guid.NewGuid().ToString());
+			doc.AppendChild(element);
 			var root = doc.DocumentElement;
 
 			int depth = 0;
